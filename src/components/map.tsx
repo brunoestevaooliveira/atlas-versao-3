@@ -25,7 +25,7 @@ interface MapProps {
 const Map: React.FC<MapProps> = ({ issues }) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const center: [number, number] = [-16.0335, -48.0445];
+  const center: [number, number] = [-16.0036, -47.9872];
   const router = useRouter();
 
 
