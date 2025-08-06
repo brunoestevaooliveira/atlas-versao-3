@@ -1,3 +1,4 @@
+
 'use client';
 
 import { issues } from '@/lib/data';
@@ -16,7 +17,7 @@ const Map = dynamic(() => import('@/components/map'), {
 
 const InteractiveMap = () => {
   return (
-    <div className="absolute inset-0">
+    <div className="absolute inset-0 z-0">
       <Map issues={issues} />
       
       <div className="absolute top-20 left-4 z-10 w-80 space-y-4">
