@@ -1,12 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Map, BarChart, FilePlus, Search, Compass } from 'lucide-react';
+import { Compass, FilePlus, BarChart, Search } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 import { Button } from './ui/button';
 import { Menu } from 'lucide-react';
+import { Sheet, SheetTrigger, SheetContent } from './ui/sheet';
 
 const navLinks = [
   { href: '/', label: 'Início', icon: <Compass className="h-5 w-5" /> },
@@ -36,20 +36,20 @@ const Header: React.FC = () => {
   );
 
   return (
-    <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] lg:w-[98%] max-w-7xl">
-      <div className="container flex h-16 items-center bg-white/80 backdrop-blur-sm rounded-lg shadow-md border border-gray-200">
-        <div className="mr-4 flex items-center">
+    <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
+      <div className="container flex h-16 items-center justify-between bg-white/80 backdrop-blur-sm rounded-lg shadow-md border border-gray-200 px-6">
+        <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
             <span className='text-foreground'>Atlas Cívico</span>
           </Link>
         </div>
 
-        <div className="hidden md:flex flex-1 items-center justify-end">
+        <div className="hidden md:flex items-center">
          <NavContent />
         </div>
         
-        <div className="md:hidden flex flex-1 justify-end">
+        <div className="md:hidden flex">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">

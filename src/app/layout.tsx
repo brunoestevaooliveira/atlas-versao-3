@@ -2,7 +2,6 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
-import Footer from '@/components/footer';
 import { cn } from '@/lib/utils';
 import 'leaflet/dist/leaflet.css';
 
@@ -24,9 +23,9 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased flex flex-col relative')}>
+      <body className={cn('min-h-screen bg-background font-body antialiased flex flex-col')}>
         <Header />
-        <main className="flex-grow">
+        <main className="flex-grow flex flex-col">
           {children}
         </main>
         <Toaster />
