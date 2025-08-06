@@ -4,6 +4,8 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
 import Footer from '@/components/footer';
 import { cn } from '@/lib/utils';
+import 'leaflet/dist/leaflet.css';
+
 
 export const metadata: Metadata = {
   title: 'Santa Maria Ativa',

@@ -1,12 +1,16 @@
 import { issues } from '@/lib/data';
-import type { Issue } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { MapPin, ArrowRight } from 'lucide-react';
-import Image from 'next/image';
 import { Badge } from './ui/badge';
 import Link from 'next/link';
 import { Button } from './ui/button';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
+import type { Issue } from '@/lib/types';
+import dynamic from 'next/dynamic';
+
+const Map = dynamic(() => import('@/components/map'), { 
+  ssr: false,
+  loading: () => <div className="h-full w-full bg-muted animate-pulse" />
+});
 
 const InteractiveMap = () => {
   const recentIssues = issues.slice(0, 5);
@@ -24,64 +28,11 @@ const InteractiveMap = () => {
     }
   };
 
-  // Approximate bounding box for Santa Maria, DF for mapping lat/lng to image coordinates
-  const bounds = {
-    top: -15.910, 
-    bottom: -15.930,
-    left: -48.050,
-    right: -48.025, 
-  };
-
-  const getPositionOnMap = (lat: number, lng: number) => {
-    const top = ((lat - bounds.bottom) / (bounds.top - bounds.bottom)) * 100;
-    const left = ((lng - bounds.left) / (bounds.right - bounds.left)) * 100;
-    return { top: `${100 - top}%`, left: `${left}%` };
-  };
-
-  const getPinColor = (status: Issue['status']) => {
-    switch (status) {
-      case 'Resolvido':
-        return 'text-green-500';
-      case 'Em análise':
-        return 'text-yellow-400';
-      case 'Recebido':
-        return 'text-blue-400';
-      default:
-        return 'text-red-500';
-    }
-  }
-
   return (
     <Card className="shadow-lg overflow-hidden">
       <div className="grid md:grid-cols-3">
         <div className="md:col-span-2 relative h-96 md:h-full min-h-[400px]">
-          <Image
-            src="https://placehold.co/1200x800.png"
-            alt="Mapa de Santa Maria-DF"
-            layout="fill"
-            objectFit="cover"
-            data-ai-hint="city map"
-          />
-           <div className="absolute inset-0">
-            <TooltipProvider>
-              {issues.map(issue => {
-                const { top, left } = getPositionOnMap(issue.location.lat, issue.location.lng);
-                return (
-                  <Tooltip key={issue.id}>
-                    <TooltipTrigger asChild>
-                      <div className="absolute" style={{ top, left, transform: 'translate(-50%, -100%)' }}>
-                        <MapPin className={`w-8 h-8 ${getPinColor(issue.status)} drop-shadow-lg`} strokeWidth={1.5}/>
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className='font-bold'>{issue.title}</p>
-                      <p>{issue.category}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                )
-              })}
-            </TooltipProvider>
-          </div>
+          <Map issues={issues} />
         </div>
 
         <div className="md:col-span-1 bg-card">
