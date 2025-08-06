@@ -25,10 +25,6 @@ interface MapProps {
 const Map: React.FC<MapProps> = ({ issues }) => {
   const center: [number, number] = [-15.92, -48.04]; // Center of Santa Maria, DF
 
-  if (typeof window === 'undefined') {
-    return null;
-  }
-
   return (
     <MapContainer center={center} zoom={14} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
       <TileLayer
