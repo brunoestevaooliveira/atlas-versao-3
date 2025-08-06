@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Badge } from './ui/badge';
 import Link from 'next/link';
 import { Button } from './ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './ui/tooltip';
 
 const InteractiveMap = () => {
   const recentIssues = issues.slice(0, 5);
@@ -23,6 +24,33 @@ const InteractiveMap = () => {
     }
   };
 
+  // Approximate bounding box for Santa Maria, DF for mapping lat/lng to image coordinates
+  const bounds = {
+    top: -15.910, 
+    bottom: -15.930,
+    left: -48.050,
+    right: -48.025, 
+  };
+
+  const getPositionOnMap = (lat: number, lng: number) => {
+    const top = ((lat - bounds.bottom) / (bounds.top - bounds.bottom)) * 100;
+    const left = ((lng - bounds.left) / (bounds.right - bounds.left)) * 100;
+    return { top: `${100 - top}%`, left: `${left}%` };
+  };
+
+  const getPinColor = (status: Issue['status']) => {
+    switch (status) {
+      case 'Resolvido':
+        return 'text-green-500';
+      case 'Em análise':
+        return 'text-yellow-400';
+      case 'Recebido':
+        return 'text-blue-400';
+      default:
+        return 'text-red-500';
+    }
+  }
+
   return (
     <Card className="shadow-lg overflow-hidden">
       <div className="grid md:grid-cols-3">
@@ -34,19 +62,24 @@ const InteractiveMap = () => {
             objectFit="cover"
             data-ai-hint="city map"
           />
-          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-                <MapPin className="w-8 h-8 text-red-500 animate-pulse" />
-            </div>
-            <div className="absolute top-1/4 left-1/3">
-                <MapPin className="w-6 h-6 text-yellow-400" />
-            </div>
-            <div className="absolute bottom-1/4 right-1/4">
-                <MapPin className="w-6 h-6 text-blue-400" />
-            </div>
-             <div className="absolute top-1/3 right-1/3">
-                <MapPin className="w-6 h-6 text-green-400" />
-            </div>
+          <div className="absolute inset-0 bg-black/20">
+             <TooltipProvider>
+              {issues.map(issue => {
+                const { top, left } = getPositionOnMap(issue.location.lat, issue.location.lng);
+                return (
+                  <Tooltip key={issue.id}>
+                    <TooltipTrigger asChild>
+                      <div className="absolute" style={{ top, left, transform: 'translate(-50%, -50%)' }}>
+                        <MapPin className={`w-6 h-6 ${getPinColor(issue.status)} animate-pulse`} />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{issue.title}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                )
+              })}
+            </TooltipProvider>
           </div>
         </div>
 
