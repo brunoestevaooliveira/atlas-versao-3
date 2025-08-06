@@ -26,7 +26,7 @@ const Header: React.FC = () => {
           href={href}
           className={cn(
             'transition-colors hover:text-primary',
-            pathname === href ? 'text-primary font-semibold' : 'text-muted-foreground',
+            pathname === href ? 'text-primary font-semibold' : 'text-foreground/80',
           )}
         >
           {label}
@@ -36,12 +36,12 @@ const Header: React.FC = () => {
   );
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+    <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-[95%] lg:w-[98%] max-w-7xl">
+      <div className="container flex h-16 items-center bg-white/80 backdrop-blur-sm rounded-lg shadow-md border border-gray-200">
         <div className="mr-4 flex items-center">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
-            <span>Atlas Cívico</span>
+            <span className='text-foreground'>Atlas Cívico</span>
           </Link>
         </div>
 
@@ -57,7 +57,7 @@ const Header: React.FC = () => {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-background">
+            <SheetContent side="right" className="bg-white">
               <div className="flex flex-col gap-6 pt-8">
                 <NavContent />
               </div>
