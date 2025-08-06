@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { Issue } from '@/lib/types';
@@ -6,7 +5,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-
 
 const defaultIcon = new L.Icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -28,10 +26,12 @@ const Map: React.FC<MapProps> = ({ issues }) => {
   const center: [number, number] = [-16.0036, -47.9872];
   const router = useRouter();
 
-
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
-        const map = L.map(mapContainerRef.current).setView(center, 14);
+        const map = L.map(mapContainerRef.current, {
+            center: center,
+            zoom: 14,
+        });
         mapRef.current = map;
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -54,16 +54,10 @@ const Map: React.FC<MapProps> = ({ issues }) => {
         });
     }
 
-    return () => {
-        if (mapRef.current) {
-            mapRef.current.remove();
-            mapRef.current = null;
-        }
-    };
   }, [issues, center, router]);
 
   return (
-    <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }}></div>
+    <div ref={mapContainerRef} className="h-full w-full"></div>
   );
 };
 

@@ -2,9 +2,7 @@
 
 import { issues } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { MapPin, ArrowRight, Search, Layers } from 'lucide-react';
-import { Badge } from './ui/badge';
-import Link from 'next/link';
+import { Layers, Search } from 'lucide-react';
 import { Button } from './ui/button';
 import type { Issue } from '@/lib/types';
 import dynamic from 'next/dynamic';
@@ -18,23 +16,8 @@ const Map = dynamic(() => import('@/components/map'), {
 });
 
 const InteractiveMap = () => {
-  const recentIssues = issues.slice(0, 5);
-
-  const getStatusVariant = (status: Issue['status']) => {
-    switch (status) {
-      case 'Resolvido':
-        return 'success';
-      case 'Em análise':
-        return 'secondary';
-      case 'Recebido':
-        return 'default';
-      default:
-        return 'default';
-    }
-  };
-
   return (
-    <div className="flex-grow w-full relative">
+    <div className="flex-grow w-full h-full relative">
       <Map issues={issues} />
       
       <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
