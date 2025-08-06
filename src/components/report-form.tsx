@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import { Camera, Send, Loader2, Sparkles } from 'lucide-react';
 import { getSuggestedCategories } from '../app/report/actions';
@@ -174,7 +174,7 @@ const ReportForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Categoria</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Selecione a categoria do problema" />
@@ -194,7 +194,7 @@ const ReportForm = () => {
                       <SelectItem value="Iluminação pública">Iluminação pública</SelectItem>
                       <SelectItem value="Lixo acumulado">Lixo acumulado</SelectItem>
                       <SelectItem value="Sinalização danificada">Sinalização danificada</SelectItem>
-                      <SelectItem value="Vazamento de água">Vazamento de água</e>
+                      <SelectItem value="Vazamento de água">Vazamento de água</SelectItem>
                       <SelectItem value="Outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>
