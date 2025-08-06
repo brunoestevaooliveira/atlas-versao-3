@@ -1,3 +1,5 @@
+'use client';
+
 import { issues } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { MapPin, ArrowRight } from 'lucide-react';
