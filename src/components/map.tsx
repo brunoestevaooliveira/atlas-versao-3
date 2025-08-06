@@ -3,6 +3,8 @@
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import type { Issue } from '@/lib/types';
 import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+
 
 // Leaflet's default icons are not easily available in this environment, so we create a custom one.
 const defaultIcon = new L.Icon({
@@ -22,6 +24,10 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ issues }) => {
   const center: [number, number] = [-15.92, -48.04]; // Center of Santa Maria, DF
+
+  if (typeof window === 'undefined') {
+    return null;
+  }
 
   return (
     <MapContainer center={center} zoom={14} scrollWheelZoom={false} style={{ height: '100%', width: '100%' }}>
