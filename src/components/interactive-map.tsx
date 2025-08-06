@@ -1,10 +1,9 @@
 'use client';
 
 import { issues } from '@/lib/data';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Card, CardContent, CardHeader } from './ui/card';
 import { Layers, Search } from 'lucide-react';
 import { Button } from './ui/button';
-import type { Issue } from '@/lib/types';
 import dynamic from 'next/dynamic';
 import { Input } from './ui/input';
 import { Switch } from './ui/switch';
@@ -17,10 +16,10 @@ const Map = dynamic(() => import('@/components/map'), {
 
 const InteractiveMap = () => {
   return (
-    <div className="flex-grow w-full h-full relative">
+    <div className="absolute inset-0">
       <Map issues={issues} />
       
-      <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
+      <div className="absolute top-20 left-4 z-10 w-80 space-y-4">
         <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
            <CardHeader>
              <div className="relative">
