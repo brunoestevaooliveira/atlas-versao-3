@@ -2,15 +2,7 @@
 'use client';
 
 import { issues } from '@/lib/data';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
-import { Layers, Search, ThumbsUp } from 'lucide-react';
-import { Button } from './ui/button';
 import dynamic from 'next/dynamic';
-import { Input } from './ui/input';
-import { Switch } from './ui/switch';
-import { Label } from './ui/label';
-import { Badge } from './ui/badge';
-import { ScrollArea } from './ui/scroll-area';
 
 const Map = dynamic(() => import('@/components/map'), { 
   ssr: false,
@@ -18,76 +10,9 @@ const Map = dynamic(() => import('@/components/map'), {
 });
 
 const InteractiveMap = () => {
-
-   const getStatusVariant = (status: 'Recebido' | 'Em análise' | 'Resolvido') => {
-    switch (status) {
-      case 'Resolvido':
-        return 'default';
-      case 'Em análise':
-        return 'secondary';
-      case 'Recebido':
-        return 'outline';
-      default:
-        return 'default';
-    }
-  };
-
   return (
     <div className="absolute inset-0 z-0">
       <Map issues={issues} />
-      
-      <div className="absolute top-24 left-4 z-10 w-80 space-y-4">
-        <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
-           <CardHeader>
-             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Buscar por endereço..." className="pl-10 bg-white" />
-              </div>
-           </CardHeader>
-           <CardContent>
-             <div className="flex items-center space-x-2">
-                <Switch id="layers-switch" />
-                <Label htmlFor="layers-switch">Mostrar Ocorrências</Label>
-              </div>
-           </CardContent>
-        </Card>
-      </div>
-
-       <div className="absolute bottom-4 right-4 z-10 space-y-2">
-           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 p-2 rounded-lg">
-                <Button variant="ghost" size="icon">
-                    <Layers />
-                </Button>
-            </Card>
-       </div>
-       
-       <div className="absolute top-24 right-4 z-10 w-96 space-y-4">
-         <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-13rem)]">
-            <CardHeader>
-              <CardTitle>Ocorrências Recentes</CardTitle>
-              <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-full max-h-[calc(100vh-20rem)]">
-                <div className="space-y-4 pr-4">
-                  {issues.map((issue) => (
-                    <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-sm mb-1">{issue.title}</h4>
-                        <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
-                      </div>
-                      <p className="text-xs text-muted-foreground mb-2">{issue.category}</p>
-                      <Button size="sm" variant="outline" className="w-full">
-                        <ThumbsUp className="mr-2 h-4 w-4" />
-                        Apoiar (Upvote)
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              </ScrollArea>
-            </CardContent>
-         </Card>
-       </div>
     </div>
   );
 };
