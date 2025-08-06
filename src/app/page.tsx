@@ -58,48 +58,49 @@ export default function Home() {
 
 
   return (
-    <div className="relative h-screen w-screen">
-      <InteractiveMap issues={filteredIssues} />
-      
-      <div className="absolute top-24 left-4 z-10 w-80 space-y-4">
-        <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
-           <CardHeader>
-             <div className="relative">
+    <div className="h-screen w-screen flex flex-col">
+      <div className="relative flex-grow">
+        <InteractiveMap issues={filteredIssues} />
+
+        <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
+          <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
+            <CardHeader>
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Buscar por endereço..." 
-                  className="pl-10 bg-white" 
+                <Input
+                  placeholder="Buscar por endereço..."
+                  className="pl-10 bg-white"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-           </CardHeader>
-           <CardContent>
-             <div className="flex items-center space-x-2">
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-2">
                 <Switch id="layers-switch" />
                 <Label htmlFor="layers-switch">Mostrar Ocorrências</Label>
               </div>
-           </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
 
-       <div className="absolute bottom-4 right-4 z-10 space-y-2">
-           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 p-2 rounded-lg">
-                <Button variant="ghost" size="icon">
-                    <Layers />
-                </Button>
-            </Card>
-       </div>
-       
-       <div className="absolute top-24 right-4 z-10 w-96 space-y-4">
-         <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-13rem)]">
+        <div className="absolute bottom-4 right-4 z-10 space-y-2">
+          <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 p-2 rounded-lg">
+            <Button variant="ghost" size="icon">
+              <Layers />
+            </Button>
+          </Card>
+        </div>
+
+        <div className="absolute top-4 right-4 z-10 w-96">
+           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-2rem)] flex flex-col">
             <CardHeader>
               <CardTitle>Ocorrências Recentes</CardTitle>
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-full max-h-[calc(100vh-20rem)]">
-                <div className="space-y-4 pr-4">
+            <CardContent className="flex-grow overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="space-y-4 pr-6">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
                     <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80">
                       <div className="flex justify-between items-start">
@@ -107,9 +108,9 @@ export default function Home() {
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mb-2">{issue.category}</p>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
+                      <Button
+                        size="sm"
+                        variant="outline"
                         className="w-full"
                         onClick={() => handleUpvote(issue.id)}
                         disabled={upvotedIssues.has(issue.id)}
@@ -124,8 +125,9 @@ export default function Home() {
                 </div>
               </ScrollArea>
             </CardContent>
-         </Card>
-       </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }
