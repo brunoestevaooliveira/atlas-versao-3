@@ -62,19 +62,20 @@ const InteractiveMap = () => {
             objectFit="cover"
             data-ai-hint="city map"
           />
-          <div className="absolute inset-0 bg-black/20">
-             <TooltipProvider>
+           <div className="absolute inset-0">
+            <TooltipProvider>
               {issues.map(issue => {
                 const { top, left } = getPositionOnMap(issue.location.lat, issue.location.lng);
                 return (
                   <Tooltip key={issue.id}>
                     <TooltipTrigger asChild>
-                      <div className="absolute" style={{ top, left, transform: 'translate(-50%, -50%)' }}>
-                        <MapPin className={`w-6 h-6 ${getPinColor(issue.status)} animate-pulse`} />
+                      <div className="absolute" style={{ top, left, transform: 'translate(-50%, -100%)' }}>
+                        <MapPin className={`w-8 h-8 ${getPinColor(issue.status)} drop-shadow-lg`} strokeWidth={1.5}/>
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>{issue.title}</p>
+                      <p className='font-bold'>{issue.title}</p>
+                      <p>{issue.category}</p>
                     </TooltipContent>
                   </Tooltip>
                 )
