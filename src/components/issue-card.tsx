@@ -25,7 +25,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue }) => {
   };
 
   return (
-    <Card className="flex flex-col h-full shadow-md hover:shadow-xl transition-shadow duration-300">
+    <Card className="flex flex-col h-full bg-card/50 border-border hover:border-primary/50 transition-colors duration-300">
       <CardHeader>
         <div className="relative h-48 w-full mb-4 rounded-t-lg overflow-hidden">
           <Image src={issue.imageUrl} alt={issue.title} layout="fill" objectFit="cover" data-ai-hint="urban problem" />
@@ -36,7 +36,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue }) => {
             </div>
             <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
         </div>
-        <CardTitle className="pt-2">{issue.title}</CardTitle>
+        <CardTitle className="pt-2 text-xl">{issue.title}</CardTitle>
       </CardHeader>
       <CardContent className="flex-grow">
         <CardDescription>{issue.description}</CardDescription>

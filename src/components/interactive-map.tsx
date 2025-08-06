@@ -11,7 +11,7 @@ import dynamic from 'next/dynamic';
 
 const Map = dynamic(() => import('@/components/map'), { 
   ssr: false,
-  loading: () => <div className="h-full w-full bg-muted animate-pulse" />
+  loading: () => <div className="h-full w-full bg-muted/20 animate-pulse rounded-lg" />
 });
 
 const InteractiveMap = () => {
@@ -31,21 +31,18 @@ const InteractiveMap = () => {
   };
 
   return (
-    <Card className="shadow-lg overflow-hidden">
+    <Card className="shadow-lg overflow-hidden bg-transparent border-border">
       <div className="grid md:grid-cols-3">
         <div className="md:col-span-2 relative h-96 md:h-full min-h-[400px]">
           <Map issues={issues} />
         </div>
 
-        <div className="md:col-span-1 bg-card">
+        <div className="md:col-span-1 bg-card/50">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="text-primary" />
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <MapPin />
               Ocorrências Recentes
             </CardTitle>
-            <CardDescription>
-              As últimas questões reportadas pela comunidade.
-            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="space-y-4">
@@ -61,7 +58,7 @@ const InteractiveMap = () => {
                 </li>
               ))}
             </ul>
-             <Button asChild variant="outline" className="w-full">
+             <Button asChild variant="secondary" className="w-full">
               <Link href="/tracking">
                 Ver Todas as Ocorrências <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
