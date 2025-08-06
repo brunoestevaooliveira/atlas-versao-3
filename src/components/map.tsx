@@ -5,8 +5,9 @@ import type { Issue } from '@/lib/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
-// Leaflet's default icons are not easily available in this environment, so we create a custom one.
+
 const defaultIcon = new L.Icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
     iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
@@ -24,10 +25,11 @@ interface MapProps {
 const Map: React.FC<MapProps> = ({ issues }) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const center: [number, number] = [-15.9839, -48.0253]; // Corrected center for Santa Maria, DF
+  const center: [number, number] = [-16.0335, -48.0445];
+  const router = useRouter();
+
 
   useEffect(() => {
-    // Initialize map only if the container ref is available and no map is initialized
     if (mapContainerRef.current && !mapRef.current) {
         const map = L.map(mapContainerRef.current).setView(center, 14);
         mapRef.current = map;
@@ -45,16 +47,20 @@ const Map: React.FC<MapProps> = ({ issues }) => {
                     <div class="text-sm text-muted-foreground">${issue.status}</div>
                 `);
         });
+
+        map.on('click', (e) => {
+          const { lat, lng } = e.latlng;
+          router.push(`/report?lat=${lat}&lng=${lng}`);
+        });
     }
 
-    // Cleanup function to run when component unmounts
     return () => {
         if (mapRef.current) {
             mapRef.current.remove();
             mapRef.current = null;
         }
     };
-  }, [issues, center]); // Rerun effect if issues or center change
+  }, [issues, center, router]);
 
   return (
     <div ref={mapContainerRef} style={{ height: '100%', width: '100%' }}></div>

@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useState, useTransition } from 'react';
+import { useState, useTransition, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,10 +12,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
-import { Camera, Send, Loader2, Sparkles } from 'lucide-react';
+import { Camera, Send, Loader2, Sparkles, MapPin } from 'lucide-react';
 import { getSuggestedCategories } from '../app/report/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from './ui/badge';
+import { useSearchParams } from 'next/navigation';
 
 const formSchema = z.object({
   title: z.string().min(5, 'O título deve ter pelo menos 5 caracteres.'),
@@ -29,6 +31,7 @@ const ReportForm = () => {
   const [suggestedCategories, setSuggestedCategories] = useState<string[]>([]);
   const [isAiLoading, startAiTransition] = useTransition();
   const { toast } = useToast();
+  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -39,6 +42,16 @@ const ReportForm = () => {
       location: '',
     },
   });
+
+  useEffect(() => {
+    const lat = searchParams.get('lat');
+    const lng = searchParams.get('lng');
+    if (lat && lng) {
+      const locationString = `Lat: ${parseFloat(lat).toFixed(5)}, Lng: ${parseFloat(lng).toFixed(5)}`;
+      form.setValue('location', locationString, { shouldValidate: true });
+    }
+  }, [searchParams, form]);
+
 
   const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -85,6 +98,8 @@ const ReportForm = () => {
     setSuggestedCategories([]);
   };
 
+  const isLocationFromMap = !!(searchParams.get('lat') && searchParams.get('lng'));
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -127,8 +142,16 @@ const ReportForm = () => {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Localização</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Em frente ao mercado Pão de Açúcar, Quadra 10" {...field} />
+                   <FormControl>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input 
+                        placeholder="Clique no mapa para selecionar ou digite um endereço" 
+                        {...field} 
+                        className="pl-10"
+                        disabled={isLocationFromMap} 
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
