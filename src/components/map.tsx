@@ -1,11 +1,10 @@
+
 'use client';
 
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import type { Issue } from '@/lib/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useRef, useEffect } from 'react';
-
+import { useEffect, useRef } from 'react';
 
 // Leaflet's default icons are not easily available in this environment, so we create a custom one.
 const defaultIcon = new L.Icon({
@@ -18,7 +17,6 @@ const defaultIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
-
 interface MapProps {
   issues: Issue[];
 }
@@ -26,7 +24,7 @@ interface MapProps {
 const Map: React.FC<MapProps> = ({ issues }) => {
   const mapRef = useRef<L.Map | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const center: [number, number] = [-15.92, -48.04]; // Center of Santa Maria, DF
+  const center: [number, number] = [-15.9839, -48.0253]; // Corrected center for Santa Maria, DF
 
   useEffect(() => {
     // Initialize map only if the container ref is available and no map is initialized
