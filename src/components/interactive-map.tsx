@@ -1,7 +1,7 @@
 
 'use client';
 
-import { issues } from '@/lib/data';
+import type { Issue } from '@/lib/types';
 import dynamic from 'next/dynamic';
 
 const Map = dynamic(() => import('@/components/map'), { 
@@ -9,7 +9,11 @@ const Map = dynamic(() => import('@/components/map'), {
   loading: () => <div className="h-full w-full bg-muted animate-pulse rounded-lg" />
 });
 
-const InteractiveMap = () => {
+interface InteractiveMapProps {
+  issues: Issue[];
+}
+
+const InteractiveMap: React.FC<InteractiveMapProps> = ({ issues }) => {
   return (
     <div className="absolute inset-0 z-0">
       <Map issues={issues} />

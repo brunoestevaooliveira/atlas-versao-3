@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Layers, Search, ThumbsUp } from 'lucide-react';
@@ -16,6 +16,19 @@ import { issues as initialIssues } from '@/lib/data';
 export default function Home() {
   const [issues, setIssues] = useState(initialIssues);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredIssues = useMemo(() => {
+    if (!searchQuery) {
+      return issues;
+    }
+    return issues.filter(issue =>
+      issue.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      issue.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      issue.category.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [issues, searchQuery]);
+
 
   const getStatusVariant = (status: 'Recebido' | 'Em análise' | 'Resolvido') => {
     switch (status) {
@@ -32,7 +45,7 @@ export default function Home() {
 
   const handleUpvote = (issueId: string) => {
     if (upvotedIssues.has(issueId)) {
-      return; // Already upvoted
+      return; 
     }
 
     setIssues(prevIssues =>
@@ -46,14 +59,19 @@ export default function Home() {
 
   return (
     <div className="relative h-screen w-screen">
-      <InteractiveMap />
+      <InteractiveMap issues={filteredIssues} />
       
       <div className="absolute top-24 left-4 z-10 w-80 space-y-4">
         <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
            <CardHeader>
              <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input placeholder="Buscar por endereço..." className="pl-10 bg-white" />
+                <Input 
+                  placeholder="Buscar por endereço..." 
+                  className="pl-10 bg-white" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
               </div>
            </CardHeader>
            <CardContent>
@@ -82,7 +100,7 @@ export default function Home() {
             <CardContent>
               <ScrollArea className="h-full max-h-[calc(100vh-20rem)]">
                 <div className="space-y-4 pr-4">
-                  {issues.map((issue) => (
+                  {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
                     <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80">
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold text-sm mb-1">{issue.title}</h4>
@@ -100,7 +118,9 @@ export default function Home() {
                         Apoiar ({issue.upvotes})
                       </Button>
                     </div>
-                  ))}
+                  )) : (
+                    <p className="text-sm text-center text-muted-foreground py-8">Nenhuma ocorrência encontrada.</p>
+                  )}
                 </div>
               </ScrollArea>
             </CardContent>
