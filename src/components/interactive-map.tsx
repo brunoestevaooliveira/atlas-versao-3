@@ -34,10 +34,10 @@ const InteractiveMap = () => {
   };
 
   return (
-    <div className="h-full w-full relative">
+    <div className="flex-grow w-full relative">
       <Map issues={issues} />
       
-      <div className="absolute top-24 left-4 z-10 w-80 space-y-4">
+      <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
         <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
            <CardHeader>
              <div className="relative">
