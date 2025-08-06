@@ -1,14 +1,33 @@
+
+'use client';
+
+import { useState } from 'react';
 import IssueCard from '@/components/issue-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { issues } from '@/lib/data';
-import type { Issue } from '@/lib/types';
+import { issues as initialIssues } from '@/lib/data';
 import { BarChart, CheckCircle, Hourglass } from 'lucide-react';
 
 export default function TrackingPage() {
-  const allIssues: Issue[] = issues;
-  const receivedIssues = allIssues.filter(issue => issue.status === 'Recebido');
-  const inProgressIssues = allIssues.filter(issue => issue.status === 'Em análise');
-  const resolvedIssues = allIssues.filter(issue => issue.status === 'Resolvido');
+  const [issues, setIssues] = useState(initialIssues);
+  const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
+
+  const handleUpvote = (issueId: string) => {
+    if (upvotedIssues.has(issueId)) {
+      return; // Already upvoted
+    }
+
+    setIssues(prevIssues =>
+      prevIssues.map(issue =>
+        issue.id === issueId ? { ...issue, upvotes: issue.upvotes + 1 } : issue
+      )
+    );
+    setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+  };
+
+
+  const receivedIssues = issues.filter(issue => issue.status === 'Recebido');
+  const inProgressIssues = issues.filter(issue => issue.status === 'Em análise');
+  const resolvedIssues = issues.filter(issue => issue.status === 'Resolvido');
 
   return (
     <div className="space-y-8">
@@ -22,7 +41,7 @@ export default function TrackingPage() {
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-2xl">
           <TabsTrigger value="all">
-            <BarChart className="mr-2 h-4 w-4" /> Todas ({allIssues.length})
+            <BarChart className="mr-2 h-4 w-4" /> Todas ({issues.length})
           </TabsTrigger>
           <TabsTrigger value="received">
             <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedIssues.length})
@@ -38,29 +57,49 @@ export default function TrackingPage() {
         <div className="mt-6">
           <TabsContent value="all">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {allIssues.map((issue) => (
-                <IssueCard key={issue.id} issue={issue} />
+              {issues.map((issue) => (
+                <IssueCard 
+                  key={issue.id} 
+                  issue={issue} 
+                  onUpvote={handleUpvote}
+                  isUpvoted={upvotedIssues.has(issue.id)}
+                />
               ))}
             </div>
           </TabsContent>
           <TabsContent value="received">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {receivedIssues.map((issue) => (
-                <IssueCard key={issue.id} issue={issue} />
+                <IssueCard 
+                  key={issue.id} 
+                  issue={issue} 
+                  onUpvote={handleUpvote}
+                  isUpvoted={upvotedIssues.has(issue.id)}
+                />
               ))}
             </div>
           </TabsContent>
           <TabsContent value="inProgress">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {inProgressIssues.map((issue) => (
-                <IssueCard key={issue.id} issue={issue} />
+                <IssueCard 
+                  key={issue.id} 
+                  issue={issue} 
+                  onUpvote={handleUpvote}
+                  isUpvoted={upvotedIssues.has(issue.id)}
+                />
               ))}
             </div>
           </TabsContent>
           <TabsContent value="resolved">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {resolvedIssues.map((issue) => (
-                <IssueCard key={issue.id} issue={issue} />
+                 <IssueCard 
+                    key={issue.id} 
+                    issue={issue} 
+                    onUpvote={handleUpvote}
+                    isUpvoted={upvotedIssues.has(issue.id)}
+                  />
               ))}
             </div>
           </TabsContent>

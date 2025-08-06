@@ -8,4 +8,5 @@ export type Issue = {
   imageUrl: string;
   reportedAt: Date;
   reporter: string;
+  upvotes: number;
 };

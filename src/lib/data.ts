@@ -11,6 +11,7 @@ export const issues: Issue[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     reportedAt: new Date('2024-05-10T09:00:00Z'),
     reporter: 'Maria Silva',
+    upvotes: 15,
   },
   {
     id: '2',
@@ -22,6 +23,7 @@ export const issues: Issue[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     reportedAt: new Date('2024-05-20T14:30:00Z'),
     reporter: 'João Pereira',
+    upvotes: 32,
   },
   {
     id: '3',
@@ -33,6 +35,7 @@ export const issues: Issue[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     reportedAt: new Date('2024-05-22T11:20:00Z'),
     reporter: 'Ana Costa',
+    upvotes: 20,
   },
   {
     id: '4',
@@ -44,6 +47,7 @@ export const issues: Issue[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     reportedAt: new Date('2024-05-23T08:00:00Z'),
     reporter: 'Carlos Souza',
+    upvotes: 5,
   },
    {
     id: '5',
@@ -55,6 +59,7 @@ export const issues: Issue[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     reportedAt: new Date('2024-05-18T17:00:00Z'),
     reporter: 'Fernanda Lima',
+    upvotes: 12,
   },
   {
     id: '6',
@@ -66,5 +71,6 @@ export const issues: Issue[] = [
     imageUrl: 'https://placehold.co/600x400.png',
     reportedAt: new Date('2024-04-28T10:15:00Z'),
     reporter: 'Ricardo Alves',
+    upvotes: 8,
   },
 ];

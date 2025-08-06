@@ -4,13 +4,16 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, User } from 'lucide-react';
+import { Calendar, User, ThumbsUp } from 'lucide-react';
+import { Button } from './ui/button';
 
 interface IssueCardProps {
   issue: Issue;
+  onUpvote: (id: string) => void;
+  isUpvoted: boolean;
 }
 
-const IssueCard: React.FC<IssueCardProps> = ({ issue }) => {
+const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => {
   const getStatusVariant = (status: Issue['status']) => {
     switch (status) {
       case 'Resolvido':
@@ -41,14 +44,27 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue }) => {
       <CardContent className="flex-grow">
         <CardDescription>{issue.description}</CardDescription>
       </CardContent>
-      <CardFooter className="text-xs text-muted-foreground justify-between">
-        <div className="flex items-center gap-1">
-          <User className="h-3 w-3" />
-          <span>{issue.reporter}</span>
+      <CardFooter className="text-xs text-muted-foreground flex-col items-start gap-4">
+        <div className="w-full">
+            <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={() => onUpvote(issue.id)}
+                disabled={isUpvoted}
+            >
+                <ThumbsUp className="mr-2 h-4 w-4" />
+                Apoiar ({issue.upvotes})
+            </Button>
         </div>
-        <div className="flex items-center gap-1">
-          <Calendar className="h-3 w-3" />
-          <span>{format(issue.reportedAt, 'dd/MM/yyyy', { locale: ptBR })}</span>
+        <div className="w-full flex justify-between">
+            <div className="flex items-center gap-1">
+                <User className="h-3 w-3" />
+                <span>{issue.reporter}</span>
+            </div>
+            <div className="flex items-center gap-1">
+                <Calendar className="h-3 w-3" />
+                <span>{format(issue.reportedAt, 'dd/MM/yyyy', { locale: ptBR })}</span>
+            </div>
         </div>
       </CardFooter>
     </Card>

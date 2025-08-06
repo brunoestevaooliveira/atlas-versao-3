@@ -1,6 +1,7 @@
 
 'use client';
 
+import { useState } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Layers, Search, ThumbsUp } from 'lucide-react';
@@ -10,9 +11,12 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { issues } from '@/lib/data';
+import { issues as initialIssues } from '@/lib/data';
 
 export default function Home() {
+  const [issues, setIssues] = useState(initialIssues);
+  const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
+
   const getStatusVariant = (status: 'Recebido' | 'Em análise' | 'Resolvido') => {
     switch (status) {
       case 'Resolvido':
@@ -25,6 +29,20 @@ export default function Home() {
         return 'default';
     }
   };
+
+  const handleUpvote = (issueId: string) => {
+    if (upvotedIssues.has(issueId)) {
+      return; // Already upvoted
+    }
+
+    setIssues(prevIssues =>
+      prevIssues.map(issue =>
+        issue.id === issueId ? { ...issue, upvotes: issue.upvotes + 1 } : issue
+      )
+    );
+    setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+  };
+
 
   return (
     <div className="relative h-screen w-screen">
@@ -71,9 +89,15 @@ export default function Home() {
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mb-2">{issue.category}</p>
-                      <Button size="sm" variant="outline" className="w-full">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="w-full"
+                        onClick={() => handleUpvote(issue.id)}
+                        disabled={upvotedIssues.has(issue.id)}
+                      >
                         <ThumbsUp className="mr-2 h-4 w-4" />
-                        Apoiar (Upvote)
+                        Apoiar ({issue.upvotes})
                       </Button>
                     </div>
                   ))}
