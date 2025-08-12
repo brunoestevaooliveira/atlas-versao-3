@@ -22,10 +22,12 @@ interface MapProps {
 
 const Map: React.FC<MapProps> = ({ issues }) => {
   const mapRef = useRef<L.Map | null>(null);
+  const markersRef = useRef<L.Marker[]>([]);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const center: [number, number] = [-16.0036, -47.9872];
   const router = useRouter();
 
+  // Initialize map
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
         const map = L.map(mapContainerRef.current, {
@@ -38,23 +40,35 @@ const Map: React.FC<MapProps> = ({ issues }) => {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        issues.forEach(issue => {
-            L.marker([issue.location.lat, issue.location.lng], { icon: defaultIcon })
-                .addTo(map)
-                .bindPopup(`
-                    <div class="font-bold">${issue.title}</div>
-                    <div>${issue.category}</div>
-                    <div class="text-sm text-muted-foreground">${issue.status}</div>
-                `);
-        });
-
         map.on('click', (e) => {
           const { lat, lng } = e.latlng;
           router.push(`/report?lat=${lat}&lng=${lng}`);
         });
     }
+  }, [center, router]);
 
-  }, [issues, center, router]);
+  // Update markers when issues change
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map) return;
+
+    // Clear existing markers
+    markersRef.current.forEach(marker => marker.remove());
+    markersRef.current = [];
+
+    // Add new markers
+    issues.forEach(issue => {
+        const marker = L.marker([issue.location.lat, issue.location.lng], { icon: defaultIcon })
+            .addTo(map)
+            .bindPopup(`
+                <div class="font-bold">${issue.title}</div>
+                <div>${issue.category}</div>
+                <div class="text-sm text-muted-foreground">${issue.status}</div>
+            `);
+        markersRef.current.push(marker);
+    });
+    
+  }, [issues]);
 
   return (
     <div ref={mapContainerRef} className="h-full w-full"></div>
