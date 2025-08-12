@@ -145,10 +145,12 @@ export default function Home() {
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground">{issue.category}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <MapPin className="h-3 w-3"/>
-                        <span>{issue.location.lat.toFixed(4)}, {issue.location.lng.toFixed(4)}</span>
-                      </div>
+                      {issue.address && (
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <MapPin className="h-3 w-3"/>
+                            <span>{issue.address}</span>
+                        </div>
+                      )}
                       <Button
                         size="sm"
                         variant="outline"

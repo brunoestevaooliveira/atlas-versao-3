@@ -8,7 +8,8 @@ export type Issue = {
   category: string;
   status: 'Recebido' | 'Em análise' | 'Resolvido';
   location: { lat: number; lng: number };
-  imageUrl: string; // Changed back to required
+  address?: string; // Endereço textual opcional
+  imageUrl: string; 
   reportedAt: Date;
   reporter: string;
   upvotes: number;
@@ -21,7 +22,8 @@ export type IssueData = {
   category: string;
   status: 'Recebido' | 'Em análise' | 'Resolvido';
   location: GeoPoint;
-  imageUrl: string; // Changed back to required
+  address?: string; // Endereço textual opcional
+  imageUrl: string;
   reportedAt: Timestamp;
   reporter: string;
   upvotes: number;

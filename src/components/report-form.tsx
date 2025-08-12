@@ -17,6 +17,7 @@ type FormState = {
   description: string;
   category: string;
   locationText: string; // "lat, lng"
+  address: string;
 };
 
 function parseLatLng(text: string | null): { lat: number; lng: number } | null {
@@ -46,6 +47,7 @@ export default function ReportForm() {
     description: "",
     category: "Buracos na via",
     locationText: initialLocation,
+    address: ""
   });
 
   const [loading, setLoading] = useState(false);
@@ -59,15 +61,16 @@ export default function ReportForm() {
 
     try {
       const loc = parseLatLng(form.locationText);
-      if (!loc) throw new Error("Informe a localização como 'latitude, longitude'.");
+      if (!loc) throw new Error("Localização inválida. Clique no mapa para definir um ponto.");
 
       const reporterName = 'Cidadão Anônimo';
 
-      const id = await addIssueClient({
+      await addIssueClient({
         title: form.title,
         description: form.description,
         category: form.category,
         location: loc,
+        address: form.address,
         reporter: reporterName,
       });
 
@@ -77,7 +80,7 @@ export default function ReportForm() {
       });
 
       // limpa o formulário após sucesso
-      setForm({ ...form, title: "", description: "" , category: form.category, locationText: form.locationText});
+      setForm({ ...form, title: "", description: "", address: ""});
     } catch (err: any) {
       console.error("Falha ao enviar ocorrência:", err);
       toast({
@@ -115,16 +118,6 @@ export default function ReportForm() {
                     required
                 />
             </div>
-             <div className="grid gap-1.5">
-                 <label htmlFor="location">Localização (Latitude, Longitude)</label>
-                <Input
-                    id="location"
-                    value={form.locationText}
-                    onChange={(e) => setForm({ ...form, locationText: e.target.value })}
-                    placeholder="-16.0036, -47.9872"
-                    required
-                />
-            </div>
         </div>
         <div className="space-y-6">
             <div className="grid gap-1.5">
@@ -145,6 +138,27 @@ export default function ReportForm() {
                       <SelectItem value="Outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>
+            </div>
+             <div className="grid gap-1.5">
+                 <label htmlFor="location">Localização (preenchida ao clicar no mapa)</label>
+                <Input
+                    id="location"
+                    value={form.locationText}
+                    onChange={(e) => setForm({ ...form, locationText: e.target.value })}
+                    placeholder="Clique no mapa na página inicial para definir"
+                    required
+                    readOnly
+                    className="bg-gray-100"
+                />
+            </div>
+            <div className="grid gap-1.5">
+                <label htmlFor="address">Endereço ou Ponto de Referência (Opcional)</label>
+                <Input
+                    id="address"
+                    value={form.address}
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    placeholder="Ex: Quadra 15, Conjunto C, em frente ao mercado"
+                />
             </div>
         </div>
        </div>

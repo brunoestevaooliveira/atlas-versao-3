@@ -31,6 +31,7 @@ const fromFirestore = (docData: any, id: string): Issue => {
       lat: data.location.latitude,
       lng: data.location.longitude,
     },
+    address: data.address,
     imageUrl: data.imageUrl,
     reportedAt: data.reportedAt ? (data.reportedAt as Timestamp).toDate() : new Date(),
     reporter: data.reporter,
@@ -43,6 +44,7 @@ export type NewIssue = {
   description: string;
   category: string;
   location: { lat: number; lng: number };
+  address?: string;
   reporter: string;
 };
 
@@ -67,6 +69,7 @@ export async function addIssueClient(issue: NewIssue) {
     status: "Recebido",
     upvotes: 0,
     reporter: issue.reporter,
+    address: issue.address?.trim() || "",
     imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
     reportedAt: serverTimestamp(),
     location: new GeoPoint(issue.location.lat, issue.location.lng),

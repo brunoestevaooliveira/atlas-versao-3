@@ -1,10 +1,11 @@
+
 import type { Issue } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, User, ThumbsUp } from 'lucide-react';
+import { Calendar, User, ThumbsUp, MapPin } from 'lucide-react';
 import { Button } from './ui/button';
 
 interface IssueCardProps {
@@ -43,6 +44,12 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
       </CardHeader>
       <CardContent className="flex-grow">
         <CardDescription>{issue.description}</CardDescription>
+         {issue.address && (
+            <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4"/>
+                <span>{issue.address}</span>
+            </div>
+        )}
       </CardContent>
       <CardFooter className="text-xs text-muted-foreground flex-col items-start gap-4">
         <div className="w-full">
