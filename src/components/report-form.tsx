@@ -85,7 +85,18 @@ export default function ReportForm() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (loading || !user) return;
+    if (loading) return;
+
+    // Re-check auth status on submit
+    const auth = getAuth();
+    if (!auth.currentUser) {
+       toast({
+        variant: 'destructive',
+        title: 'Autenticação Necessária',
+        description: "Por favor, aguarde a autenticação ou recarregue a página.",
+      });
+      return;
+    }
 
     setLoading(true);
 
@@ -179,7 +190,7 @@ export default function ReportForm() {
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading || !user}>
+             <Button type="submit" size="lg" disabled={loading}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
