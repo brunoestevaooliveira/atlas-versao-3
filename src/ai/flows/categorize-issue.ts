@@ -43,7 +43,7 @@ const prompt = ai.definePrompt({
   Description: {{{description}}}
   Photo: {{media url=photoDataUri}}
 
-  Return the categories as a JSON array of strings.`,
+  Your output must be a valid JSON object matching the format: { "suggestedCategories": ["category1", "category2", ...] }`,
 });
 
 const categorizeIssueFlow = ai.defineFlow(
