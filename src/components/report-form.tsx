@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Send, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { getCurrentUser } from "@/services/auth-service";
 
 type FormState = {
   title: string;
@@ -33,7 +34,8 @@ function parseLatLng(text: string | null): { lat: number; lng: number } | null {
 export default function ReportForm() {
   const params = useSearchParams();
   const { toast } = useToast();
-  const { user } = useAuth(); // Use the main auth context
+  // We still get user from context to try and avoid fetching it again
+  const { user: contextUser } = useAuth();
 
   // tenta preencher com ?lat=...&lng=...
   const initialLocation = useMemo(() => {
@@ -52,19 +54,20 @@ export default function ReportForm() {
 
   const [loading, setLoading] = useState(false);
 
-  // This effect handles anonymous sign-in logic via the global provider now.
-  // We just need to check if the user object from the context is available.
-
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (loading || !user) {
-        if (!user) {
-             toast({
-                variant: 'destructive',
-                title: 'Autenticação Necessária',
-                description: "Aguardando autenticação anônima para enviar. Tente novamente em um instante.",
-             });
-        }
+    
+    // Get user at the moment of submission
+    const user = contextUser || getCurrentUser();
+
+    if (loading) return;
+
+    if (!user) {
+        toast({
+            variant: 'destructive',
+            title: 'Autenticação Necessária',
+            description: "Aguardando autenticação. Por favor, tente novamente em um instante.",
+        });
         return;
     }
 
@@ -163,7 +166,7 @@ export default function ReportForm() {
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading || !user}>
+             <Button type="submit" size="lg" disabled={loading}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
