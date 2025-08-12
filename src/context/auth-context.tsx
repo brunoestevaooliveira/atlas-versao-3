@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -11,23 +11,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const AUTH_KEY = 'isAdminAuthenticated';
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Check session storage on initial load
-    const storedAuth = sessionStorage.getItem(AUTH_KEY);
-    if (storedAuth === 'true') {
-      setIsAuthenticated(true);
-    }
-  }, []);
 
   const login = (user: string, pass: string): boolean => {
     // Hardcoded credentials
     if (user === 'admin' && pass === 'admin') {
-      sessionStorage.setItem(AUTH_KEY, 'true');
       setIsAuthenticated(true);
       return true;
     }
@@ -35,7 +24,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const logout = () => {
-    sessionStorage.removeItem(AUTH_KEY);
     setIsAuthenticated(false);
   };
 
