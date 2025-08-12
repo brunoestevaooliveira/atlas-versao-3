@@ -12,6 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Send, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
 type FormState = {
   title: string;
@@ -33,7 +34,8 @@ function parseLatLng(text: string | null): { lat: number; lng: number } | null {
 export default function ReportForm() {
   const params = useSearchParams();
   const { toast } = useToast();
-  const [user, setUser] = useState<User | null>(null);
+  const { user: authUser } = useAuth(); // Use the main auth context
+  const [localUser, setLocalUser] = useState<User | null>(authUser);
 
   // tenta preencher com ?lat=...&lng=...
   const initialLocation = useMemo(() => {
@@ -52,50 +54,51 @@ export default function ReportForm() {
 
   const [loading, setLoading] = useState(false);
 
-  // garante auth anônima p/ regras que exigem request.auth
+  // Sign in anonymously only if there's no logged-in user
   useEffect(() => {
+    if (authUser) {
+      setLocalUser(authUser);
+      return;
+    }
     const auth = getAuth();
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setUser(user);
+        setLocalUser(user);
         return;
       }
       try {
         const userCredential = await signInAnonymously(auth);
-        setUser(userCredential.user);
+        setLocalUser(userCredential.user);
       } catch (e: any) {
-        // Se o provedor não estiver habilitado, não quebre o app
         if (
           e?.code === "auth/configuration-not-found" ||
           e?.code === "auth/operation-not-allowed"
         ) {
           console.warn("Auth anônima não habilitada; prosseguindo sem login.");
         } else {
-          console.error("Erro ao autenticar:", e);
+          console.error("Erro ao autenticar anonimamente:", e);
            toast({
             variant: 'destructive',
             title: 'Erro de Autenticação',
-            description: "Não foi possível autenticar. Verifique o console.",
+            description: "Não foi possível autenticar. Ocorrências não podem ser enviadas.",
           });
         }
       }
     });
     return () => unsub();
-  }, [toast]);
+  }, [authUser, toast]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (loading) return;
-
-    // Re-check auth status on submit
-    const auth = getAuth();
-    if (!auth.currentUser) {
-       toast({
-        variant: 'destructive',
-        title: 'Autenticação Necessária',
-        description: "Por favor, aguarde a autenticação ou recarregue a página.",
-      });
-      return;
+    if (loading || !localUser) {
+        if (!localUser) {
+             toast({
+                variant: 'destructive',
+                title: 'Autenticação Necessária',
+                description: "Você precisa estar logado para enviar uma ocorrência.",
+             });
+        }
+        return;
     }
 
     setLoading(true);
@@ -104,26 +107,29 @@ export default function ReportForm() {
       const loc = parseLatLng(form.locationText);
       if (!loc) throw new Error("Informe a localização como 'latitude, longitude'.");
 
+      const reporterName = authUser?.displayName || 'Cidadão Anônimo';
+
       const id = await addIssueClient({
         title: form.title,
         description: form.description,
         category: form.category,
         location: loc,
+        reporter: reporterName,
       });
 
       toast({
         title: "Ocorrência Enviada!",
-        description: `Sua ocorrência foi registrada com sucesso. ID: ${id}`,
+        description: `Sua ocorrência (${form.title}) foi registrada com sucesso.`,
       });
 
       // limpa o formulário após sucesso
-      setForm((f) => ({ ...f, title: "", description: "" }));
+      setForm({ ...form, title: "", description: "" });
     } catch (err: any) {
       console.error("Falha ao enviar ocorrência:", err);
       toast({
         variant: 'destructive',
         title: 'Erro ao Enviar',
-        description: err?.message ?? "ver console",
+        description: err?.message ?? "Verifique o console para mais detalhes.",
       });
     } finally {
       setLoading(false);
@@ -190,7 +196,7 @@ export default function ReportForm() {
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading || !user}>
+             <Button type="submit" size="lg" disabled={loading || !localUser}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (

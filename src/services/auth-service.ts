@@ -10,7 +10,7 @@ import {
   User,
 } from 'firebase/auth';
 import { db } from '@/lib/firebase';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import type { AppUser } from '@/lib/types';
 
 const auth = getAuth();
@@ -31,15 +31,31 @@ export const loginWithGoogle = async (): Promise<AppUser | null> => {
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        createdAt: new Date(),
+        createdAt: serverTimestamp(),
       });
     }
 
     const appUserDoc = await getDoc(userRef);
-    return appUserDoc.data() as AppUser;
+    const appUserData = appUserDoc.data();
+    
+    if (!appUserData) return null;
 
-  } catch (error) {
-    console.error('Error during Google login:', error);
+    // Convert Firestore Timestamp to Date
+    const finalUser: AppUser = {
+        ...appUserData,
+        createdAt: appUserData.createdAt?.toDate() ?? new Date(),
+    } as AppUser;
+
+    return finalUser;
+
+  } catch (error: any) {
+    if (error.code === 'auth/popup-closed-by-user') {
+        console.log('Login popup closed by user.');
+    } else if (error.code === 'auth/cancelled-popup-request') {
+        console.log('Multiple login popups open.');
+    } else {
+        console.error('Error during Google login:', error);
+    }
     return null;
   }
 };

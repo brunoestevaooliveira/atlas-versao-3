@@ -24,22 +24,21 @@ setLogLevel("debug"); // log detalhado no console do navegador
 
 // Helper to convert Firestore doc to Issue object
 const fromFirestore = (docData: any, id: string): Issue => {
+  const data = docData as IssueData;
   return {
     id,
-    title: docData.title,
-    description: docData.description,
-    category: docData.category,
-    status: docData.status,
+    title: data.title,
+    description: data.description,
+    category: data.category,
+    status: data.status,
     location: {
-      lat: docData.location.latitude,
-      lng: docData.location.longitude,
+      lat: data.location.latitude,
+      lng: data.location.longitude,
     },
-    imageUrl: docData.imageUrl,
-    // Firestore Timestamps can be null if serverTimestamp is used and the data is not yet on the server.
-    // We provide a fallback to the current date.
-    reportedAt: docData.reportedAt ? docData.reportedAt.toDate() : new Date(),
-    reporter: docData.reporter,
-    upvotes: docData.upvotes,
+    imageUrl: data.imageUrl,
+    reportedAt: data.reportedAt ? (data.reportedAt as Timestamp).toDate() : new Date(),
+    reporter: data.reporter,
+    upvotes: data.upvotes,
   };
 };
 
@@ -48,14 +47,10 @@ export type NewIssue = {
   description: string;
   category: string;
   location: { lat: number; lng: number };
+  reporter: string;
 };
 
-export async function addIssueClient(issue: {
-  title: string;
-  description: string;
-  category: string;
-  location: { lat: number; lng: number };
-}) {
+export async function addIssueClient(issue: NewIssue) {
     // validação simples
   if (!issue.title?.trim()) throw new Error("Título obrigatório");
   if (!issue.description?.trim()) throw new Error("Descrição obrigatória");
@@ -69,13 +64,13 @@ export async function addIssueClient(issue: {
   }
 
   const ref = collection(db, "issues");
-  const payload = {
+  const payload: Omit<IssueData, 'reportedAt'> & { reportedAt: any } = {
     title: issue.title.trim(),
     description: issue.description.trim(),
     category: issue.category || "Outros",
     status: "Recebido",
     upvotes: 0,
-    reporter: 'Cidadão Anônimo',
+    reporter: issue.reporter,
     imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
     reportedAt: serverTimestamp(),
     location: new GeoPoint(issue.location.lat, issue.location.lng),
