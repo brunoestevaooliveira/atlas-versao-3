@@ -6,7 +6,7 @@ import IssueCard from '@/components/issue-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
 import type { Issue } from '@/lib/types';
-import { BarChart, CheckCircle, Hourglass } from 'lucide-react';
+import { BarChart, CheckCircle, Hourglass, ListFilter } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
 export default function TrackingPage() {
@@ -40,31 +40,31 @@ export default function TrackingPage() {
   const resolvedIssues = issues.filter(issue => issue.status === 'Resolvido');
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-2 text-center">
+    <div className="container mx-auto py-8 mt-20">
+      <header className="space-y-2 text-center mb-12">
         <h1 className="text-4xl font-bold font-headline">Acompanhar Solicitações</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Veja o andamento das ocorrências que você e outros cidadãos reportaram.
+          Veja o andamento das ocorrências que você e outros cidadãos reportaram em tempo real.
         </p>
       </header>
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-2xl">
           <TabsTrigger value="all">
-            <BarChart className="mr-2 h-4 w-4" /> Todas ({issues.length})
+            <ListFilter className="mr-2 h-4 w-4" /> Todas ({issues.length})
           </TabsTrigger>
           <TabsTrigger value="received">
             <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedIssues.length})
           </TabsTrigger>
           <TabsTrigger value="inProgress">
-             <Hourglass className="mr-2 h-4 w-4" /> Em Análise ({inProgressIssues.length})
+             <BarChart className="mr-2 h-4 w-4" /> Em Análise ({inProgressIssues.length})
           </TabsTrigger>
           <TabsTrigger value="resolved">
             <CheckCircle className="mr-2 h-4 w-4" /> Resolvidas ({resolvedIssues.length})
           </TabsTrigger>
         </TabsList>
         
-        <div className="mt-6">
+        <div className="mt-8">
           <TabsContent value="all">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {issues.map((issue) => (

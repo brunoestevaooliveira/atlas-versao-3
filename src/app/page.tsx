@@ -13,12 +13,13 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
 import type { Issue } from '@/lib/types';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Home() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
+  const [showIssues, setShowIssues] = useState(true);
 
   useEffect(() => {
     const unsubscribe = listenToIssues(setIssues);
@@ -71,7 +72,7 @@ export default function Home() {
   return (
     <div className="h-screen w-screen flex flex-col">
       <div className="relative flex-grow">
-        <InteractiveMap issues={filteredIssues} />
+        <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
         <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
@@ -79,7 +80,7 @@ export default function Home() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por endereço..."
+                  placeholder="Buscar por ocorrência..."
                   className="pl-10 bg-white"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -88,7 +89,11 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center space-x-2">
-                <Switch id="layers-switch" defaultChecked />
+                <Switch 
+                  id="layers-switch" 
+                  checked={showIssues}
+                  onCheckedChange={setShowIssues}
+                />
                 <Label htmlFor="layers-switch">Mostrar Ocorrências</Label>
               </div>
             </CardContent>

@@ -12,7 +12,7 @@ export async function addIssue(issueData: Omit<Issue, 'id' | 'reportedAt' | 'sta
       status: 'Recebido',
       upvotes: 0,
       reporter: 'Cidadão Anônimo', // Replace with logged-in user later
-      imageUrl: 'https://placehold.co/600x400.png', // Default placeholder
+      imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issueData.title)}`, // Default placeholder
     };
 
     await addIssueToDb(newIssue);
