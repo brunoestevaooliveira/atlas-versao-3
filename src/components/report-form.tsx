@@ -45,7 +45,7 @@ export default function ReportForm() {
   const [form, setForm] = useState<FormState>({
     title: "",
     description: "",
-    category: "Buracos na via",
+    category: "Limpeza urbana / Acúmulo de lixo",
     locationText: initialLocation,
     address: ""
   });
@@ -56,6 +56,15 @@ export default function ReportForm() {
     e.preventDefault();
     
     if (loading) return;
+
+    if (!form.address.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Endereço Obrigatório',
+        description: 'Por favor, preencha o campo de endereço.',
+      });
+      return;
+    }
 
     setLoading(true);
 
@@ -130,11 +139,14 @@ export default function ReportForm() {
                         <SelectValue placeholder="Selecione a categoria do problema" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Buracos na via">Buracos na via</SelectItem>
+                      <SelectItem value="Limpeza urbana / Acúmulo de lixo">Limpeza urbana / Acúmulo de lixo</SelectItem>
                       <SelectItem value="Iluminação pública">Iluminação pública</SelectItem>
-                      <SelectItem value="Lixo acumulado">Lixo acumulado</SelectItem>
+                      <SelectItem value="Saneamento / Vazamento de água">Saneamento / Vazamento de água</SelectItem>
                       <SelectItem value="Sinalização danificada">Sinalização danificada</SelectItem>
-                      <SelectItem value="Vazamento de água">Vazamento de água</SelectItem>
+                      <SelectItem value="Calçadas / Acessibilidade">Calçadas / Acessibilidade</SelectItem>
+                      <SelectItem value="Trânsito / Superlotação ou parada de ônibus">Trânsito / Superlotação ou parada de ônibus</SelectItem>
+                      <SelectItem value="Meio ambiente (árvores quebradas, áreas destruídas)">Meio ambiente (árvores quebradas, áreas destruídas)</SelectItem>
+                      <SelectItem value="Segurança (como falta de policiamento, zonas escuras)">Segurança (como falta de policiamento, zonas escuras)</SelectItem>
                       <SelectItem value="Outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>
