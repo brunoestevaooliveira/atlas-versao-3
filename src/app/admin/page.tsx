@@ -21,13 +21,25 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield } from 'lucide-react';
+import { Shield, Lock } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+
 
 export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(true);
+
 
   useEffect(() => {
     const unsubscribe = listenToIssues((issues) => {
@@ -68,6 +80,27 @@ export default function AdminPage() {
   };
 
   return (
+    <>
+    <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Lock className="w-5 h-5" /> Acesso Restrito
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta área é destinada apenas para administradores e pessoal autorizado. Para continuar, você precisaria fazer login com uma conta verificada.
+              <br/><br/>
+              (Esta é uma demonstração. A funcionalidade de login de administrador ainda não foi implementada.)
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setShowLoginPrompt(false)}>
+              Entendido
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>>
+      
     <div className="container mx-auto py-8 mt-20 space-y-8">
       <header className="space-y-2 text-center">
         <div className="inline-block bg-primary text-primary-foreground p-3 rounded-full">
@@ -144,5 +177,6 @@ export default function AdminPage() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }
