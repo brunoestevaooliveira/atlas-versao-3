@@ -1,10 +1,56 @@
+
+'use client';
+
 import ReportForm from '@/components/report-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { FileText, Database } from 'lucide-react';
+import { issues as seedData } from '@/lib/data';
+import { db } from '@/lib/firebase';
+import { collection, addDoc, GeoPoint, Timestamp } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+
 
 export default function ReportPage() {
+  const { toast } = useToast();
+  const [isSeeding, setIsSeeding] = useState(false);
+
+  const handleSeedDatabase = async () => {
+    setIsSeeding(true);
+    toast({
+      title: 'Iniciando semeadura...',
+      description: 'Adicionando ocorrências de teste ao banco de dados.',
+    });
+    try {
+      let count = 0;
+      for (const issue of seedData) {
+        await addDoc(collection(db, 'issues'), {
+          ...issue,
+          location: new GeoPoint(issue.location.lat, issue.location.lng),
+          reportedAt: Timestamp.fromDate(new Date()),
+        });
+        count++;
+      }
+      toast({
+        title: 'Banco de dados semeado!',
+        description: `${count} ocorrências de teste foram adicionadas com sucesso.`,
+      });
+    } catch (error) {
+      console.error('Erro ao semear o banco de dados:', error);
+      toast({
+        variant: 'destructive',
+        title: 'Erro na semeadura',
+        description: 'Não foi possível adicionar os dados de teste. Verifique o console.',
+      });
+    } finally {
+      setIsSeeding(false);
+    }
+  };
+
+
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto space-y-6">
       <Card className="shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center mb-4">
@@ -17,6 +63,21 @@ export default function ReportPage() {
         </CardHeader>
         <CardContent>
           <ReportForm />
+        </CardContent>
+      </Card>
+
+      <Card className="shadow-lg">
+        <CardHeader>
+          <CardTitle>Dados de Teste</CardTitle>
+          <CardDescription>
+            Use o botão abaixo para popular o banco de dados com ocorrências de exemplo para fins de teste.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button onClick={handleSeedDatabase} disabled={isSeeding}>
+            <Database className="mr-2 h-4 w-4" />
+            {isSeeding ? 'Semeando...' : 'Semear Banco de Dados com Ocorrências'}
+          </Button>
         </CardContent>
       </Card>
     </div>
