@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Layers, Search, ThumbsUp } from 'lucide-react';
@@ -11,12 +11,19 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { issues as initialIssues } from '@/lib/data';
+import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
+import type { Issue } from '@/lib/types';
+import { toast } from '@/hooks/use-toast';
 
 export default function Home() {
-  const [issues, setIssues] = useState(initialIssues);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = listenToIssues(setIssues);
+    return () => unsubscribe();
+  }, []);
 
   const filteredIssues = useMemo(() => {
     if (!searchQuery) {
@@ -43,17 +50,21 @@ export default function Home() {
     }
   };
 
-  const handleUpvote = (issueId: string) => {
+  const handleUpvote = async (issueId: string, currentUpvotes: number) => {
     if (upvotedIssues.has(issueId)) {
       return; 
     }
-
-    setIssues(prevIssues =>
-      prevIssues.map(issue =>
-        issue.id === issueId ? { ...issue, upvotes: issue.upvotes + 1 } : issue
-      )
-    );
-    setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+    
+    try {
+      await updateIssueUpvotes(issueId, currentUpvotes + 1);
+      setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+    } catch (error) {
+       toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível registrar seu apoio. Tente novamente.',
+      });
+    }
   };
 
 
@@ -77,7 +88,7 @@ export default function Home() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center space-x-2">
-                <Switch id="layers-switch" />
+                <Switch id="layers-switch" defaultChecked />
                 <Label htmlFor="layers-switch">Mostrar Ocorrências</Label>
               </div>
             </CardContent>
@@ -112,7 +123,7 @@ export default function Home() {
                         size="sm"
                         variant="outline"
                         className="w-full"
-                        onClick={() => handleUpvote(issue.id)}
+                        onClick={() => handleUpvote(issue.id, issue.upvotes)}
                         disabled={upvotedIssues.has(issue.id)}
                       >
                         <ThumbsUp className="mr-2 h-4 w-4" />

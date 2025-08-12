@@ -9,7 +9,7 @@ import { Button } from './ui/button';
 
 interface IssueCardProps {
   issue: Issue;
-  onUpvote: (id: string) => void;
+  onUpvote: (id: string, currentUpvotes: number) => void;
   isUpvoted: boolean;
 }
 
@@ -49,7 +49,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
             <Button 
                 variant="outline" 
                 className="w-full"
-                onClick={() => onUpvote(issue.id)}
+                onClick={() => onUpvote(issue.id, issue.upvotes)}
                 disabled={isUpvoted}
             >
                 <ThumbsUp className="mr-2 h-4 w-4" />

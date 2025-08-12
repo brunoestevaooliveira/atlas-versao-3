@@ -1,29 +1,39 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import IssueCard from '@/components/issue-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { issues as initialIssues } from '@/lib/data';
+import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
+import type { Issue } from '@/lib/types';
 import { BarChart, CheckCircle, Hourglass } from 'lucide-react';
+import { toast } from '@/hooks/use-toast';
 
 export default function TrackingPage() {
-  const [issues, setIssues] = useState(initialIssues);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
 
-  const handleUpvote = (issueId: string) => {
+  useEffect(() => {
+    const unsubscribe = listenToIssues(setIssues);
+    return () => unsubscribe();
+  }, []);
+
+  const handleUpvote = async (issueId: string, currentUpvotes: number) => {
     if (upvotedIssues.has(issueId)) {
-      return; // Already upvoted
+      return; 
     }
-
-    setIssues(prevIssues =>
-      prevIssues.map(issue =>
-        issue.id === issueId ? { ...issue, upvotes: issue.upvotes + 1 } : issue
-      )
-    );
-    setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+    
+    try {
+      await updateIssueUpvotes(issueId, currentUpvotes + 1);
+      setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+    } catch (error) {
+       toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível registrar seu apoio. Tente novamente.',
+      });
+    }
   };
-
 
   const receivedIssues = issues.filter(issue => issue.status === 'Recebido');
   const inProgressIssues = issues.filter(issue => issue.status === 'Em análise');
@@ -61,7 +71,7 @@ export default function TrackingPage() {
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
-                  onUpvote={handleUpvote}
+                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
               ))}
@@ -73,7 +83,7 @@ export default function TrackingPage() {
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
-                  onUpvote={handleUpvote}
+                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
               ))}
@@ -85,7 +95,7 @@ export default function TrackingPage() {
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
-                  onUpvote={handleUpvote}
+                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
               ))}
@@ -97,7 +107,7 @@ export default function TrackingPage() {
                  <IssueCard 
                     key={issue.id} 
                     issue={issue} 
-                    onUpvote={handleUpvote}
+                    onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                     isUpvoted={upvotedIssues.has(issue.id)}
                   />
               ))}

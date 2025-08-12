@@ -13,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card } from '@/components/ui/card';
 import Image from 'next/image';
 import { Camera, Send, Loader2, Sparkles, MapPin } from 'lucide-react';
-import { getSuggestedCategories } from '../app/report/actions';
+import { getSuggestedCategories, addIssue } from '../app/report/actions';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from './ui/badge';
 import { useSearchParams } from 'next/navigation';
@@ -30,6 +30,7 @@ const ReportForm = () => {
   const [photoPreview, setPhotoPreview] = useState<string | null>(null);
   const [suggestedCategories, setSuggestedCategories] = useState<string[]>([]);
   const [isAiLoading, startAiTransition] = useTransition();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const searchParams = useSearchParams();
 
@@ -47,7 +48,7 @@ const ReportForm = () => {
     const lat = searchParams.get('lat');
     const lng = searchParams.get('lng');
     if (lat && lng) {
-      const locationString = `Lat: ${parseFloat(lat).toFixed(5)}, Lng: ${parseFloat(lng).toFixed(5)}`;
+      const locationString = `${lat}, ${lng}`;
       form.setValue('location', locationString, { shouldValidate: true });
     }
   }, [searchParams, form]);
@@ -87,15 +88,39 @@ const ReportForm = () => {
     });
   };
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast({
-      title: 'Ocorrência Enviada!',
-      description: 'Agradecemos sua colaboração. Sua ocorrência foi registrada com sucesso.',
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
+    const [lat, lng] = values.location.split(',').map(Number);
+    
+    // In a real app, you'd upload the photo to a service like Firebase Storage
+    // and get a URL. For now, we'll use a placeholder.
+    const imageUrl = 'https://placehold.co/600x400.png';
+
+    const result = await addIssue({
+      title: values.title,
+      description: values.description,
+      category: values.category,
+      location: { lat, lng },
+      imageUrl: imageUrl, // Placeholder for now
     });
-    form.reset();
-    setPhotoPreview(null);
-    setSuggestedCategories([]);
+
+    setIsSubmitting(false);
+
+    if (result.success) {
+      toast({
+        title: 'Ocorrência Enviada!',
+        description: 'Agradecemos sua colaboração. Sua ocorrência foi registrada com sucesso.',
+      });
+      form.reset();
+      setPhotoPreview(null);
+      setSuggestedCategories([]);
+    } else {
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao Enviar',
+        description: result.error || 'Não foi possível registrar a ocorrência. Tente novamente.',
+      });
+    }
   };
 
   const isLocationFromMap = !!(searchParams.get('lat') && searchParams.get('lng'));
@@ -141,12 +166,12 @@ const ReportForm = () => {
               name="location"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Localização</FormLabel>
+                  <FormLabel>Localização (Latitude, Longitude)</FormLabel>
                    <FormControl>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                       <Input 
-                        placeholder="Clique no mapa para selecionar ou digite um endereço" 
+                        placeholder="Clique no mapa para selecionar ou digite as coordenadas" 
                         {...field} 
                         className="pl-10"
                         disabled={isLocationFromMap} 
@@ -245,8 +270,8 @@ const ReportForm = () => {
         </div>
 
         <div className="flex justify-end">
-          <Button type="submit" size="lg" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? (
+          <Button type="submit" size="lg" disabled={isSubmitting}>
+            {isSubmitting ? (
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
             ) : (
               <Send className="mr-2 h-4 w-4" />

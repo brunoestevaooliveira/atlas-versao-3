@@ -1,5 +1,8 @@
 import type { Issue } from './types';
 
+// This file is now a backup and will not be actively used.
+// Data will be fetched from Firestore.
+
 export const issues: Issue[] = [
   {
     id: '1',
@@ -24,53 +27,5 @@ export const issues: Issue[] = [
     reportedAt: new Date('2024-05-20T14:30:00Z'),
     reporter: 'João Pereira',
     upvotes: 32,
-  },
-  {
-    id: '3',
-    title: 'Lixo acumulado em terreno baldio',
-    description: 'O terreno ao lado da escola infantil está com uma quantidade enorme de lixo e entulho, atraindo insetos e animais.',
-    category: 'Lixo Acumulado',
-    status: 'Recebido',
-    location: { lat: -15.999, lng: -47.990 },
-    imageUrl: 'https://placehold.co/600x400.png',
-    reportedAt: new Date('2024-05-22T11:20:00Z'),
-    reporter: 'Ana Costa',
-    upvotes: 20,
-  },
-  {
-    id: '4',
-    title: 'Placa de "PARE" caída',
-    description: 'A placa de "PARE" no cruzamento da Rua 12 com a Rua 8 caiu e está no chão, causando confusão no trânsito.',
-    category: 'Sinalização Danificada',
-    status: 'Recebido',
-    location: { lat: -16.006, lng: -47.984 },
-    imageUrl: 'https://placehold.co/600x400.png',
-    reportedAt: new Date('2024-05-23T08:00:00Z'),
-    reporter: 'Carlos Souza',
-    upvotes: 5,
-  },
-   {
-    id: '5',
-    title: 'Vazamento de água limpa',
-    description: 'Há um vazamento de água na calçada da Quadra 2, desperdiçando muita água e deixando o local escorregadio.',
-    category: 'Vazamento de Água',
-    status: 'Em análise',
-    location: { lat: -16.005, lng: -47.992 },
-    imageUrl: 'https://placehold.co/600x400.png',
-    reportedAt: new Date('2024-05-18T17:00:00Z'),
-    reporter: 'Fernanda Lima',
-    upvotes: 12,
-  },
-  {
-    id: '6',
-    title: 'Semáforo de pedestres com defeito',
-    description: 'O semáforo para pedestres na faixa em frente ao hospital não está funcionando, o que torna a travessia muito perigosa.',
-    category: 'Sinalização Danificada',
-    status: 'Resolvido',
-    location: { lat: -16.002, lng: -47.989 },
-    imageUrl: 'https://placehold.co/600x400.png',
-    reportedAt: new Date('2024-04-28T10:15:00Z'),
-    reporter: 'Ricardo Alves',
-    upvotes: 8,
   },
 ];

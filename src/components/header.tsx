@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Compass, FilePlus, BarChart, Search } from 'lucide-react';
+import { Compass, FilePlus, BarChart, Search, LogIn } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -45,8 +45,13 @@ const Header: React.FC = () => {
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center">
+        <div className="hidden md:flex items-center gap-4">
          <NavContent />
+         <div className="w-px h-6 bg-border mx-2"></div>
+         <Button variant="ghost" size="sm">
+            <LogIn className="mr-2 h-4 w-4" />
+            Login
+         </Button>
         </div>
         
         <div className="md:hidden flex">
@@ -60,6 +65,12 @@ const Header: React.FC = () => {
             <SheetContent side="right" className="bg-white">
               <div className="flex flex-col gap-6 pt-8">
                 <NavContent />
+                 <div className="border-t pt-6">
+                    <Button className="w-full">
+                      <LogIn className="mr-2 h-4 w-4" />
+                      Login
+                    </Button>
+                 </div>
               </div>
             </SheetContent>
           </Sheet>
