@@ -99,3 +99,8 @@ export const updateIssueUpvotes = async (issueId: string, newUpvotes: number) =>
     const issueRef = doc(db, 'issues', issueId);
     await updateDoc(issueRef, { upvotes: newUpvotes });
 };
+
+export const updateIssueStatus = async (issueId: string, newStatus: Issue['status']) => {
+    const issueRef = doc(db, 'issues', issueId);
+    await updateDoc(issueRef, { status: newStatus });
+};
