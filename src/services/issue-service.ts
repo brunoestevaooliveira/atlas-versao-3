@@ -14,13 +14,9 @@ import {
   Timestamp,
   GeoPoint,
   serverTimestamp,
-  setLogLevel,
   getDocs,
 } from 'firebase/firestore';
 import type { Issue, IssueData } from '@/lib/types';
-
-
-setLogLevel("debug"); // log detalhado no console do navegador
 
 // Helper to convert Firestore doc to Issue object
 const fromFirestore = (docData: any, id: string): Issue => {
