@@ -2,9 +2,10 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { onAuthChange, type getCurrentUser } from '@/services/auth-service';
-import type { User } from 'firebase/auth';
+import { onAuthChange } from '@/services/auth-service';
+import { getAuth, signInAnonymously, type User } from 'firebase/auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { app } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -18,9 +19,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthChange((user) => {
-      setUser(user);
-      setLoading(false);
+    const unsubscribe = onAuthChange(async (user) => {
+      if (user) {
+        setUser(user);
+        setLoading(false);
+      } else {
+        // If no user, sign in anonymously
+        try {
+          const auth = getAuth(app);
+          const userCredential = await signInAnonymously(auth);
+          setUser(userCredential.user);
+        } catch (error) {
+          console.error("Anonymous sign-in failed:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
     });
 
     // Cleanup subscription on unmount

@@ -1,5 +1,5 @@
 // src/lib/firebase.ts
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 // Configuração do seu app Firebase
@@ -13,7 +13,9 @@ const firebaseConfig = {
 };
 
 // Inicializa Firebase de forma segura (evita reinicialização)
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
 // Exporta a instância do Firestore para que possa ser usada em outros lugares
-export const db = getFirestore(app);
+const db = getFirestore(app);
+
+export { app, db };

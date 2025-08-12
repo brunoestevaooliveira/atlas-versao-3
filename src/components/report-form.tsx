@@ -4,7 +4,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { addIssueClient } from "@/services/issue-service";
-import { getAuth, onAuthStateChanged, signInAnonymously, type User } from "firebase/auth";
 import { useSearchParams } from "next/navigation";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,8 +33,7 @@ function parseLatLng(text: string | null): { lat: number; lng: number } | null {
 export default function ReportForm() {
   const params = useSearchParams();
   const { toast } = useToast();
-  const { user: authUser } = useAuth(); // Use the main auth context
-  const [localUser, setLocalUser] = useState<User | null>(authUser);
+  const { user } = useAuth(); // Use the main auth context
 
   // tenta preencher com ?lat=...&lng=...
   const initialLocation = useMemo(() => {
@@ -54,48 +52,17 @@ export default function ReportForm() {
 
   const [loading, setLoading] = useState(false);
 
-  // Sign in anonymously only if there's no logged-in user
-  useEffect(() => {
-    if (authUser) {
-      setLocalUser(authUser);
-      return;
-    }
-    const auth = getAuth();
-    const unsub = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        setLocalUser(user);
-        return;
-      }
-      try {
-        const userCredential = await signInAnonymously(auth);
-        setLocalUser(userCredential.user);
-      } catch (e: any) {
-        if (
-          e?.code === "auth/configuration-not-found" ||
-          e?.code === "auth/operation-not-allowed"
-        ) {
-          console.warn("Auth anônima não habilitada; prosseguindo sem login.");
-        } else {
-          console.error("Erro ao autenticar anonimamente:", e);
-           toast({
-            variant: 'destructive',
-            title: 'Erro de Autenticação',
-            description: "Não foi possível autenticar. Ocorrências não podem ser enviadas.",
-          });
-        }
-      }
-    });
-    return () => unsub();
-  }, [authUser, toast]);
+  // This effect handles anonymous sign-in logic via the global provider now.
+  // We just need to check if the user object from the context is available.
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (loading || !localUser) {
-        if (!localUser) {
+    if (loading || !user) {
+        if (!user) {
              toast({
                 variant: 'destructive',
                 title: 'Autenticação Necessária',
-                description: "Você precisa estar logado para enviar uma ocorrência.",
+                description: "Aguardando autenticação anônima para enviar. Tente novamente em um instante.",
              });
         }
         return;
@@ -107,7 +74,7 @@ export default function ReportForm() {
       const loc = parseLatLng(form.locationText);
       if (!loc) throw new Error("Informe a localização como 'latitude, longitude'.");
 
-      const reporterName = authUser?.displayName || 'Cidadão Anônimo';
+      const reporterName = 'Cidadão Anônimo';
 
       const id = await addIssueClient({
         title: form.title,
@@ -196,7 +163,7 @@ export default function ReportForm() {
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading || !localUser}>
+             <Button type="submit" size="lg" disabled={loading || !user}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
