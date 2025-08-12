@@ -1,3 +1,4 @@
+
 // src/services/issue-service.ts
 "use client";
 
@@ -14,6 +15,7 @@ import {
   GeoPoint,
   serverTimestamp,
   setLogLevel,
+  getDocs,
 } from 'firebase/firestore';
 import type { Issue, IssueData } from '@/lib/types';
 
@@ -46,7 +48,6 @@ export type NewIssue = {
   description: string;
   category: string;
   location: { lat: number; lng: number };
-  reporter: string;
 };
 
 
@@ -80,11 +81,11 @@ export async function addIssueClient(issue: {
     title: issue.title.trim(),
     description: issue.description.trim(),
     category: issue.category || "Outros",
-    status: "Recebido",
+    status: "Recebido", // Correct status
     upvotes: 0,
     reporter: 'Cidadão Anônimo',
     imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
-    reportedAt: serverTimestamp(),
+    reportedAt: serverTimestamp(), // Correct field name
     location: new GeoPoint(issue.location.lat, issue.location.lng),
   };
 
@@ -95,7 +96,7 @@ export async function addIssueClient(issue: {
 
 
 export const getIssues = async (): Promise<Issue[]> => {
-  const q = query(issuesCollectionRef, orderBy('reportedAt', 'desc'));
+  const q = query(collection(db, 'issues'), orderBy('reportedAt', 'desc'));
   const querySnapshot = await getDocs(q);
   return querySnapshot.docs.map(doc => fromFirestore(doc.data() as IssueData, doc.id));
 };
