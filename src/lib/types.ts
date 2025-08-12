@@ -1,3 +1,4 @@
+
 import { Timestamp, GeoPoint } from 'firebase/firestore';
 
 export type Issue = {
@@ -24,4 +25,12 @@ export type IssueData = {
   reportedAt: Timestamp;
   reporter: string;
   upvotes: number;
+};
+
+export type AppUser = {
+    uid: string;
+    email: string | null;
+    displayName: string | null;
+    photoURL: string | null;
+    createdAt: Date | Timestamp;
 };
