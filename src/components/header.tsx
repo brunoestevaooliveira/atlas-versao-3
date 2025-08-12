@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -45,7 +46,7 @@ const Header: React.FC = () => {
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center">
+        <div className="hidden md:flex items-center gap-4">
          <NavContent />
         </div>
         

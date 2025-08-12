@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Layers, Search, ThumbsUp } from 'lucide-react';
@@ -11,12 +11,21 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { issues as initialIssues } from '@/lib/data';
+import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
+import type { Issue } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 export default function Home() {
-  const [issues, setIssues] = useState(initialIssues);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
+  const [showIssues, setShowIssues] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const unsubscribe = listenToIssues(setIssues);
+    return () => unsubscribe();
+  }, []);
 
   const filteredIssues = useMemo(() => {
     if (!searchQuery) {
@@ -43,63 +52,79 @@ export default function Home() {
     }
   };
 
-  const handleUpvote = (issueId: string) => {
+  const handleUpvote = async (issueId: string, currentUpvotes: number) => {
     if (upvotedIssues.has(issueId)) {
       return; 
     }
-
-    setIssues(prevIssues =>
-      prevIssues.map(issue =>
-        issue.id === issueId ? { ...issue, upvotes: issue.upvotes + 1 } : issue
-      )
-    );
-    setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+    
+    try {
+      // Immediately add to upvoted set to disable button
+      setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+      await updateIssueUpvotes(issueId, currentUpvotes + 1);
+    } catch (error) {
+       // If update fails, remove from the set to allow retry
+       setUpvotedIssues(prevUpvoted => {
+        const newSet = new Set(prevUpvoted);
+        newSet.delete(issueId);
+        return newSet;
+       });
+       toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível registrar seu apoio. Tente novamente.',
+      });
+    }
   };
 
 
   return (
-    <div className="relative h-screen w-screen">
-      <InteractiveMap issues={filteredIssues} />
-      
-      <div className="absolute top-24 left-4 z-10 w-80 space-y-4">
-        <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
-           <CardHeader>
-             <div className="relative">
+    <div className="h-screen w-screen flex flex-col">
+      <div className="relative flex-grow">
+        <InteractiveMap issues={showIssues ? filteredIssues : []} />
+
+        <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
+          <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
+            <CardHeader>
+              <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Buscar por endereço..." 
-                  className="pl-10 bg-white" 
+                <Input
+                  placeholder="Buscar por ocorrência..."
+                  className="pl-10 bg-white"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-           </CardHeader>
-           <CardContent>
-             <div className="flex items-center space-x-2">
-                <Switch id="layers-switch" />
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center space-x-2">
+                <Switch 
+                  id="layers-switch" 
+                  checked={showIssues}
+                  onCheckedChange={setShowIssues}
+                />
                 <Label htmlFor="layers-switch">Mostrar Ocorrências</Label>
               </div>
-           </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
 
-       <div className="absolute bottom-4 right-4 z-10 space-y-2">
-           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 p-2 rounded-lg">
-                <Button variant="ghost" size="icon">
-                    <Layers />
-                </Button>
-            </Card>
-       </div>
-       
-       <div className="absolute top-24 right-4 z-10 w-96 space-y-4">
-         <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-13rem)]">
+        <div className="absolute bottom-4 right-4 z-10 space-y-2">
+          <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 p-2 rounded-lg">
+            <Button variant="ghost" size="icon">
+              <Layers />
+            </Button>
+          </Card>
+        </div>
+
+        <div className="absolute top-4 right-4 z-10 w-96">
+           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-2rem)] flex flex-col">
             <CardHeader>
               <CardTitle>Ocorrências Recentes</CardTitle>
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
-            <CardContent>
-              <ScrollArea className="h-full max-h-[calc(100vh-20rem)]">
-                <div className="space-y-4 pr-4">
+            <CardContent className="flex-grow overflow-hidden">
+              <ScrollArea className="h-full">
+                <div className="space-y-4 pr-6">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
                     <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80">
                       <div className="flex justify-between items-start">
@@ -107,11 +132,11 @@ export default function Home() {
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
                       <p className="text-xs text-muted-foreground mb-2">{issue.category}</p>
-                      <Button 
-                        size="sm" 
-                        variant="outline" 
+                      <Button
+                        size="sm"
+                        variant="outline"
                         className="w-full"
-                        onClick={() => handleUpvote(issue.id)}
+                        onClick={() => handleUpvote(issue.id, issue.upvotes)}
                         disabled={upvotedIssues.has(issue.id)}
                       >
                         <ThumbsUp className="mr-2 h-4 w-4" />
@@ -124,8 +149,9 @@ export default function Home() {
                 </div>
               </ScrollArea>
             </CardContent>
-         </Card>
-       </div>
+          </Card>
+        </div>
+      </div>
     </div>
   );
 }

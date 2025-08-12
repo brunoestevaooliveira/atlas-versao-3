@@ -1,67 +1,85 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import IssueCard from '@/components/issue-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { issues as initialIssues } from '@/lib/data';
-import { BarChart, CheckCircle, Hourglass } from 'lucide-react';
+import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
+import type { Issue } from '@/lib/types';
+import { BarChart, CheckCircle, Hourglass, ListFilter } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function TrackingPage() {
-  const [issues, setIssues] = useState(initialIssues);
+  const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
+  const { toast } = useToast();
 
-  const handleUpvote = (issueId: string) => {
+  useEffect(() => {
+    const unsubscribe = listenToIssues(setIssues);
+    return () => unsubscribe();
+  }, []);
+
+  const handleUpvote = async (issueId: string, currentUpvotes: number) => {
     if (upvotedIssues.has(issueId)) {
-      return; // Already upvoted
+      return; 
     }
-
-    setIssues(prevIssues =>
-      prevIssues.map(issue =>
-        issue.id === issueId ? { ...issue, upvotes: issue.upvotes + 1 } : issue
-      )
-    );
-    setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+    
+    try {
+      // Immediately add to upvoted set to disable button
+      setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+      await updateIssueUpvotes(issueId, currentUpvotes + 1);
+    } catch (error) {
+       // If update fails, remove from the set to allow retry
+       setUpvotedIssues(prevUpvoted => {
+        const newSet = new Set(prevUpvoted);
+        newSet.delete(issueId);
+        return newSet;
+       });
+       toast({
+        variant: 'destructive',
+        title: 'Erro',
+        description: 'Não foi possível registrar seu apoio. Tente novamente.',
+      });
+    }
   };
-
 
   const receivedIssues = issues.filter(issue => issue.status === 'Recebido');
   const inProgressIssues = issues.filter(issue => issue.status === 'Em análise');
   const resolvedIssues = issues.filter(issue => issue.status === 'Resolvido');
 
   return (
-    <div className="space-y-8">
-      <header className="space-y-2 text-center">
+    <div className="container mx-auto py-8 mt-20">
+      <header className="space-y-2 text-center mb-12">
         <h1 className="text-4xl font-bold font-headline">Acompanhar Solicitações</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Veja o andamento das ocorrências que você e outros cidadãos reportaram.
+          Veja o andamento das ocorrências que você e outros cidadãos reportaram em tempo real.
         </p>
       </header>
 
       <Tabs defaultValue="all" className="w-full">
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-2xl">
           <TabsTrigger value="all">
-            <BarChart className="mr-2 h-4 w-4" /> Todas ({issues.length})
+            <ListFilter className="mr-2 h-4 w-4" /> Todas ({issues.length})
           </TabsTrigger>
           <TabsTrigger value="received">
             <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedIssues.length})
           </TabsTrigger>
           <TabsTrigger value="inProgress">
-             <Hourglass className="mr-2 h-4 w-4" /> Em Análise ({inProgressIssues.length})
+             <BarChart className="mr-2 h-4 w-4" /> Em Análise ({inProgressIssues.length})
           </TabsTrigger>
           <TabsTrigger value="resolved">
             <CheckCircle className="mr-2 h-4 w-4" /> Resolvidas ({resolvedIssues.length})
           </TabsTrigger>
         </TabsList>
         
-        <div className="mt-6">
+        <div className="mt-8">
           <TabsContent value="all">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {issues.map((issue) => (
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
-                  onUpvote={handleUpvote}
+                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
               ))}
@@ -73,7 +91,7 @@ export default function TrackingPage() {
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
-                  onUpvote={handleUpvote}
+                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
               ))}
@@ -85,7 +103,7 @@ export default function TrackingPage() {
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
-                  onUpvote={handleUpvote}
+                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
               ))}
@@ -97,7 +115,7 @@ export default function TrackingPage() {
                  <IssueCard 
                     key={issue.id} 
                     issue={issue} 
-                    onUpvote={handleUpvote}
+                    onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                     isUpvoted={upvotedIssues.has(issue.id)}
                   />
               ))}

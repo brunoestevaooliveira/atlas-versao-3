@@ -1,218 +1,155 @@
 
-'use client';
+// src/components/report-form.tsx
+"use client";
 
-import { useState, useTransition, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { useEffect, useMemo, useState } from "react";
+import { addIssueClient } from "@/services/issue-service";
+import { useSearchParams } from "next/navigation";
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card } from '@/components/ui/card';
-import Image from 'next/image';
-import { Camera, Send, Loader2, Sparkles, MapPin } from 'lucide-react';
-import { getSuggestedCategories } from '../app/report/actions';
-import { useToast } from '@/hooks/use-toast';
-import { Badge } from './ui/badge';
-import { useSearchParams } from 'next/navigation';
+import { Send, Loader2 } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
 
-const formSchema = z.object({
-  title: z.string().min(5, 'O título deve ter pelo menos 5 caracteres.'),
-  description: z.string().min(20, 'A descrição deve ter pelo menos 20 caracteres.'),
-  photo: z.any().refine(file => file?.length == 1, 'A foto é obrigatória.'),
-  category: z.string().min(1, 'A categoria é obrigatória.'),
-  location: z.string().min(3, 'A localização é obrigatória.'),
-});
+type FormState = {
+  title: string;
+  description: string;
+  category: string;
+  locationText: string; // "lat, lng"
+};
 
-const ReportForm = () => {
-  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-  const [suggestedCategories, setSuggestedCategories] = useState<string[]>([]);
-  const [isAiLoading, startAiTransition] = useTransition();
+function parseLatLng(text: string | null): { lat: number; lng: number } | null {
+  if (!text) return null;
+  const parts = text.split(",").map((s) => s.trim());
+  if (parts.length !== 2) return null;
+  const lat = Number(parts[0]);
+  const lng = Number(parts[1]);
+  if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+  return { lat, lng };
+}
+
+export default function ReportForm() {
+  const params = useSearchParams();
   const { toast } = useToast();
-  const searchParams = useSearchParams();
+  const { user } = useAuth(); // Use the main auth context
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      category: '',
-      location: '',
-    },
+  // tenta preencher com ?lat=...&lng=...
+  const initialLocation = useMemo(() => {
+    const lat = params.get("lat");
+    const lng = params.get("lng");
+    if (lat && lng) return `${lat}, ${lng}`;
+    return "";
+  }, [params]);
+
+  const [form, setForm] = useState<FormState>({
+    title: "",
+    description: "",
+    category: "Buracos na via",
+    locationText: initialLocation,
   });
 
-  useEffect(() => {
-    const lat = searchParams.get('lat');
-    const lng = searchParams.get('lng');
-    if (lat && lng) {
-      const locationString = `Lat: ${parseFloat(lat).toFixed(5)}, Lng: ${parseFloat(lng).toFixed(5)}`;
-      form.setValue('location', locationString, { shouldValidate: true });
-    }
-  }, [searchParams, form]);
+  const [loading, setLoading] = useState(false);
 
+  // This effect handles anonymous sign-in logic via the global provider now.
+  // We just need to check if the user object from the context is available.
 
-  const handlePhotoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPhotoPreview(reader.result as string);
-        if (form.getValues('description')) {
-          handleCategorize(form.getValues('description'), reader.result as string);
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (loading || !user) {
+        if (!user) {
+             toast({
+                variant: 'destructive',
+                title: 'Autenticação Necessária',
+                description: "Aguardando autenticação anônima para enviar. Tente novamente em um instante.",
+             });
         }
-      };
-      reader.readAsDataURL(file);
+        return;
     }
-  };
 
-  const handleDescriptionBlur = (event: React.FocusEvent<HTMLTextAreaElement>) => {
-    const description = event.target.value;
-    if (description && photoPreview) {
-      handleCategorize(description, photoPreview);
+    setLoading(true);
+
+    try {
+      const loc = parseLatLng(form.locationText);
+      if (!loc) throw new Error("Informe a localização como 'latitude, longitude'.");
+
+      const reporterName = 'Cidadão Anônimo';
+
+      const id = await addIssueClient({
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        location: loc,
+        reporter: reporterName,
+      });
+
+      toast({
+        title: "Ocorrência Enviada!",
+        description: `Sua ocorrência (${form.title}) foi registrada com sucesso.`,
+      });
+
+      // limpa o formulário após sucesso
+      setForm({ ...form, title: "", description: "" });
+    } catch (err: any) {
+      console.error("Falha ao enviar ocorrência:", err);
+      toast({
+        variant: 'destructive',
+        title: 'Erro ao Enviar',
+        description: err?.message ?? "Verifique o console para mais detalhes.",
+      });
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleCategorize = (description: string, photoDataUri: string) => {
-    startAiTransition(async () => {
-      const suggestions = await getSuggestedCategories({ description, photoDataUri });
-      setSuggestedCategories(suggestions);
-      if (suggestions.length > 0) {
-        toast({
-          title: 'Sugestões de Categoria',
-          description: 'A IA sugeriu algumas categorias para sua ocorrência.',
-        });
-      }
-    });
-  };
-
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
-    toast({
-      title: 'Ocorrência Enviada!',
-      description: 'Agradecemos sua colaboração. Sua ocorrência foi registrada com sucesso.',
-    });
-    form.reset();
-    setPhotoPreview(null);
-    setSuggestedCategories([]);
-  };
-
-  const isLocationFromMap = !!(searchParams.get('lat') && searchParams.get('lng'));
+  }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Título da Ocorrência</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Buraco na rua principal" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição Detalhada</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Descreva o problema com o máximo de detalhes possível."
-                      rows={6}
-                      {...field}
-                      onBlur={handleDescriptionBlur}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Localização</FormLabel>
-                   <FormControl>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        placeholder="Clique no mapa para selecionar ou digite um endereço" 
-                        {...field} 
-                        className="pl-10"
-                        disabled={isLocationFromMap} 
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="space-y-6">
-            <FormField
-              control={form.control}
-              name="photo"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Foto do Problema</FormLabel>
-                  <FormControl>
-                    <Card className="relative flex flex-col items-center justify-center p-6 border-2 border-dashed h-64">
-                      {photoPreview ? (
-                        <Image src={photoPreview} alt="Pré-visualização" layout="fill" objectFit="cover" className="rounded-md" />
-                      ) : (
-                        <div className="text-center text-muted-foreground space-y-2">
-                          <Camera className="mx-auto h-12 w-12" />
-                          <p>Clique para enviar ou arraste uma foto</p>
-                        </div>
-                      )}
-                      <Input
-                        type="file"
-                        accept="image/*"
-                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                        onChange={(e) => {
-                          field.onChange(e.target.files);
-                          handlePhotoChange(e);
-                        }}
-                      />
-                    </Card>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Categoria</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
+    <form onSubmit={onSubmit} className="space-y-8">
+       <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+            <div className="grid gap-1.5">
+                <label htmlFor="title">Título da Ocorrência</label>
+                <Input
+                    id="title"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    placeholder="Ex.: Buraco na rua principal"
+                    required
+                />
+            </div>
+             <div className="grid gap-1.5">
+                <label htmlFor="description">Descrição Detalhada</label>
+                <Textarea
+                    id="description"
+                    rows={6}
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    placeholder="Descreva o problema com o máximo de detalhes possível."
+                    required
+                />
+            </div>
+             <div className="grid gap-1.5">
+                 <label htmlFor="location">Localização (Latitude, Longitude)</label>
+                <Input
+                    id="location"
+                    value={form.locationText}
+                    onChange={(e) => setForm({ ...form, locationText: e.target.value })}
+                    placeholder="-16.0036, -47.9872"
+                    required
+                />
+            </div>
+        </div>
+        <div className="space-y-6">
+            <div className="grid gap-1.5">
+                <label htmlFor="category">Categoria</label>
+                 <Select
+                    value={form.category}
+                    onValueChange={(value) => setForm({ ...form, category: value })}
+                  >
+                    <SelectTrigger id="category">
                         <SelectValue placeholder="Selecione a categoria do problema" />
-                      </SelectTrigger>
-                    </FormControl>
+                    </SelectTrigger>
                     <SelectContent>
-                      {suggestedCategories.length > 0 && (
-                        <>
-                          {suggestedCategories.map((cat) => (
-                            <SelectItem key={cat} value={cat}>
-                              <span className='flex items-center'>{cat} <Sparkles className="ml-2 h-4 w-4 text-yellow-400" /></span>
-                            </SelectItem>
-                          ))}
-                        </>
-                      )}
                       <SelectItem value="Buracos na via">Buracos na via</SelectItem>
                       <SelectItem value="Iluminação pública">Iluminação pública</SelectItem>
                       <SelectItem value="Lixo acumulado">Lixo acumulado</SelectItem>
@@ -221,42 +158,20 @@ const ReportForm = () => {
                       <SelectItem value="Outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             {isAiLoading && (
-                <div className="flex items-center text-sm text-muted-foreground">
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Analisando imagem e descrição para sugerir categorias...
-                </div>
-            )}
-             {suggestedCategories.length > 0 && !isAiLoading && (
-                <div className="space-y-2">
-                    <p className='text-sm font-medium'>Categorias Sugeridas:</p>
-                    <div className='flex flex-wrap gap-2'>
-                        {suggestedCategories.map(cat => (
-                            <Badge key={cat} variant='secondary' className='cursor-pointer' onClick={() => form.setValue('category', cat)}>{cat}</Badge>
-                        ))}
-                    </div>
-                </div>
-            )}
-          </div>
+            </div>
         </div>
+       </div>
 
         <div className="flex justify-end">
-          <Button type="submit" size="lg" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="mr-2 h-4 w-4" />
-            )}
-            Enviar Ocorrência
-          </Button>
+             <Button type="submit" size="lg" disabled={loading || !user}>
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 h-4 w-4" />
+                )}
+                Enviar Ocorrência
+              </Button>
         </div>
-      </form>
-    </Form>
+    </form>
   );
-};
-
-export default ReportForm;
+}

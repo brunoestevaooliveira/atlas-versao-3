@@ -1,14 +1,6 @@
+
 "use server";
 
-import { categorizeIssue } from "@/ai/flows/categorize-issue";
-import type { CategorizeIssueInput } from "@/ai/flows/categorize-issue";
-
-export async function getSuggestedCategories(input: CategorizeIssueInput) {
-  try {
-    const result = await categorizeIssue(input);
-    return result.suggestedCategories;
-  } catch (error) {
-    console.error("Error getting suggested categories:", error);
-    return [];
-  }
-}
+// This file is intentionally left blank.
+// The logic for adding an issue has been moved to the client-side
+// in src/services/issue-service.ts to improve performance.

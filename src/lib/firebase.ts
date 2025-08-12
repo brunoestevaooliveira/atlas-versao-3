@@ -1,23 +1,21 @@
-
-// Import the functions you need from the SDKs you need
-import { initializeApp, getApps, getApp } from "firebase/app";
+// src/lib/firebase.ts
+import { initializeApp, getApps, getApp, type FirebaseApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
+// Configuração do seu app Firebase
+// Removidas chaves não utilizadas (storageBucket, messagingSenderId) para evitar
+// possíveis timeouts em serviços não provisionados.
 const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  apiKey: "AIzaSyD4pQe9Cq9KlEqlHKBFKaBw6ZBm9WOy1MY",
+  authDomain: "santa-maria-ativa.firebaseapp.com",
+  projectId: "santa-maria-ativa",
+  appId: "1:122210829117:web:666dda466c4197216a3b54"
 };
 
+// Inicializa Firebase de forma segura (evita reinicialização)
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+// Exporta a instância do Firestore para que possa ser usada em outros lugares
 const db = getFirestore(app);
 
 export { app, db };
