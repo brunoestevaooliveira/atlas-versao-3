@@ -19,11 +19,13 @@ export default function LoginPage() {
   const router = useRouter();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    if (login(username, password)) {
+    const isLoggedIn = await login(username, password);
+
+    if (isLoggedIn) {
       toast({
         title: 'Login bem-sucedido!',
         description: 'Redirecionando para o painel de administração.',
