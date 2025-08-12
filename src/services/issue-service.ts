@@ -50,14 +50,6 @@ export type NewIssue = {
   location: { lat: number; lng: number };
 };
 
-
-function withTimeout<T>(p: Promise<T>, ms = 12000) {
-  return Promise.race([
-    p,
-    new Promise<T>((_, rej) => setTimeout(() => rej(new Error("timeout")), ms)),
-  ]);
-}
-
 export async function addIssueClient(issue: {
   title: string;
   description: string;
@@ -81,16 +73,15 @@ export async function addIssueClient(issue: {
     title: issue.title.trim(),
     description: issue.description.trim(),
     category: issue.category || "Outros",
-    status: "Recebido", // Correct status
+    status: "Recebido",
     upvotes: 0,
     reporter: 'Cidadão Anônimo',
     imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
-    reportedAt: serverTimestamp(), // Correct field name
+    reportedAt: serverTimestamp(),
     location: new GeoPoint(issue.location.lat, issue.location.lng),
   };
 
-  // usa timeout para nunca deixar o botão preso
-  const docRef = await withTimeout(addDoc(ref, payload));
+  const docRef = await addDoc(ref, payload);
   return docRef.id;
 }
 
@@ -106,6 +97,9 @@ export const listenToIssues = (callback: (issues: Issue[]) => void): (() => void
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
     const issues = querySnapshot.docs.map(doc => fromFirestore(doc.data(), doc.id));
     callback(issues);
+  }, (error) => {
+    console.error("Firestore listen error:", error);
+    // Optionally, inform the user that real-time updates have failed.
   });
   return unsubscribe; // Return the unsubscribe function
 };

@@ -4,7 +4,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { addIssueClient } from "@/services/issue-service";
-import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { getAuth, onAuthStateChanged, signInAnonymously, type User } from "firebase/auth";
 import { useSearchParams } from "next/navigation";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -33,6 +33,7 @@ function parseLatLng(text: string | null): { lat: number; lng: number } | null {
 export default function ReportForm() {
   const params = useSearchParams();
   const { toast } = useToast();
+  const [user, setUser] = useState<User | null>(null);
 
   // tenta preencher com ?lat=...&lng=...
   const initialLocation = useMemo(() => {
@@ -55,9 +56,13 @@ export default function ReportForm() {
   useEffect(() => {
     const auth = getAuth();
     const unsub = onAuthStateChanged(auth, async (user) => {
-      if (user) return;
+      if (user) {
+        setUser(user);
+        return;
+      }
       try {
-        await signInAnonymously(auth);
+        const userCredential = await signInAnonymously(auth);
+        setUser(userCredential.user);
       } catch (e: any) {
         // Se o provedor não estiver habilitado, não quebre o app
         if (
@@ -67,15 +72,20 @@ export default function ReportForm() {
           console.warn("Auth anônima não habilitada; prosseguindo sem login.");
         } else {
           console.error("Erro ao autenticar:", e);
+           toast({
+            variant: 'destructive',
+            title: 'Erro de Autenticação',
+            description: "Não foi possível autenticar. Verifique o console.",
+          });
         }
       }
     });
     return () => unsub();
-  }, []);
+  }, [toast]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (loading) return;
+    if (loading || !user) return;
 
     setLoading(true);
 
@@ -105,7 +115,7 @@ export default function ReportForm() {
         description: err?.message ?? "ver console",
       });
     } finally {
-      setLoading(false); // <-- nunca fica preso
+      setLoading(false);
     }
   }
 
@@ -169,7 +179,7 @@ export default function ReportForm() {
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading}>
+             <Button type="submit" size="lg" disabled={loading || !user}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
