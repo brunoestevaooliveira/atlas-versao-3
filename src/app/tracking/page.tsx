@@ -9,6 +9,8 @@ import type { Issue } from '@/lib/types';
 import { BarChart, CheckCircle, Hourglass, ListFilter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
+const UPVOTED_ISSUES_KEY = 'upvotedIssues';
+
 export default function TrackingPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
@@ -19,22 +21,33 @@ export default function TrackingPage() {
     return () => unsubscribe();
   }, []);
 
+  useEffect(() => {
+    try {
+      const storedUpvotes = localStorage.getItem(UPVOTED_ISSUES_KEY);
+      if (storedUpvotes) {
+        setUpvotedIssues(new Set(JSON.parse(storedUpvotes)));
+      }
+    } catch (error) {
+      console.error('Failed to parse upvoted issues from localStorage', error);
+    }
+  }, []);
+
   const handleUpvote = async (issueId: string, currentUpvotes: number) => {
     if (upvotedIssues.has(issueId)) {
       return; 
     }
     
+    const newUpvotedSet = new Set(upvotedIssues).add(issueId);
+    setUpvotedIssues(newUpvotedSet);
+
     try {
-      // Immediately add to upvoted set to disable button
-      setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
       await updateIssueUpvotes(issueId, currentUpvotes + 1);
+      localStorage.setItem(UPVOTED_ISSUES_KEY, JSON.stringify(Array.from(newUpvotedSet)));
     } catch (error) {
-       // If update fails, remove from the set to allow retry
-       setUpvotedIssues(prevUpvoted => {
-        const newSet = new Set(prevUpvoted);
-        newSet.delete(issueId);
-        return newSet;
-       });
+       const revertedUpvotedSet = new Set(upvotedIssues);
+       revertedUpvotedSet.delete(issueId);
+       setUpvotedIssues(revertedUpvotedSet);
+
        toast({
         variant: 'destructive',
         title: 'Erro',
