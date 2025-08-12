@@ -82,7 +82,7 @@ export default function Home() {
       <div className="relative flex-grow">
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
-        <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
+        <div className="absolute top-4 left-4 z-10 w-80 space-y-4 mt-20">
           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
             <CardHeader>
               <div className="relative">
@@ -116,8 +116,8 @@ export default function Home() {
           </Card>
         </div>
 
-        <div className="absolute top-4 right-4 z-10 w-96">
-           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-2rem)] flex flex-col">
+        <div className="absolute top-4 right-4 z-10 w-96 mt-20">
+           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-8rem)] flex flex-col">
             <CardHeader>
               <CardTitle>Ocorrências Recentes</CardTitle>
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
