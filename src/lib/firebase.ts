@@ -1,22 +1,19 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp, getApps, getApp } from "firebase/app";
+// src/lib/firebase.ts
+import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
+// Configuração do seu app Firebase
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyD4pQe9Cq9KlEqlHKBFKaBw6ZBm9WOy1MY",
+  authDomain: "santa-maria-ativa.firebaseapp.com",
+  projectId: "santa-maria-ativa",
+  storageBucket: "santa-maria-ativa.firebasestorage.app",
+  messagingSenderId: "122210829117",
+  appId: "1:122210829117:web:666dda466c4197216a3b54"
 };
 
+// Inicializa Firebase
+const app = initializeApp(firebaseConfig);
 
-// Initialize Firebase
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-
-export { app, db };
+// Exporta a instância do Firestore para que possa ser usada em outros lugares
+export const db = getFirestore(app);
