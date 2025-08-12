@@ -1,11 +1,10 @@
-
+// src/services/issue-service.ts
 "use client";
 
-import { db } from '@/lib/firebase';
+import { db } from "@/lib/firebase";
 import {
   collection,
   addDoc,
-  getDocs,
   onSnapshot,
   query,
   orderBy,
@@ -14,10 +13,12 @@ import {
   Timestamp,
   GeoPoint,
   serverTimestamp,
+  setLogLevel,
 } from 'firebase/firestore';
 import type { Issue, IssueData } from '@/lib/types';
 
-const issuesCollectionRef = collection(db, 'issues');
+
+setLogLevel("debug"); // log detalhado no console do navegador
 
 // Helper to convert Firestore doc to Issue object
 const fromFirestore = (docData: any, id: string): Issue => {
@@ -40,22 +41,57 @@ const fromFirestore = (docData: any, id: string): Issue => {
   };
 };
 
-export const addIssueClient = async (issueData: {
+export type NewIssue = {
   title: string;
   description: string;
   category: string;
   location: { lat: number; lng: number };
-}) => {
-  await addDoc(collection(db, 'issues'), {
-      ...issueData,
-      reportedAt: serverTimestamp(),
-      status: 'Recebido',
-      upvotes: 0,
-      reporter: 'Cidadão Anônimo',
-      imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issueData.title)}`,
-      location: new GeoPoint(issueData.location.lat, issueData.location.lng),
-  });
+  reporter: string;
 };
+
+
+function withTimeout<T>(p: Promise<T>, ms = 12000) {
+  return Promise.race([
+    p,
+    new Promise<T>((_, rej) => setTimeout(() => rej(new Error("timeout")), ms)),
+  ]);
+}
+
+export async function addIssueClient(issue: {
+  title: string;
+  description: string;
+  category: string;
+  location: { lat: number; lng: number };
+}) {
+    // validação simples
+  if (!issue.title?.trim()) throw new Error("Título obrigatório");
+  if (!issue.description?.trim()) throw new Error("Descrição obrigatória");
+  if (
+    typeof issue.location?.lat !== "number" ||
+    typeof issue.location?.lng !== "number" ||
+    Number.isNaN(issue.location.lat) ||
+    Number.isNaN(issue.location.lng)
+  ) {
+    throw new Error("Localização inválida");
+  }
+
+  const ref = collection(db, "issues");
+  const payload = {
+    title: issue.title.trim(),
+    description: issue.description.trim(),
+    category: issue.category || "Outros",
+    status: "Recebido",
+    upvotes: 0,
+    reporter: 'Cidadão Anônimo',
+    imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
+    reportedAt: serverTimestamp(),
+    location: new GeoPoint(issue.location.lat, issue.location.lng),
+  };
+
+  // usa timeout para nunca deixar o botão preso
+  const docRef = await withTimeout(addDoc(ref, payload));
+  return docRef.id;
+}
 
 
 export const getIssues = async (): Promise<Issue[]> => {
@@ -65,7 +101,7 @@ export const getIssues = async (): Promise<Issue[]> => {
 };
 
 export const listenToIssues = (callback: (issues: Issue[]) => void): (() => void) => {
-  const q = query(issuesCollectionRef, orderBy('reportedAt', 'desc'));
+  const q = query(collection(db, 'issues'), orderBy('reportedAt', 'desc'));
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
     const issues = querySnapshot.docs.map(doc => fromFirestore(doc.data(), doc.id));
     callback(issues);

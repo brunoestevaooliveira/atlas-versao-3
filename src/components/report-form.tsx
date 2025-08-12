@@ -1,160 +1,146 @@
+// src/components/report-form.tsx
+"use client";
 
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
+import { useEffect, useMemo, useState } from "react";
+import { addIssueClient } from "@/services/issue-service";
+import { getAuth, onAuthStateChanged, signInAnonymously } from "firebase/auth";
+import { useSearchParams } from "next/navigation";
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Send, Loader2, MapPin } from 'lucide-react';
-import { addIssueClient } from '@/services/issue-service';
-import { useToast } from '@/hooks/use-toast';
-import { useSearchParams } from 'next/navigation';
+import { Send, Loader2 } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
-const formSchema = z.object({
-  title: z.string().min(5, 'O título deve ter pelo menos 5 caracteres.'),
-  description: z.string().min(20, 'A descrição deve ter pelo menos 20 caracteres.'),
-  category: z.string().min(1, 'A categoria é obrigatória.'),
-  location: z.string().min(3, 'A localização é obrigatória.').refine(
-    (val) => {
-        const parts = val.split(',');
-        return parts.length === 2 && !isNaN(Number(parts[0])) && !isNaN(Number(parts[1]));
-    }, { message: "A localização deve estar no formato 'latitude, longitude'." }
-  )
-});
+type FormState = {
+  title: string;
+  description: string;
+  category: string;
+  locationText: string; // "lat, lng"
+};
 
-const ReportForm = () => {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+function parseLatLng(text: string | null): { lat: number; lng: number } | null {
+  if (!text) return null;
+  const parts = text.split(",").map((s) => s.trim());
+  if (parts.length !== 2) return null;
+  const lat = Number(parts[0]);
+  const lng = Number(parts[1]);
+  if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
+  return { lat, lng };
+}
+
+export default function ReportForm() {
+  const params = useSearchParams();
   const { toast } = useToast();
-  const searchParams = useSearchParams();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      title: '',
-      description: '',
-      category: '',
-      location: '',
-    },
+  // tenta preencher com ?lat=...&lng=...
+  const initialLocation = useMemo(() => {
+    const lat = params.get("lat");
+    const lng = params.get("lng");
+    if (lat && lng) return `${lat}, ${lng}`;
+    return "";
+  }, [params]);
+
+  const [form, setForm] = useState<FormState>({
+    title: "",
+    description: "",
+    category: "Buracos na via",
+    locationText: initialLocation,
   });
 
-  useEffect(() => {
-    const lat = searchParams.get('lat');
-    const lng = searchParams.get('lng');
-    if (lat && lng) {
-      const locationString = `${lat}, ${lng}`;
-      form.setValue('location', locationString, { shouldValidate: true });
-    }
-  }, [searchParams, form]);
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsSubmitting(true);
-    
+  // garante auth anônima p/ regras que exigem request.auth
+  useEffect(() => {
+    const auth = getAuth();
+    const unsub = onAuthStateChanged(auth, (user) => {
+      if (!user) signInAnonymously(auth).catch(console.error);
+    });
+    return () => unsub();
+  }, []);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (loading) return;
+
+    setLoading(true);
+
     try {
-      const [lat, lng] = values.location.split(',').map(part => Number(part.trim()));
-      
-      await addIssueClient({
-        title: values.title,
-        description: values.description,
-        category: values.category,
-        location: { lat, lng },
+      const loc = parseLatLng(form.locationText);
+      if (!loc) throw new Error("Informe a localização como 'latitude, longitude'.");
+
+      const id = await addIssueClient({
+        title: form.title,
+        description: form.description,
+        category: form.category,
+        location: loc,
       });
 
       toast({
-        title: 'Ocorrência Enviada!',
-        description: 'Agradecemos sua colaboração. Sua ocorrência foi registrada com sucesso.',
+        title: "Ocorrência Enviada!",
+        description: `Sua ocorrência foi registrada com sucesso. ID: ${id}`,
       });
-      form.reset();
 
-    } catch (error) {
-      console.error("Error adding issue:", error);
+      // limpa o formulário após sucesso
+      setForm((f) => ({ ...f, title: "", description: "" }));
+    } catch (err: any) {
+      console.error("Falha ao enviar ocorrência:", err);
       toast({
         variant: 'destructive',
         title: 'Erro ao Enviar',
-        description: 'Não foi possível registrar a ocorrência. Tente novamente.',
+        description: err?.message ?? "ver console",
       });
     } finally {
-      setIsSubmitting(false);
+      setLoading(false); // <-- nunca fica preso
     }
-  };
-
-  const isLocationFromMap = !!(searchParams.get('lat') && searchParams.get('lng'));
+  }
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="space-y-6">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Título da Ocorrência</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Ex: Buraco na rua principal" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Descrição Detalhada</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="Descreva o problema com o máximo de detalhes possível."
-                      rows={6}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-             <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Localização (Latitude, Longitude)</FormLabel>
-                   <FormControl>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <Input 
-                        placeholder="Clique no mapa para selecionar ou digite as coordenadas" 
-                        {...field} 
-                        className="pl-10"
-                        disabled={isLocationFromMap} 
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-
-          <div className="space-y-6">
-             <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Categoria</FormLabel>
-                  <Select onValueChange={field.onChange} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
+    <form onSubmit={onSubmit} className="space-y-8">
+       <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-6">
+            <div className="grid gap-1.5">
+                <label htmlFor="title">Título da Ocorrência</label>
+                <Input
+                    id="title"
+                    value={form.title}
+                    onChange={(e) => setForm({ ...form, title: e.target.value })}
+                    placeholder="Ex.: Buraco na rua principal"
+                    required
+                />
+            </div>
+             <div className="grid gap-1.5">
+                <label htmlFor="description">Descrição Detalhada</label>
+                <Textarea
+                    id="description"
+                    rows={6}
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    placeholder="Descreva o problema com o máximo de detalhes possível."
+                    required
+                />
+            </div>
+             <div className="grid gap-1.5">
+                 <label htmlFor="location">Localização (Latitude, Longitude)</label>
+                <Input
+                    id="location"
+                    value={form.locationText}
+                    onChange={(e) => setForm({ ...form, locationText: e.target.value })}
+                    placeholder="-16.0036, -47.9872"
+                    required
+                />
+            </div>
+        </div>
+        <div className="space-y-6">
+            <div className="grid gap-1.5">
+                <label htmlFor="category">Categoria</label>
+                 <Select
+                    value={form.category}
+                    onValueChange={(value) => setForm({ ...form, category: value })}
+                  >
+                    <SelectTrigger id="category">
                         <SelectValue placeholder="Selecione a categoria do problema" />
-                      </SelectTrigger>
-                    </FormControl>
+                    </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="Buracos na via">Buracos na via</SelectItem>
                       <SelectItem value="Iluminação pública">Iluminação pública</SelectItem>
@@ -164,26 +150,20 @@ const ReportForm = () => {
                       <SelectItem value="Outros">Outros</SelectItem>
                     </SelectContent>
                   </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+            </div>
         </div>
+       </div>
 
         <div className="flex justify-end">
-          <Button type="submit" size="lg" disabled={isSubmitting}>
-            {isSubmitting ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="mr-2 h-4 w-4" />
-            )}
-            Enviar Ocorrência
-          </Button>
+             <Button type="submit" size="lg" disabled={loading}>
+                {loading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Send className="mr-2 h-4 w-4" />
+                )}
+                Enviar Ocorrência
+              </Button>
         </div>
-      </form>
-    </Form>
+    </form>
   );
-};
-
-export default ReportForm;
+}
