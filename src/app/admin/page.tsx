@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import type { Issue } from '@/lib/types';
 import { listenToIssues, updateIssueStatus } from '@/services/issue-service';
 import {
@@ -21,33 +21,33 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Lock } from 'lucide-react';
+import { Shield } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const [showLoginPrompt, setShowLoginPrompt] = useState(true);
-
+  const { isAuthenticated } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
-    const unsubscribe = listenToIssues((issues) => {
-      setIssues(issues);
-      setLoading(false);
-    });
-    return () => unsubscribe();
-  }, []);
+    if (!isAuthenticated) {
+      router.push('/admin/login');
+    }
+  }, [isAuthenticated, router]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      const unsubscribe = listenToIssues((issues) => {
+        setIssues(issues);
+        setLoading(false);
+      });
+      return () => unsubscribe();
+    }
+  }, [isAuthenticated]);
 
   const handleStatusChange = async (issueId: string, newStatus: Issue['status']) => {
     try {
@@ -79,28 +79,15 @@ export default function AdminPage() {
     }
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <p>Redirecionando para a página de login...</p>
+      </div>
+    );
+  }
+
   return (
-    <>
-    <AlertDialog open={showLoginPrompt} onOpenChange={setShowLoginPrompt}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle className="flex items-center gap-2">
-              <Lock className="w-5 h-5" /> Acesso Restrito
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta área é destinada apenas para administradores e pessoal autorizado. Para continuar, você precisaria fazer login com uma conta verificada.
-              <br/><br/>
-              (Esta é uma demonstração. A funcionalidade de login de administrador ainda não foi implementada.)
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogAction onClick={() => setShowLoginPrompt(false)}>
-              Entendido
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>>
-      
     <div className="container mx-auto py-8 mt-20 space-y-8">
       <header className="space-y-2 text-center">
         <div className="inline-block bg-primary text-primary-foreground p-3 rounded-full">
@@ -177,6 +164,5 @@ export default function AdminPage() {
         </CardContent>
       </Card>
     </div>
-    </>
   );
 }

@@ -5,6 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
 import { cn } from '@/lib/utils';
 import 'leaflet/dist/leaflet.css';
+import { AuthProvider } from '@/context/auth-context';
 
 
 export const metadata: Metadata = {
@@ -25,11 +26,13 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
+        <AuthProvider>
             <Header />
             <main>
             {children}
             </main>
             <Toaster />
+        </AuthProvider>
       </body>
     </html>
   );
