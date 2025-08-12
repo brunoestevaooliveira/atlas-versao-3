@@ -58,9 +58,16 @@ export default function Home() {
     }
     
     try {
-      await updateIssueUpvotes(issueId, currentUpvotes + 1);
+      // Immediately add to upvoted set to disable button
       setUpvotedIssues(prevUpvoted => new Set(prevUpvoted).add(issueId));
+      await updateIssueUpvotes(issueId, currentUpvotes + 1);
     } catch (error) {
+       // If update fails, remove from the set to allow retry
+       setUpvotedIssues(prevUpvoted => {
+        const newSet = new Set(prevUpvoted);
+        newSet.delete(issueId);
+        return newSet;
+       });
        toast({
         variant: 'destructive',
         title: 'Erro',
