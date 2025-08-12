@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp } from 'lucide-react';
+import { Layers, Search, ThumbsUp, MapPin } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -139,12 +139,16 @@ export default function Home() {
               <ScrollArea className="h-full">
                 <div className="space-y-4 pr-6">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
-                    <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80">
+                    <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80 space-y-2">
                       <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-sm mb-1">{issue.title}</h4>
+                        <h4 className="font-bold text-sm">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground mb-2">{issue.category}</p>
+                      <p className="text-xs text-muted-foreground">{issue.category}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <MapPin className="h-3 w-3"/>
+                        <span>{issue.location.lat.toFixed(4)}, {issue.location.lng.toFixed(4)}</span>
+                      </div>
                       <Button
                         size="sm"
                         variant="outline"
