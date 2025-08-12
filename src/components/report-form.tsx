@@ -90,7 +90,7 @@ export default function ReportForm() {
       });
 
       // limpa o formulário após sucesso
-      setForm({ ...form, title: "", description: "" });
+      setForm({ ...form, title: "", description: "" , category: form.category, locationText: form.locationText});
     } catch (err: any) {
       console.error("Falha ao enviar ocorrência:", err);
       toast({
