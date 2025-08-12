@@ -1,7 +1,7 @@
 import type { Issue } from './types';
 
-// This file is now a backup and will not be actively used.
-// Data will be fetched from Firestore.
+// This file is now a backup and will not be actively used for display.
+// Data is fetched from Firestore. This is used to seed the database.
 
 export const issues: Omit<Issue, 'id' | 'reportedAt'>[] = [
   {
@@ -10,7 +10,7 @@ export const issues: Omit<Issue, 'id' | 'reportedAt'>[] = [
     category: 'Iluminação pública',
     status: 'Resolvido',
     location: { lat: -16.001, lng: -47.985 },
-    imageUrl: 'https://placehold.co/600x400.png?text=Poste+Queimado',
+    imageUrl: 'https://placehold.co/600x400.png',
     reporter: 'Maria Silva',
     upvotes: 15,
   },
@@ -20,7 +20,7 @@ export const issues: Omit<Issue, 'id' | 'reportedAt'>[] = [
     category: 'Buracos na via',
     status: 'Em análise',
     location: { lat: -16.004, lng: -47.988 },
-    imageUrl: 'https://placehold.co/600x400.png?text=Buraco+na+Via',
+    imageUrl: 'https://placehold.co/600x400.png',
     reporter: 'João Pereira',
     upvotes: 32,
   },
@@ -30,7 +30,7 @@ export const issues: Omit<Issue, 'id' | 'reportedAt'>[] = [
     category: 'Lixo acumulado',
     status: 'Recebido',
     location: { lat: -16.005, lng: -47.986 },
-    imageUrl: 'https://placehold.co/600x400.png?text=Lixo+Acumulado',
+    imageUrl: 'https://placehold.co/600x400.png',
     reporter: 'Ana Costa',
     upvotes: 21,
   },
@@ -40,7 +40,7 @@ export const issues: Omit<Issue, 'id' | 'reportedAt'>[] = [
     category: 'Sinalização danificada',
     status: 'Em análise',
     location: { lat: -16.002, lng: -47.991 },
-    imageUrl: 'https://placehold.co/600x400.png?text=Sinal+Defeituoso',
+    imageUrl: 'https://placehold.co/600x400.png',
     reporter: 'Carlos Souza',
     upvotes: 8,
   },
@@ -50,8 +50,58 @@ export const issues: Omit<Issue, 'id' | 'reportedAt'>[] = [
     category: 'Vazamento de água',
     status: 'Resolvido',
     location: { lat: -15.999, lng: -47.989 },
-    imageUrl: 'https://placehold.co/600x400.png?text=Vazamento',
+    imageUrl: 'https://placehold.co/600x400.png',
     reporter: 'Fernanda Lima',
     upvotes: 45,
+  },
+  {
+    title: 'Calçada quebrada na Quadra 10',
+    description: 'A calçada em frente à padaria está toda quebrada, dificultando a passagem de pedestres, principalmente idosos e pessoas com carrinhos de bebê.',
+    category: 'Buracos na via',
+    status: 'Recebido',
+    location: { lat: -16.008, lng: -47.982 },
+    imageUrl: 'https://placehold.co/600x400.png',
+    reporter: 'Mariana Almeida',
+    upvotes: 12,
+  },
+  {
+    title: 'Terreno baldio com mato alto',
+    description: 'O terreno ao lado da escola infantil está com o mato muito alto, o que pode atrair animais peçonhentos e gerar insegurança.',
+    category: 'Outros',
+    status: 'Em análise',
+    location: { lat: -16.006, lng: -47.993 },
+    imageUrl: 'https://placehold.co/600x400.png',
+    reporter: 'Ricardo Nunes',
+    upvotes: 5,
+  },
+  {
+    title: 'Falta de iluminação no parque',
+    description: 'O parque da cidade fica completamente escuro à noite, tornando-o inutilizável e perigoso para os moradores.',
+    category: 'Iluminação pública',
+    status: 'Recebido',
+    location: { lat: -16.010, lng: -47.987 },
+    imageUrl: 'https://placehold.co/600x400.png',
+    reporter: 'Beatriz Santos',
+    upvotes: 18,
+  },
+    {
+    title: 'Bueiro entupido na Rua das Flores',
+    description: 'O bueiro na esquina da Rua das Flores com a Av. Principal está entupido e, sempre que chove, a rua alaga completamente.',
+    category: 'Vazamento de água',
+    status: 'Em análise',
+    location: { lat: -16.003, lng: -47.984 },
+    imageUrl: 'https://placehold.co/600x400.png',
+    reporter: 'Lucas Martins',
+    upvotes: 25,
+  },
+  {
+    title: 'Placa de "Pare" pichada',
+    description: 'A placa de "Pare" no cruzamento perigoso da Quadra 5 está completamente pichada e ilegível, aumentando o risco de acidentes.',
+    category: 'Sinalização danificada',
+    status: 'Resolvido',
+    location: { lat: -16.007, lng: -47.990 },
+    imageUrl: 'https://placehold.co/600x400.png',
+    reporter: 'Juliana Ribeiro',
+    upvotes: 9,
   },
 ];

@@ -25,11 +25,14 @@ export default function ReportPage() {
     try {
       let count = 0;
       for (const issue of seedData) {
-        await addDoc(collection(db, 'issues'), {
+        // Create a payload that matches the IssueData type
+        const payload = {
           ...issue,
           location: new GeoPoint(issue.location.lat, issue.location.lng),
-          reportedAt: Timestamp.fromDate(new Date()),
-        });
+          reportedAt: Timestamp.fromDate(new Date()), // Use current date for seed data
+          imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
+        };
+        await addDoc(collection(db, 'issues'), payload);
         count++;
       }
       toast({
@@ -50,7 +53,7 @@ export default function ReportPage() {
 
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="container mx-auto py-8 mt-20 max-w-4xl space-y-6">
       <Card className="shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center mb-4">
@@ -58,7 +61,7 @@ export default function ReportPage() {
           </div>
           <CardTitle className="text-3xl font-headline">Reportar uma Ocorrência</CardTitle>
           <CardDescription>
-            Ajude a melhorar nossa cidade. Descreva o problema e anexe uma foto para que possamos encaminhá-lo para a equipe responsável.
+            Ajude a melhorar nossa cidade. Descreva o problema e sua localização para que possamos encaminhá-lo para a equipe responsável.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -70,13 +73,13 @@ export default function ReportPage() {
         <CardHeader>
           <CardTitle>Dados de Teste</CardTitle>
           <CardDescription>
-            Use o botão abaixo para popular o banco de dados com ocorrências de exemplo para fins de teste.
+            Use o botão abaixo para popular o banco de dados com ocorrências de exemplo para fins de teste. Isso adicionará 10 problemas fictícios ao mapa.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button onClick={handleSeedDatabase} disabled={isSeeding}>
             <Database className="mr-2 h-4 w-4" />
-            {isSeeding ? 'Semeando...' : 'Semear Banco de Dados com Ocorrências'}
+            {isSeeding ? 'Semeando...' : 'Semear Banco de Dados'}
           </Button>
         </CardContent>
       </Card>
