@@ -1,24 +1,6 @@
 
 "use server";
 
-import { addIssue as addIssueToDb } from "@/services/issue-service";
-import type { Issue } from "@/lib/types";
-
-export async function addIssue(issueData: Omit<Issue, 'id' | 'reportedAt' | 'status' | 'upvotes' | 'reporter' | 'imageUrl'>) {
-  try {
-    const newIssue: Omit<Issue, 'id'> = {
-      ...issueData,
-      reportedAt: new Date(),
-      status: 'Recebido',
-      upvotes: 0,
-      reporter: 'Cidadão Anônimo', // Replace with logged-in user later
-      imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issueData.title)}`, // Default placeholder
-    };
-
-    await addIssueToDb(newIssue);
-    return { success: true };
-  } catch (error) {
-    console.error("Error adding issue:", error);
-    return { success: false, error: "Failed to add issue." };
-  }
-}
+// This file is intentionally left blank.
+// The logic for adding an issue has been moved to the client-side
+// in src/services/issue-service.ts to improve performance.

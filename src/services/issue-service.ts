@@ -1,3 +1,5 @@
+"use client";
+
 import { db } from '@/lib/firebase';
 import {
   collection,
@@ -10,13 +12,14 @@ import {
   updateDoc,
   Timestamp,
   GeoPoint,
+  serverTimestamp,
 } from 'firebase/firestore';
 import type { Issue, IssueData } from '@/lib/types';
 
 const issuesCollectionRef = collection(db, 'issues');
 
 // Helper to convert Firestore doc to Issue object
-const fromFirestore = (docData: IssueData, id: string): Issue => {
+const fromFirestore = (docData: any, id: string): Issue => {
   return {
     id,
     title: docData.title,
@@ -28,20 +31,31 @@ const fromFirestore = (docData: IssueData, id: string): Issue => {
       lng: docData.location.longitude,
     },
     imageUrl: docData.imageUrl,
-    reportedAt: docData.reportedAt.toDate(),
+    // Firestore Timestamps can be null if serverTimestamp is used and the data is not yet on the server.
+    // We provide a fallback to the current date.
+    reportedAt: docData.reportedAt ? docData.reportedAt.toDate() : new Date(),
     reporter: docData.reporter,
     upvotes: docData.upvotes,
   };
 };
 
-export const addIssue = async (issue: Omit<Issue, 'id'>) => {
-  const issueData: IssueData = {
-    ...issue,
-    reportedAt: Timestamp.fromDate(issue.reportedAt),
-    location: new GeoPoint(issue.location.lat, issue.location.lng),
-  };
-  await addDoc(issuesCollectionRef, issueData);
+export const addIssueClient = async (issueData: {
+  title: string;
+  description: string;
+  category: string;
+  location: { lat: number; lng: number };
+}) => {
+  await addDoc(collection(db, 'issues'), {
+      ...issueData,
+      reportedAt: serverTimestamp(),
+      status: 'Recebido',
+      upvotes: 0,
+      reporter: 'Cidadão Anônimo',
+      imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issueData.title)}`,
+      location: new GeoPoint(issueData.location.lat, issueData.location.lng),
+  });
 };
+
 
 export const getIssues = async (): Promise<Issue[]> => {
   const q = query(issuesCollectionRef, orderBy('reportedAt', 'desc'));
@@ -52,7 +66,7 @@ export const getIssues = async (): Promise<Issue[]> => {
 export const listenToIssues = (callback: (issues: Issue[]) => void): (() => void) => {
   const q = query(issuesCollectionRef, orderBy('reportedAt', 'desc'));
   const unsubscribe = onSnapshot(q, (querySnapshot) => {
-    const issues = querySnapshot.docs.map(doc => fromFirestore(doc.data() as IssueData, doc.id));
+    const issues = querySnapshot.docs.map(doc => fromFirestore(doc.data(), doc.id));
     callback(issues);
   });
   return unsubscribe; // Return the unsubscribe function

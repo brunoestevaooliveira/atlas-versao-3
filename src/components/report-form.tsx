@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Send, Loader2, MapPin } from 'lucide-react';
-import { addIssue } from '../app/report/actions';
+import { addIssueClient } from '@/services/issue-service';
 import { useToast } from '@/hooks/use-toast';
 import { useSearchParams } from 'next/navigation';
 
@@ -19,7 +19,12 @@ const formSchema = z.object({
   title: z.string().min(5, 'O título deve ter pelo menos 5 caracteres.'),
   description: z.string().min(20, 'A descrição deve ter pelo menos 20 caracteres.'),
   category: z.string().min(1, 'A categoria é obrigatória.'),
-  location: z.string().min(3, 'A localização é obrigatória.'),
+  location: z.string().min(3, 'A localização é obrigatória.').refine(
+    (val) => {
+        const parts = val.split(',');
+        return parts.length === 2 && !isNaN(Number(parts[0])) && !isNaN(Number(parts[1]));
+    }, { message: "A localização deve estar no formato 'latitude, longitude'." }
+  )
 });
 
 const ReportForm = () => {
@@ -48,29 +53,32 @@ const ReportForm = () => {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    const [lat, lng] = values.location.split(',').map(Number);
     
-    const result = await addIssue({
-      title: values.title,
-      description: values.description,
-      category: values.category,
-      location: { lat, lng },
-    });
+    try {
+      const [lat, lng] = values.location.split(',').map(part => Number(part.trim()));
+      
+      await addIssueClient({
+        title: values.title,
+        description: values.description,
+        category: values.category,
+        location: { lat, lng },
+      });
 
-    setIsSubmitting(false);
-
-    if (result.success) {
       toast({
         title: 'Ocorrência Enviada!',
         description: 'Agradecemos sua colaboração. Sua ocorrência foi registrada com sucesso.',
       });
       form.reset();
-    } else {
+
+    } catch (error) {
+      console.error("Error adding issue:", error);
       toast({
         variant: 'destructive',
         title: 'Erro ao Enviar',
-        description: result.error || 'Não foi possível registrar a ocorrência. Tente novamente.',
+        description: 'Não foi possível registrar a ocorrência. Tente novamente.',
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
