@@ -44,7 +44,7 @@ export type NewIssue = {
   description: string;
   category: string;
   location: { lat: number; lng: number };
-  address?: string;
+  address: string;
   reporter: string;
 };
 
@@ -52,6 +52,7 @@ export async function addIssueClient(issue: NewIssue) {
     // validação simples
   if (!issue.title?.trim()) throw new Error("Título obrigatório");
   if (!issue.description?.trim()) throw new Error("Descrição obrigatória");
+  if (!issue.address?.trim()) throw new Error("Endereço obrigatório");
   if (
     typeof issue.location?.lat !== "number" ||
     typeof issue.location?.lng !== "number" ||
@@ -69,7 +70,7 @@ export async function addIssueClient(issue: NewIssue) {
     status: "Recebido",
     upvotes: 0,
     reporter: issue.reporter,
-    address: issue.address?.trim() || "",
+    address: issue.address.trim(),
     imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
     reportedAt: serverTimestamp(),
     location: new GeoPoint(issue.location.lat, issue.location.lng),

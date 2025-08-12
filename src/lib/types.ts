@@ -8,7 +8,7 @@ export type Issue = {
   category: string;
   status: 'Recebido' | 'Em análise' | 'Resolvido';
   location: { lat: number; lng: number };
-  address?: string; // Endereço textual opcional
+  address: string; // Endereço textual obrigatório
   imageUrl: string; 
   reportedAt: Date;
   reporter: string;
@@ -22,7 +22,7 @@ export type IssueData = {
   category: string;
   status: 'Recebido' | 'Em análise' | 'Resolvido';
   location: GeoPoint;
-  address?: string; // Endereço textual opcional
+  address: string; // Endereço textual obrigatório
   imageUrl: string;
   reportedAt: Timestamp;
   reporter: string;

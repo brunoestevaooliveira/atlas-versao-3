@@ -152,12 +152,13 @@ export default function ReportForm() {
                 />
             </div>
             <div className="grid gap-1.5">
-                <label htmlFor="address">Endereço ou Ponto de Referência (Opcional)</label>
+                <label htmlFor="address">Endereço ou Ponto de Referência</label>
                 <Input
                     id="address"
                     value={form.address}
                     onChange={(e) => setForm({ ...form, address: e.target.value })}
                     placeholder="Ex: Quadra 15, Conjunto C, em frente ao mercado"
+                    required
                 />
             </div>
         </div>
