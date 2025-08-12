@@ -20,6 +20,7 @@ export default function Home() {
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
   const [showIssues, setShowIssues] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const unsubscribe = listenToIssues(setIssues);

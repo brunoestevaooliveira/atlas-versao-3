@@ -7,11 +7,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
 import type { Issue } from '@/lib/types';
 import { BarChart, CheckCircle, Hourglass, ListFilter } from 'lucide-react';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 export default function TrackingPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
+  const { toast } = useToast();
 
   useEffect(() => {
     const unsubscribe = listenToIssues(setIssues);

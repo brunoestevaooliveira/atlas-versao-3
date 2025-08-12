@@ -190,7 +190,7 @@ export default function ReportForm() {
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading}>
+             <Button type="submit" size="lg" disabled={loading || !user}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
