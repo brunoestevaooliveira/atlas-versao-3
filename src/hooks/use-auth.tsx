@@ -2,8 +2,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { onAuthChange } from '@/services/auth-service';
-import { getAuth, signInAnonymously, type User } from 'firebase/auth';
+import { getAuth, signInAnonymously, type User, onAuthStateChanged } from 'firebase/auth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { app } from '@/lib/firebase';
 
