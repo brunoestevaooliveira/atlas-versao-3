@@ -53,8 +53,21 @@ export default function ReportForm() {
   // garante auth anônima p/ regras que exigem request.auth
   useEffect(() => {
     const auth = getAuth();
-    const unsub = onAuthStateChanged(auth, (user) => {
-      if (!user) signInAnonymously(auth).catch(console.error);
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (user) return;
+      try {
+        await signInAnonymously(auth);
+      } catch (e: any) {
+        // Se o provedor não estiver habilitado, não quebre o app
+        if (
+          e?.code === "auth/configuration-not-found" ||
+          e?.code === "auth/operation-not-allowed"
+        ) {
+          console.warn("Auth anônima não habilitada; prosseguindo sem login.");
+        } else {
+          console.error("Erro ao autenticar:", e);
+        }
+      }
     });
     return () => unsub();
   }, []);
