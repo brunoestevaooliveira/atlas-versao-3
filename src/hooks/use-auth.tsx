@@ -19,18 +19,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthChange(async (user) => {
-      if (user) {
-        setUser(user);
+    const auth = getAuth(app);
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        setUser(currentUser);
         setLoading(false);
       } else {
-        // If no user, sign in anonymously
+        // If no user is logged in, try to sign in anonymously
         try {
-          const auth = getAuth(app);
           const userCredential = await signInAnonymously(auth);
           setUser(userCredential.user);
-        } catch (error) {
-          console.error("Anonymous sign-in failed:", error);
+        } catch (error: any) {
+           if (
+            error?.code === 'auth/operation-not-allowed' ||
+            error?.code === 'auth/configuration-not-found'
+          ) {
+            console.warn(
+              'Firebase Anonymous Sign-In is not enabled. Please enable it in your Firebase console for the app to work correctly.'
+            );
+          } else {
+             console.error('Anonymous sign-in failed:', error);
+          }
         } finally {
           setLoading(false);
         }
