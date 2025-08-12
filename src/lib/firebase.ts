@@ -3,12 +3,12 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 // Configuração do seu app Firebase
+// Removidas chaves não utilizadas (storageBucket, messagingSenderId) para evitar
+// possíveis timeouts em serviços não provisionados.
 const firebaseConfig = {
   apiKey: "AIzaSyD4pQe9Cq9KlEqlHKBFKaBw6ZBm9WOy1MY",
   authDomain: "santa-maria-ativa.firebaseapp.com",
   projectId: "santa-maria-ativa",
-  storageBucket: "santa-maria-ativa.firebasestorage.app",
-  messagingSenderId: "122210829117",
   appId: "1:122210829117:web:666dda466c4197216a3b54"
 };
 
