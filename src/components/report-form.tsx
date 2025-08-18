@@ -8,9 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Send, Loader2, Sparkles } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { categorizeIssue } from "@/ai/flows/categorize-issue-flow";
 
 type FormState = {
   title: string;
@@ -62,41 +61,6 @@ export default function ReportForm() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [aiLoading, setAiLoading] = useState(false);
-
-  const handleSuggestCategory = async () => {
-    if (!form.title || !form.description) {
-      toast({
-        variant: 'destructive',
-        title: 'Dados Insuficientes',
-        description: 'Por favor, preencha o título e a descrição antes de usar a sugestão da IA.',
-      });
-      return;
-    }
-    setAiLoading(true);
-    try {
-      const result = await categorizeIssue({ title: form.title, description: form.description });
-      if (result.category && issueCategories.includes(result.category)) {
-        setForm(prev => ({ ...prev, category: result.category }));
-        toast({
-            title: 'Categoria Sugerida!',
-            description: `A IA sugeriu a categoria: "${result.category}".`,
-        });
-      } else {
-        throw new Error('Categoria inválida retornada pela IA.');
-      }
-    } catch (error) {
-      console.error('Erro ao sugerir categoria:', error);
-      toast({
-        variant: 'destructive',
-        title: 'Erro da IA',
-        description: 'Não foi possível sugerir uma categoria. Tente novamente.',
-      });
-    } finally {
-      setAiLoading(false);
-    }
-  };
-
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -177,31 +141,19 @@ export default function ReportForm() {
         <div className="space-y-6">
             <div className="grid gap-1.5">
                 <label htmlFor="category">Categoria</label>
-                <div className="flex items-center gap-2">
-                    <Select
-                        value={form.category}
-                        onValueChange={(value) => setForm({ ...form, category: value })}
-                    >
-                        <SelectTrigger id="category" className="flex-grow">
-                            <SelectValue placeholder="Selecione a categoria do problema" />
-                        </SelectTrigger>
-                        <SelectContent>
-                        {issueCategories.map(category => (
-                            <SelectItem key={category} value={category}>{category}</SelectItem>
-                        ))}
-                        </SelectContent>
-                    </Select>
-                    <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={handleSuggestCategory}
-                        disabled={aiLoading}
-                        title="Sugerir categoria com IA"
-                    >
-                        {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
-                    </Button>
-                </div>
+                <Select
+                    value={form.category}
+                    onValueChange={(value) => setForm({ ...form, category: value })}
+                >
+                    <SelectTrigger id="category">
+                        <SelectValue placeholder="Selecione a categoria do problema" />
+                    </SelectTrigger>
+                    <SelectContent>
+                    {issueCategories.map(category => (
+                        <SelectItem key={category} value={category}>{category}</SelectItem>
+                    ))}
+                    </SelectContent>
+                </Select>
             </div>
              <div className="grid gap-1.5">
                  <label htmlFor="location">Localização (preenchida ao clicar no mapa)</label>
