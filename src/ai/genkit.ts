@@ -4,9 +4,8 @@
  * @fileoverview This file initializes the Genkit AI plugin.
  */
 
-import {genkit} from 'genkit';
+import {genkit, configureGenkit} from 'genkit';
 import {googleAI} from '@genkit-ai/googleai';
-import {configureGenkit} from 'genkit';
 import {AlwaysOnSampler} from 'genkit/trace';
 
 // Note: might be useful to set GENKIT_ENV=dev in your local .env file.
@@ -15,12 +14,7 @@ if (!process.env.GENKIT_ENV || process.env.GENKIT_ENV !== 'prod') {
   configureGenkit({
     // Log developer-level details to the console.
     enableTracing: true,
-    traceStore: {
-      provider: 'dev',
-      options: {
-        sampler: new AlwaysOnSampler(),
-      },
-    },
+    traceStore: 'dev',
   });
 }
 
