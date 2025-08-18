@@ -7,16 +7,41 @@ import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
 import { cn } from '@/lib/utils';
 import 'leaflet/dist/leaflet.css';
-import { AuthProvider } from '@/context/auth-context';
+import { AuthProvider, useAuth } from '@/context/auth-context';
 import SplashScreen from '@/components/splash-screen';
+import { usePathname, useRouter } from 'next/navigation';
 
 
-// Metadata cannot be exported from a client component.
-// We can handle this in a separate file if needed.
-// export const metadata: Metadata = {
-//   title: 'Atlas Cívico',
-//   description: 'Plataforma cívica para mapeamento e resolução de problemas urbanos.',
-// };
+const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, loading } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    // Don't redirect on the login page itself, or if still loading
+    if (loading || pathname === '/') {
+      return;
+    }
+    
+    if (!isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, loading, router, pathname]);
+
+  // While loading auth state, show nothing to prevent flashes of content
+  if (loading && pathname !== '/') return null;
+  
+  // If not authenticated and not on login page, we'll be redirecting, so don't render children
+  if (!isAuthenticated && pathname !== '/') return null;
+
+  return (
+    <>
+      {isAuthenticated && <Header />}
+      <main>{children}</main>
+      <Toaster />
+    </>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -55,11 +80,9 @@ export default function RootLayout({
       <body className={cn('min-h-screen bg-background font-body antialiased')}>
         {isLoading && <SplashScreen isFinishing={isFinishing} />}
         <AuthProvider>
-            <Header />
-            <main>
-            {children}
-            </main>
-            <Toaster />
+            <ProtectedLayout>
+              {children}
+            </ProtectedLayout>
         </AuthProvider>
       </body>
     </html>

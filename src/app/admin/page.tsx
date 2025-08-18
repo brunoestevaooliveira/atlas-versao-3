@@ -47,7 +47,7 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      router.push('/admin/login');
+      router.push('/');
     }
   }, [isAuthenticated, router]);
 
@@ -109,11 +109,7 @@ export default function AdminPage() {
   };
 
   if (!isAuthenticated) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        <p>Redirecionando para a página de login...</p>
-      </div>
-    );
+    return null;
   }
 
   return (

@@ -1,10 +1,13 @@
 
 'use client';
 
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
+
+const SESSION_STORAGE_KEY = 'atlas-civico-auth';
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  loading: boolean;
   login: (user: string, pass: string) => Promise<boolean>;
   logout: () => void;
 }
@@ -26,11 +29,26 @@ const ADMIN_PASSWORD_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    try {
+      const storedAuth = sessionStorage.getItem(SESSION_STORAGE_KEY);
+      if (storedAuth) {
+        setIsAuthenticated(JSON.parse(storedAuth));
+      }
+    } catch (e) {
+      console.error('Could not parse auth state from session storage', e);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const login = async (user: string, pass: string): Promise<boolean> => {
     const passwordHash = await hashPassword(pass);
-    if (user === 'admin' && passwordHash === ADMIN_PASSWORD_HASH) {
+    if (user.toLowerCase() === 'admin' && passwordHash === ADMIN_PASSWORD_HASH) {
       setIsAuthenticated(true);
+      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(true));
       return true;
     }
     return false;
@@ -38,10 +56,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     setIsAuthenticated(false);
+    sessionStorage.removeItem(SESSION_STORAGE_KEY);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
