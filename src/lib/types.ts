@@ -1,6 +1,20 @@
 
 import { Timestamp, GeoPoint } from 'firebase/firestore';
 
+export type Comment = {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: Date;
+};
+
+export type CommentData = {
+  id: string;
+  author: string;
+  content: string;
+  createdAt: Timestamp;
+}
+
 export type Issue = {
   id: string;
   title: string;
@@ -13,6 +27,7 @@ export type Issue = {
   reportedAt: Date;
   reporter: string;
   upvotes: number;
+  comments: Comment[];
 };
 
 // This is the type for data stored in Firestore
@@ -27,6 +42,7 @@ export type IssueData = {
   reportedAt: Timestamp;
   reporter: string;
   upvotes: number;
+  comments: CommentData[];
 };
 
 export type AppUser = {

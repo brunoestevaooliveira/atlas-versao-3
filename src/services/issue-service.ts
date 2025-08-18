@@ -16,8 +16,11 @@ import {
   GeoPoint,
   serverTimestamp,
   getDocs,
+  arrayUnion,
 } from 'firebase/firestore';
-import type { Issue, IssueData } from '@/lib/types';
+import type { Issue, IssueData, Comment, CommentData } from '@/lib/types';
+import { v4 as uuidv4 } from 'uuid';
+
 
 // Helper to convert Firestore doc to Issue object
 const fromFirestore = (docData: any, id: string): Issue => {
@@ -37,6 +40,10 @@ const fromFirestore = (docData: any, id: string): Issue => {
     reportedAt: data.reportedAt ? (data.reportedAt as Timestamp).toDate() : new Date(),
     reporter: data.reporter,
     upvotes: data.upvotes,
+    comments: (data.comments || []).map(comment => ({
+      ...comment,
+      createdAt: (comment.createdAt as Timestamp).toDate(),
+    })).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime()),
   };
 };
 
@@ -75,6 +82,7 @@ export async function addIssueClient(issue: NewIssue) {
     imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
     reportedAt: serverTimestamp(),
     location: new GeoPoint(issue.location.lat, issue.location.lng),
+    comments: [], // Initialize with empty comments array
   };
 
   const docRef = await addDoc(ref, payload);
@@ -113,4 +121,21 @@ export const updateIssueStatus = async (issueId: string, newStatus: Issue['statu
 export const deleteIssue = async (issueId: string) => {
   const issueRef = doc(db, 'issues', issueId);
   await deleteDoc(issueRef);
+};
+
+export const addCommentToIssue = async (issueId: string, comment: { author: string, content: string }) => {
+    if (!comment.content?.trim()) throw new Error("O comentário não pode estar vazio.");
+    
+    const issueRef = doc(db, 'issues', issueId);
+    
+    const newComment: CommentData = {
+        id: uuidv4(),
+        author: comment.author,
+        content: comment.content.trim(),
+        createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0)
+    };
+
+    await updateDoc(issueRef, {
+        comments: arrayUnion(newComment)
+    });
 };
