@@ -2,7 +2,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Compass, FilePlus, BarChart, Search, Shield } from 'lucide-react';
+import { Compass, FilePlus, BarChart, Search, Shield, LineChart } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -13,6 +13,7 @@ const navLinks = [
   { href: '/', label: 'Início', icon: <Compass className="h-5 w-5" /> },
   { href: '/report', label: 'Reportar', icon: <FilePlus className="h-5 w-5" /> },
   { href: '/tracking', label: 'Acompanhar', icon: <BarChart className="h-5 w-5" /> },
+  { href: '/dashboard', label: 'Dashboard', icon: <LineChart className="h-5 w-5" /> },
   { href: '/search', label: 'Buscar', icon: <Search className="h-5 w-5" /> },
   { href: '/admin', label: 'Admin', icon: <Shield className="h-5 w-5" /> },
 ];
