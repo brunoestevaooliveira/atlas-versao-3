@@ -84,20 +84,23 @@ export default function Home() {
       return; 
     }
     
+    // Optimistically update the UI
     const newUpvotedSet = new Set(upvotedIssues).add(issueId);
     setUpvotedIssues(newUpvotedSet);
 
     try {
       await updateIssueUpvotes(issueId, currentUpvotes + 1);
+       // Persist to localStorage only on success
        localStorage.setItem(UPVOTED_ISSUES_KEY, JSON.stringify(Array.from(newUpvotedSet)));
     } catch (error) {
+       // Revert the optimistic update on error
        const revertedUpvotedSet = new Set(upvotedIssues);
        revertedUpvotedSet.delete(issueId);
        setUpvotedIssues(revertedUpvotedSet);
 
        toast({
         variant: 'destructive',
-        title: 'Erro',
+        title: 'Erro ao apoiar',
         description: 'Não foi possível registrar seu apoio. Tente novamente.',
       });
     }
