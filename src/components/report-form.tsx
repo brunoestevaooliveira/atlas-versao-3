@@ -10,7 +10,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Send, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/context/auth-context";
 
 type FormState = {
   title: string;
@@ -45,7 +44,6 @@ function parseLatLng(text: string | null): { lat: number; lng: number } | null {
 export default function ReportForm() {
   const params = useSearchParams();
   const { toast } = useToast();
-  const { appUser } = useAuth();
 
   const initialLocation = useMemo(() => {
     const lat = params.get("lat");
@@ -67,7 +65,7 @@ export default function ReportForm() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     
-    if (loading || !appUser) return;
+    if (loading) return;
 
     if (!form.address.trim()) {
       toast({
@@ -84,7 +82,7 @@ export default function ReportForm() {
       const loc = parseLatLng(form.locationText);
       if (!loc) throw new Error("Localização inválida. Clique no mapa para definir um ponto.");
 
-      const reporterName = appUser.name || 'Usuário Anônimo';
+      const reporterName = 'Cidadão Anônimo';
 
       await addIssueClient({
         title: form.title,
@@ -183,7 +181,7 @@ export default function ReportForm() {
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading || !appUser}>
+             <Button type="submit" size="lg" disabled={loading}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (

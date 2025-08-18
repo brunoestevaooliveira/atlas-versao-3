@@ -34,37 +34,20 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Shield, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { useAuth } from '@/context/auth-context';
-import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 
 export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { user, isAdmin, loading: authLoading } = useAuth();
-  const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && !isAdmin) {
-      toast({
-        variant: 'destructive',
-        title: 'Acesso Negado',
-        description: 'Você não tem permissão para acessar esta página.',
-      });
-      router.push('/mapa');
-    }
-  }, [user, isAdmin, authLoading, router, toast]);
-
-  useEffect(() => {
-    if (isAdmin) {
       const unsubscribe = listenToIssues((issues) => {
         setIssues(issues);
         setLoading(false);
       });
       return () => unsubscribe();
-    }
-  }, [isAdmin]);
+  }, []);
 
   const handleStatusChange = async (issueId: string, newStatus: Issue['status']) => {
     try {
@@ -112,14 +95,6 @@ export default function AdminPage() {
         return 'default';
     }
   };
-
-  if (authLoading || !isAdmin) {
-    return (
-        <div className="flex justify-center items-center h-screen">
-            <p>Carregando ou redirecionando...</p>
-        </div>
-    );
-  }
 
   return (
     <div className="container mx-auto py-8 mt-20 space-y-8">

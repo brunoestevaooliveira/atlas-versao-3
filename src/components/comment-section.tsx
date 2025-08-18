@@ -12,7 +12,6 @@ import { ptBR } from 'date-fns/locale';
 import { ScrollArea } from './ui/scroll-area';
 import { Send, User } from 'lucide-react';
 import { Separator } from './ui/separator';
-import { useAuth } from '@/context/auth-context';
 
 interface CommentSectionProps {
   issueId: string;
@@ -23,16 +22,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
-  const { appUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newComment.trim() || !appUser) return;
+    if (!newComment.trim()) return;
 
     setLoading(true);
     try {
       await addCommentToIssue(issueId, {
-        author: appUser.name || 'Usuário Anônimo',
+        author: 'Usuário Anônimo',
         content: newComment,
       });
       setNewComment('');
@@ -60,9 +58,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           rows={3}
-          disabled={loading || !appUser}
+          disabled={loading}
         />
-        <Button type="submit" disabled={loading || !appUser}>
+        <Button type="submit" disabled={loading}>
           <Send className="mr-2 h-4 w-4" />
           {loading ? 'Enviando...' : 'Enviar Comentário'}
         </Button>
