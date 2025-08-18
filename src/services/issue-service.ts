@@ -11,6 +11,7 @@ import {
   orderBy,
   doc,
   updateDoc,
+  deleteDoc,
   Timestamp,
   GeoPoint,
   serverTimestamp,
@@ -107,4 +108,9 @@ export const updateIssueUpvotes = async (issueId: string, newUpvotes: number) =>
 export const updateIssueStatus = async (issueId: string, newStatus: Issue['status']) => {
     const issueRef = doc(db, 'issues', issueId);
     await updateDoc(issueRef, { status: newStatus });
+};
+
+export const deleteIssue = async (issueId: string) => {
+  const issueRef = doc(db, 'issues', issueId);
+  await deleteDoc(issueRef);
 };

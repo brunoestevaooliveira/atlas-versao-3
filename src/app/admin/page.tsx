@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import type { Issue } from '@/lib/types';
-import { listenToIssues, updateIssueStatus } from '@/services/issue-service';
+import { listenToIssues, updateIssueStatus, deleteIssue } from '@/services/issue-service';
 import {
   Table,
   TableBody,
@@ -20,11 +20,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield } from 'lucide-react';
+import { Shield, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -66,6 +78,23 @@ export default function AdminPage() {
     }
   };
 
+  const handleDeleteIssue = async (issueId: string) => {
+    try {
+      await deleteIssue(issueId);
+      toast({
+        title: "Ocorrência Excluída",
+        description: "A ocorrência foi removida com sucesso.",
+      });
+    } catch (error) {
+      console.error("Erro ao excluir ocorrência:", error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao Excluir",
+        description: "Não foi possível remover a ocorrência.",
+      });
+    }
+  };
+
   const getStatusVariant = (status: Issue['status']) => {
     switch (status) {
       case 'Resolvido':
@@ -103,7 +132,7 @@ export default function AdminPage() {
         <CardHeader>
           <CardTitle>Lista de Ocorrências</CardTitle>
           <CardDescription>
-            Altere o status de cada ocorrência para manter a comunidade informada.
+            Altere o status ou exclua as ocorrências para manter os dados atualizados.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -115,12 +144,13 @@ export default function AdminPage() {
                   <TableHead>Categoria</TableHead>
                   <TableHead>Status Atual</TableHead>
                   <TableHead>Alterar Status</TableHead>
+                  <TableHead>Ações</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center">
+                    <TableCell colSpan={5} className="text-center">
                       Carregando ocorrências...
                     </TableCell>
                   </TableRow>
@@ -149,11 +179,35 @@ export default function AdminPage() {
                           </SelectContent>
                         </Select>
                       </TableCell>
+                      <TableCell>
+                        <AlertDialog>
+                          <AlertDialogTrigger asChild>
+                            <Button variant="destructive" size="icon">
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </AlertDialogTrigger>
+                          <AlertDialogContent>
+                            <AlertDialogHeader>
+                              <AlertDialogTitle>Você tem certeza?</AlertDialogTitle>
+                              <AlertDialogDescription>
+                                Esta ação não pode ser desfeita. Isso excluirá permanentemente a ocorrência
+                                "{issue.title}".
+                              </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                              <AlertDialogAction onClick={() => handleDeleteIssue(issue.id)}>
+                                Excluir
+                              </AlertDialogAction>
+                            </AlertDialogFooter>
+                          </AlertDialogContent>
+                        </AlertDialog>
+                      </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center py-10">
+                    <TableCell colSpan={5} className="text-center py-10">
                       Nenhuma ocorrência reportada ainda.
                     </TableCell>
                   </TableRow>
