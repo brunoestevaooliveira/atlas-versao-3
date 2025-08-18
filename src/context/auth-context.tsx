@@ -43,7 +43,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           setAppUser(userData);
           setIsAdmin(userData.role === 'admin');
         } else {
-          // If user exists in Auth but not in Firestore, log them out or handle as an error state.
+          // This case might happen if Firestore doc creation fails after auth creation.
+          // Forcing a logout to ensure consistent state.
           await signOut(auth);
           setAppUser(null);
           setIsAdmin(false);
@@ -63,27 +64,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
     const newUser = userCredential.user;
     
-    const role = email === 'admin@example.com' ? 'admin' : 'user';
+    // Determine role and name
+    const role = email.toLowerCase() === 'admin@example.com' ? 'admin' : 'user';
     const name = newUser.email?.split('@')[0] || 'Usuário Anônimo';
 
-    const newUserDoc = {
+    // Create user document in Firestore
+    const userDocRef = doc(db, 'users', newUser.uid);
+    await setDoc(userDocRef, {
       uid: newUser.uid,
       email: newUser.email,
       name: name,
       role: role,
-    };
-
-    // Set the document in Firestore with the server timestamp
-    await setDoc(doc(db, 'users', newUser.uid), {
-        ...newUserDoc,
-        createdAt: serverTimestamp(),
-    });
-    
-    // Set the local appUser state without the serverTimestamp
-    // The correct timestamp will be fetched on the next auth state change or reload.
-    setAppUser({
-        ...newUserDoc,
-        createdAt: new Date(), // Use a client-side timestamp for the initial local state.
+      createdAt: serverTimestamp(),
     });
   };
 
