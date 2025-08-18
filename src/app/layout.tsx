@@ -10,16 +10,15 @@ import 'leaflet/dist/leaflet.css';
 import { AuthProvider, useAuth } from '@/context/auth-context';
 import SplashScreen from '@/components/splash-screen';
 import { usePathname, useRouter } from 'next/navigation';
-import { User } from 'firebase/auth';
 
-const publicPaths = ['/']; // a página de login é publica
+const publicPaths = ['/', '/register']; 
 
 const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  const isPublicPath = publicPaths.includes(pathname) || pathname.startsWith('/register');
+  const isPublicPath = publicPaths.includes(pathname);
   const isAuthenticated = !!user;
 
   useEffect(() => {
@@ -35,17 +34,14 @@ const ProtectedLayout = ({ children }: { children: React.ReactNode }) => {
 
   }, [isAuthenticated, loading, router, pathname, isPublicPath]);
 
-  // Enquanto carrega, mostra splash ou nada para evitar piscar de conteúdo
   if (loading) {
      return <SplashScreen isFinishing={false} />;
   }
 
-  // Se não estiver autenticado e não for página pública, redireciona, então não renderiza
   if (!isAuthenticated && !isPublicPath) {
     return <SplashScreen isFinishing={false} />;
   }
   
-  // Se estiver autenticado e for página pública, redireciona, então não renderiza
   if (isAuthenticated && isPublicPath) {
       return <SplashScreen isFinishing={false} />;
   }
@@ -67,8 +63,17 @@ export default function RootLayout({
 }>) {
   const [isLoading, setIsLoading] = useState(true);
   const [isFinishing, setIsFinishing] = useState(false);
+  
+  const pathname = usePathname();
+  const noSplash = ['/', '/register'];
 
   useEffect(() => {
+    // Only run splash screen if not on a public/auth page
+    if (noSplash.includes(pathname)) {
+        setIsLoading(false);
+        return;
+    }
+
     const finishTimer = setTimeout(() => {
       setIsFinishing(true);
     }, 2000); 
@@ -81,10 +86,7 @@ export default function RootLayout({
       clearTimeout(finishTimer);
       clearTimeout(removeTimer);
     };
-  }, []);
-  
-  const pathname = usePathname();
-  const noSplash = ['/', '/register'];
+  }, [pathname]);
 
   return (
     <html lang="pt-BR">
@@ -93,11 +95,11 @@ export default function RootLayout({
         <meta name="description" content="Plataforma cívica para mapeamento e resolução de problemas urbanos." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('min-h-screen bg-background font-body antialiased')}>
+      <body className={cn('min-h-screen bg-background font-sans antialiased')}>
         <AuthProvider>
-            {isLoading && !noSplash.includes(pathname) ? (
+            {isLoading ? (
                 <SplashScreen isFinishing={isFinishing} />
             ) : (
                 <ProtectedLayout>
@@ -108,4 +110,3 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
