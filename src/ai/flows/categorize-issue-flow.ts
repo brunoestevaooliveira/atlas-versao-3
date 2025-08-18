@@ -23,13 +23,13 @@ const issueCategories = [
   "Outros",
 ];
 
-export const CategorizeIssueInputSchema = z.object({
+const CategorizeIssueInputSchema = z.object({
   title: z.string().describe('The title of the issue report.'),
   description: z.string().describe('The detailed description of the issue.'),
 });
 export type CategorizeIssueInput = z.infer<typeof CategorizeIssueInputSchema>;
 
-export const CategorizeIssueOutputSchema = z.object({
+const CategorizeIssueOutputSchema = z.object({
   category: z
     .string()
     .describe(`The most relevant category for the issue. Must be one of the following: ${issueCategories.map(c => `"${c}"`).join(', ')}`),

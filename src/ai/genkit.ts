@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileoverview This file initializes the Genkit AI plugin.
@@ -5,7 +6,8 @@
 
 import {genkit} from 'genkit';
 import {googleAI} from '@genkit-ai/googleai';
-import {AlwaysOnSampler, configureGenkit} from 'genkit/experimental/tracing';
+import {configureGenkit} from 'genkit';
+import {AlwaysOnSampler} from 'genkit/trace';
 
 // Note: might be useful to set GENKIT_ENV=dev in your local .env file.
 // If not set, it defaults to 'prod'
