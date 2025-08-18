@@ -32,14 +32,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Trash2 } from 'lucide-react';
+import { LogOut, Shield, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
+import { useAdminAuth } from '@/context/admin-auth-context';
 
 export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { logout } = useAdminAuth();
 
   useEffect(() => {
       const unsubscribe = listenToIssues((issues) => {
@@ -99,10 +101,16 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto py-8 mt-20 space-y-8">
       <header className="space-y-2 text-center">
-        <div className="inline-block bg-primary text-primary-foreground p-3 rounded-full">
-            <Shield className="w-8 h-8" />
+        <div className="flex justify-center items-center gap-4">
+            <div className="inline-block bg-primary text-primary-foreground p-3 rounded-full">
+                <Shield className="w-8 h-8" />
+            </div>
+            <h1 className="text-4xl font-bold font-headline">Painel do Administrador</h1>
+            <Button variant="outline" size="icon" onClick={logout} className="ml-4">
+                <LogOut className="h-4 w-4" />
+                <span className="sr-only">Sair</span>
+            </Button>
         </div>
-        <h1 className="text-4xl font-bold font-headline">Painel do Administrador</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
           Gerencie o status de todas as ocorrências reportadas pela comunidade.
         </p>
