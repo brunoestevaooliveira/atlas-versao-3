@@ -42,24 +42,29 @@ export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { isAuthenticated } = useAuth();
+  const { user, isAdmin, loading: authLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/');
+    if (!authLoading && !isAdmin) {
+      toast({
+        variant: 'destructive',
+        title: 'Acesso Negado',
+        description: 'Você não tem permissão para acessar esta página.',
+      });
+      router.push('/mapa');
     }
-  }, [isAuthenticated, router]);
+  }, [user, isAdmin, authLoading, router, toast]);
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAdmin) {
       const unsubscribe = listenToIssues((issues) => {
         setIssues(issues);
         setLoading(false);
       });
       return () => unsubscribe();
     }
-  }, [isAuthenticated]);
+  }, [isAdmin]);
 
   const handleStatusChange = async (issueId: string, newStatus: Issue['status']) => {
     try {
@@ -108,8 +113,12 @@ export default function AdminPage() {
     }
   };
 
-  if (!isAuthenticated) {
-    return null;
+  if (authLoading || !isAdmin) {
+    return (
+        <div className="flex justify-center items-center h-screen">
+            <p>Carregando ou redirecionando...</p>
+        </div>
+    );
   }
 
   return (

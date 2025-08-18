@@ -8,37 +8,52 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { LogIn } from 'lucide-react';
+import { UserPlus } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import Link from 'next/link';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { register } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      toast({
+        variant: 'destructive',
+        title: 'Senhas não coincidem',
+        description: 'Por favor, verifique se as senhas são iguais.',
+      });
+      return;
+    }
     setLoading(true);
 
     try {
-      await login(email, password);
+      await register(email, password);
       toast({
-        title: 'Login bem-sucedido!',
-        description: 'Redirecionando para a plataforma.',
+        title: 'Cadastro realizado com sucesso!',
+        description: 'Você será redirecionado para a plataforma.',
       });
       router.push('/mapa');
     } catch (error: any) {
-       toast({
+      let description = 'Ocorreu um erro desconhecido. Tente novamente.';
+      if (error.code === 'auth/email-already-in-use') {
+          description = 'Este e-mail já está em uso por outra conta.';
+      } else if (error.code === 'auth/weak-password') {
+          description = 'A senha é muito fraca. Use pelo menos 6 caracteres.';
+      }
+      toast({
         variant: 'destructive',
-        title: 'Falha no Login',
-        description: 'Email ou senha incorretos. Tente novamente.',
+        title: 'Falha no Cadastro',
+        description,
       });
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -47,10 +62,10 @@ export default function LoginPage() {
       <Card className="w-full max-w-md mx-4">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center mb-4">
-            <LogIn className="w-8 h-8" />
+            <UserPlus className="w-8 h-8" />
           </div>
-          <CardTitle className="text-2xl font-bold">Atlas Cívico</CardTitle>
-          <CardDescription>Use suas credenciais para acessar a plataforma.</CardDescription>
+          <CardTitle className="text-2xl font-bold">Criar Conta</CardTitle>
+          <CardDescription>Junte-se à plataforma Atlas Cívico.</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -70,22 +85,33 @@ export default function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Sua senha"
+                placeholder="Crie uma senha forte"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirmar Senha</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirme sua senha"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+              />
+            </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? 'Registrando...' : 'Registrar'}
             </Button>
           </form>
         </CardContent>
         <CardFooter className="flex justify-center text-sm">
             <p className="text-muted-foreground">
-                Não tem uma conta?{' '}
-                <Link href="/register" className="text-primary hover:underline">
-                    Registre-se
+                Já tem uma conta?{' '}
+                <Link href="/" className="text-primary hover:underline">
+                    Faça login
                 </Link>
             </p>
         </CardFooter>

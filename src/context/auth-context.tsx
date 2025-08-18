@@ -2,65 +2,84 @@
 'use client';
 
 import React, { createContext, useState, useContext, ReactNode, useEffect } from 'react';
-
-const SESSION_STORAGE_KEY = 'atlas-civico-auth';
+import { auth, db } from '@/lib/firebase';
+import { 
+  onAuthStateChanged, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  signOut,
+  type User
+} from 'firebase/auth';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import type { AppUser } from '@/lib/types';
 
 interface AuthContextType {
-  isAuthenticated: boolean;
+  user: User | null;
+  appUser: AppUser | null;
   loading: boolean;
-  login: (user: string, pass: string) => Promise<boolean>;
-  logout: () => void;
+  isAdmin: boolean;
+  register: (email: string, pass: string) => Promise<void>;
+  login: (email: string, pass: string) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper to hash password using SHA-256
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return hashHex;
-}
-
-// Pre-hashed password for "admin"
-const ADMIN_PASSWORD_HASH = '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918';
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [appUser, setAppUser] = useState<AppUser | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    try {
-      const storedAuth = sessionStorage.getItem(SESSION_STORAGE_KEY);
-      if (storedAuth) {
-        setIsAuthenticated(JSON.parse(storedAuth));
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      setLoading(true);
+      if (user) {
+        setUser(user);
+        const userRef = doc(db, 'users', user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const userData = userSnap.data() as AppUser;
+          setAppUser(userData);
+          setIsAdmin(userData.role === 'admin');
+        }
+      } else {
+        setUser(null);
+        setAppUser(null);
+        setIsAdmin(false);
       }
-    } catch (e) {
-      console.error('Could not parse auth state from session storage', e);
-    } finally {
       setLoading(false);
-    }
+    });
+
+    return () => unsubscribe();
   }, []);
 
-  const login = async (user: string, pass: string): Promise<boolean> => {
-    const passwordHash = await hashPassword(pass);
-    if (user.toLowerCase() === 'admin' && passwordHash === ADMIN_PASSWORD_HASH) {
-      setIsAuthenticated(true);
-      sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(true));
-      return true;
-    }
-    return false;
+  const register = async (email: string, pass: string) => {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    const newUser = userCredential.user;
+    
+    // Define o primeiro usuário como admin para fins de demonstração
+    const role = email === 'admin@example.com' ? 'admin' : 'user';
+
+    await setDoc(doc(db, 'users', newUser.uid), {
+      uid: newUser.uid,
+      email: newUser.email,
+      displayName: newUser.email?.split('@')[0], // default display name
+      createdAt: serverTimestamp(),
+      role: role,
+    });
   };
 
-  const logout = () => {
-    setIsAuthenticated(false);
-    sessionStorage.removeItem(SESSION_STORAGE_KEY);
+  const login = async (email: string, pass: string) => {
+    await signInWithEmailAndPassword(auth, email, pass);
+  };
+
+  const logout = async () => {
+    await signOut(auth);
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, appUser, loading, isAdmin, register, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

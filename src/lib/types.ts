@@ -49,6 +49,6 @@ export type AppUser = {
     uid: string;
     email: string | null;
     displayName: string | null;
-    photoURL: string | null;
-    createdAt: Date | Timestamp;
+    createdAt: Timestamp;
+    role: 'user' | 'admin';
 };
