@@ -84,7 +84,7 @@ export default function ReportForm() {
       const loc = parseLatLng(form.locationText);
       if (!loc) throw new Error("Localização inválida. Clique no mapa para definir um ponto.");
 
-      const reporterName = appUser.displayName || 'Usuário Anônimo';
+      const reporterName = appUser.name || 'Usuário Anônimo';
 
       await addIssueClient({
         title: form.title,

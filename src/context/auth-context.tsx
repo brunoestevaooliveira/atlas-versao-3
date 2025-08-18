@@ -59,12 +59,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const newUser = userCredential.user;
     
     const role = email === 'admin@example.com' ? 'admin' : 'user';
-    const displayName = newUser.email?.split('@')[0] || 'Usuário Anônimo';
+    const name = newUser.email?.split('@')[0] || 'Usuário Anônimo';
 
     await setDoc(doc(db, 'users', newUser.uid), {
       uid: newUser.uid,
       email: newUser.email,
-      displayName: displayName,
+      name: name,
       createdAt: serverTimestamp(),
       role: role,
     });

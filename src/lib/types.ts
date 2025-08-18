@@ -48,7 +48,7 @@ export type IssueData = {
 export type AppUser = {
     uid: string;
     email: string | null;
-    displayName: string | null;
+    name: string | null;
     createdAt: Timestamp;
     role: 'user' | 'admin';
 };

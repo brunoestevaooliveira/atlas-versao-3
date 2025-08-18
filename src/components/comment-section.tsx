@@ -32,7 +32,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
     setLoading(true);
     try {
       await addCommentToIssue(issueId, {
-        author: appUser.displayName || 'Usuário Anônimo',
+        author: appUser.name || 'Usuário Anônimo',
         content: newComment,
       });
       setNewComment('');
