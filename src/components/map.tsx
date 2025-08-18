@@ -18,13 +18,13 @@ const defaultIcon = new L.Icon({
 
 interface MapProps {
   issues: Issue[];
+  center: [number, number];
 }
 
-const Map: React.FC<MapProps> = ({ issues }) => {
+const Map: React.FC<MapProps> = ({ issues, center }) => {
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const mapContainerRef = useRef<HTMLDivElement>(null);
-  const center: [number, number] = [-16.0036, -47.9872];
   const router = useRouter();
 
   // Initialize map
