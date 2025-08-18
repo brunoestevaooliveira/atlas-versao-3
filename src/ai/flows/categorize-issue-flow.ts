@@ -35,11 +35,19 @@ export const CategorizeIssueOutputSchema = z.object({
 });
 export type CategorizeIssueOutput = z.infer<typeof CategorizeIssueOutputSchema>;
 
-const prompt = ai.definePrompt({
-    name: 'categorizeIssuePrompt',
-    input: { schema: CategorizeIssueInputSchema },
-    output: { schema: CategorizeIssueOutputSchema },
-    prompt: `You are an expert in urban problem classification for the city of Santa Maria, DF, Brazil. 
+
+const categorizeIssueFlow = ai.defineFlow(
+  {
+    name: 'categorizeIssueFlow',
+    inputSchema: CategorizeIssueInputSchema,
+    outputSchema: CategorizeIssueOutputSchema,
+  },
+  async (input) => {
+    const prompt = ai.definePrompt({
+        name: 'categorizeIssuePrompt',
+        input: { schema: CategorizeIssueInputSchema },
+        output: { schema: CategorizeIssueOutputSchema },
+        prompt: `You are an expert in urban problem classification for the city of Santa Maria, DF, Brazil. 
 Your task is to analyze the title and description of an issue reported by a citizen and assign it to the most appropriate category.
 
 You MUST choose one of the following predefined categories:
@@ -59,16 +67,8 @@ Description: {{{description}}}
 
 Based on the information, determine the best category.
 `,
-});
+    });
 
-
-const categorizeIssueFlow = ai.defineFlow(
-  {
-    name: 'categorizeIssueFlow',
-    inputSchema: CategorizeIssueInputSchema,
-    outputSchema: CategorizeIssueOutputSchema,
-  },
-  async (input) => {
     const { output } = await prompt(input);
     return output!;
   }
