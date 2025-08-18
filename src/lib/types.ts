@@ -49,6 +49,6 @@ export type AppUser = {
     uid: string;
     email: string | null;
     name: string | null;
-    createdAt: Timestamp;
+    createdAt: Timestamp | Date; // Allow both types for client/server consistency
     role: 'user' | 'admin';
 };
