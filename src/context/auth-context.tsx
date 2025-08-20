@@ -52,7 +52,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               createdAt: (data.createdAt as Timestamp).toDate()
           });
         } else {
-            await handleNewUser(user);
+          // This case handles a user who is authenticated with Firebase Auth
+          // but doesn't have a document in Firestore yet (e.g., first Google login).
+          await handleNewUser(user);
         }
       } else {
         setAuthUser(null);
@@ -68,6 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userRef = doc(db, 'users', user.uid);
     const docSnap = await getDoc(userRef);
 
+    // If the document already exists, just load the data.
     if (docSnap.exists()) { 
         const data = docSnap.data() as AppUserData;
         setAppUser({
@@ -77,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
     }
     
-    // For first-time Google sign in, use Google's display name.
+    // If it doesn't exist, create it.
     const newName = name || user.displayName || user.email?.split('@')[0] || 'Usuário';
     const isFirstUser = user.email === 'admin@example.com';
 
@@ -92,13 +95,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     await setDoc(userRef, newUserDoc);
 
+    // After creating, set the local state.
     setAppUser({
         uid: newUserDoc.uid,
         email: newUserDoc.email,
         name: newUserDoc.name,
         photoURL: newUserDoc.photoURL,
         role: newUserDoc.role,
-        createdAt: new Date(), 
+        createdAt: new Date(), // Use current date for local state
     });
   }
 
@@ -115,12 +119,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const provider = new GoogleAuthProvider();
     try {
         const result = await signInWithPopup(auth, provider);
-        await handleNewUser(result.user);
+        // `onAuthStateChanged` will handle the user creation/login.
+        toast({
+            title: 'Login com Google bem-sucedido!',
+            description: 'Bem-vindo(a).',
+        });
     } catch (error: any) {
-        // Don't show an error if the user intentionally closed the popup.
         if (error.code === 'auth/popup-closed-by-user') {
             return;
         }
+        console.error("Google Sign-In Error:", error);
         toast({
             variant: 'destructive',
             title: 'Falha no Login com Google',
