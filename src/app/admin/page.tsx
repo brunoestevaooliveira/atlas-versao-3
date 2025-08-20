@@ -36,20 +36,32 @@ import { LogOut, Shield, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useAdminAuth } from '@/context/admin-auth-context';
+import { useRouter } from 'next/navigation';
 
-export default function AdminPage() {
+function ProtectedAdminPage() {
+  const { appUser, isLoading } = useAdminAuth();
+  const router = useRouter();
+
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { logout } = useAdminAuth();
 
   useEffect(() => {
+    if (!isLoading && !appUser) {
+      router.push('/admin/login');
+    }
+  }, [appUser, isLoading, router]);
+
+  useEffect(() => {
+    if (appUser) {
       const unsubscribe = listenToIssues((issues) => {
         setIssues(issues);
         setLoading(false);
       });
       return () => unsubscribe();
-  }, []);
+    }
+  }, [appUser]);
 
   const handleStatusChange = async (issueId: string, newStatus: Issue['status']) => {
     try {
@@ -97,6 +109,15 @@ export default function AdminPage() {
         return 'default';
     }
   };
+
+  if (isLoading || !appUser) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <p>Verificando autorização de administrador...</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="container mx-auto py-8 mt-20 space-y-8">
@@ -207,4 +228,8 @@ export default function AdminPage() {
       </Card>
     </div>
   );
+}
+
+export default function AdminPage() {
+  return <ProtectedAdminPage />;
 }
