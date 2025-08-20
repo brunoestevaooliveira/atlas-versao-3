@@ -17,8 +17,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   const isPublicPage = ['/login', '/register'].includes(pathname);
-  const isAdminPage = pathname.startsWith('/admin');
-  const isSplashPage = !isPublicPage && !isAdminPage;
+  const isSplashPage = !isPublicPage && !pathname.startsWith('/admin');
   const [isSplashLoading, setIsSplashLoading] = useState(isSplashPage);
   const [isSplashFinishing, setIsSplashFinishing] = useState(false);
 
@@ -36,31 +35,27 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   }, [isSplashPage]);
   
   useEffect(() => {
-    // Aguarda o carregamento terminar antes de qualquer lógica
+    // Não faz nada até o carregamento da autenticação terminar
     if (isLoading) return; 
 
-    // Se já temos a informação do usuário, podemos tomar decisões
-    if (appUser) {
-        // Redireciona usuários autenticados para a home se tentarem acessar login/register
+    if (appUser) { // Usuário está logado
+        // Se tentar acessar login/register, redireciona para a home
         if (isPublicPage) {
             router.push('/');
         }
-        // Protege a rota de admin
-        if (isAdminPage && appUser.role !== 'admin') {
-            router.push('/');
-        }
-    } else { // Se não há appUser (não está logado)
-        // Redireciona para login se tentar acessar páginas protegidas
+    } else { // Usuário não está logado
+        // Se tentar acessar qualquer página protegida (que não seja pública), redireciona para login
         if (!isPublicPage) {
              router.push('/login');
         }
     }
-  }, [isLoading, authUser, appUser, isPublicPage, isAdminPage, router, pathname]);
+    // A proteção da rota /admin foi movida para src/app/admin/layout.tsx
+  }, [isLoading, appUser, isPublicPage, router, pathname]);
 
    if (isLoading && !isPublicPage) {
     return (
       <body className="flex h-screen w-full items-center justify-center bg-background">
-        <p>Verificando autenticação...</p>
+        {/* Este é um estado de carregamento global para o appUser */}
       </body>
     );
   }
