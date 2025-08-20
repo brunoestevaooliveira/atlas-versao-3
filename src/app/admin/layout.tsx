@@ -1,8 +1,6 @@
 
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 import { Toaster } from '@/components/ui/toaster';
 import { Button } from '@/components/ui/button';
@@ -10,10 +8,9 @@ import Link from 'next/link';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const { appUser, isLoading } = useAuth();
-  const router = useRouter();
 
-  // Enquanto os dados de autenticação estão sendo carregados, exibe uma tela de loading.
-  // Isso é crucial para evitar a condição de corrida.
+  // 1. Enquanto os dados de autenticação estão sendo carregados, exibe uma tela de loading.
+  // Isso é a etapa mais crucial para evitar a condição de corrida.
   if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -22,8 +19,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Após o carregamento, se o usuário não for um admin, exibe acesso negado.
-  // Renderização condicional é mais segura que useEffect para redirecionamento aqui.
+  // 2. Após o carregamento, se o usuário NÃO for um admin, exibe a tela de acesso negado.
+  // Esta verificação só ocorre depois que 'isLoading' é falso, garantindo que 'appUser' tenha seu valor final.
   if (appUser?.role !== 'admin') {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background gap-4">
@@ -36,7 +33,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  // Se o carregamento terminou e o usuário é um admin, renderiza o conteúdo da página.
+  // 3. Se o carregamento terminou e o usuário é um admin, renderiza o conteúdo da página.
   return (
     <>
       {children}
