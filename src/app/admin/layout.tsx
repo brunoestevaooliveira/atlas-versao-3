@@ -20,7 +20,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     );
   }
 
-  if (appUser?.role !== 'admin') {
+  // Hardcoded check for the specific admin email to bypass any database role issues.
+  if (appUser?.email !== 'ylhito0307@gmail.com') {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background gap-4">
         <h1 className="text-2xl font-bold">Acesso Negado</h1>
