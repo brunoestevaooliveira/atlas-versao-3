@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -12,7 +11,7 @@ import SplashScreen from '@/components/splash-screen';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
 
-function ProtectedLayout({ children }: { children: React.ReactNode }) {
+function LayoutContent({ children }: { children: React.ReactNode }) {
   const { authUser, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
@@ -35,19 +34,14 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   }, [isPublicPage]);
   
   useEffect(() => {
-    // This is the core logic. If loading is finished, and there's no user,
-    // and we are NOT on a public page, then redirect.
     if (!isLoading && !authUser && !isPublicPage) {
       router.push('/login');
     }
-    // If the user is logged in and tries to access a public page, redirect to home.
     if (!isLoading && authUser && isPublicPage) {
       router.push('/');
     }
   }, [isLoading, authUser, isPublicPage, router]);
 
-  // While auth is loading, and we are not on a public page, show a loader.
-  // This prevents the redirect logic from firing prematurely.
   if (isLoading && !isPublicPage) {
     return (
        <div className="flex h-screen w-full items-center justify-center bg-background">
@@ -57,14 +51,6 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <html lang="pt-BR">
-      <head>
-        <title>Atlas Cívico</title>
-        <meta name="description" content="Plataforma cívica para mapeamento e resolução de problemas urbanos." />
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
-      </head>
       <body className={cn('min-h-screen bg-background font-sans antialiased')}>
         {isSplashLoading && !isPublicPage ? (
           <SplashScreen isFinishing={isSplashFinishing} />
@@ -76,7 +62,6 @@ function ProtectedLayout({ children }: { children: React.ReactNode }) {
           </>
         )}
       </body>
-    </html>
   );
 }
 
@@ -86,8 +71,17 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <AuthProvider>
-      <ProtectedLayout>{children}</ProtectedLayout>
-    </AuthProvider>
+    <html lang="pt-BR">
+       <head>
+        <title>Atlas Cívico</title>
+        <meta name="description" content="Plataforma cívica para mapeamento e resolução de problemas urbanos." />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
+      </head>
+      <AuthProvider>
+        <LayoutContent>{children}</LayoutContent>
+      </AuthProvider>
+    </html>
   );
 }
