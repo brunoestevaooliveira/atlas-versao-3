@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-        const result = await signInWithPopup(auth, provider);
+        await signInWithPopup(auth, provider);
         // `onAuthStateChanged` will handle the user creation/login.
         toast({
             title: 'Login com Google bem-sucedido!',
