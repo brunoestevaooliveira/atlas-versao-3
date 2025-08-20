@@ -2,38 +2,41 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Regras para a coleção 'users'
+
+    // Helper function to check if a user is an admin
+    function isAdmin() {
+      return exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // Rules for the 'users' collection
     match /users/{userId} {
-      // Qualquer um pode ler perfis de usuário (para exibir nomes, etc.)
+      // Anyone can read user profiles (useful for displaying reporter names, etc.)
       allow read: if true;
-      
-      // Um usuário só pode criar ou atualizar seu próprio documento.
-      allow create, update: if request.auth != null && request.auth.uid == userId;
-
-      // Apenas administradores podem apagar usuários (opcional, mas seguro)
-      allow delete: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Only the user themselves can create their own profile
+      allow create: if request.auth.uid == userId;
+      // A user can only update their own profile
+      allow update: if request.auth.uid == userId;
+      // Only admins can delete users (for moderation)
+      allow delete: if isAdmin();
     }
 
-    // Regras para a coleção 'issues'
+    // Rules for the 'issues' collection
     match /issues/{issueId} {
-      // Qualquer um (logado ou não) pode ler as ocorrências
+      // Anyone (even unauthenticated users) can read issues for map/dashboard display
       allow read: if true;
-      
-      // Apenas usuários autenticados podem criar novas ocorrências
+      // Any authenticated user can create (report) an issue
       allow create: if request.auth != null;
-      
-      // Apenas um admin pode modificar o documento inteiro ou apagar
-      allow update, delete: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      // Only an admin can perform a full update or delete an issue
+      allow update, delete: if isAdmin();
 
-      // Regra específica para permitir que usuários autenticados apoiem (upvote) ou comentem
-      allow update: if request.auth != null 
-                    && (request.resource.data.keys().hasOnly(['upvotes', 'comments']));
-    }
-    
-    // Regra de fallback: nega tudo que não foi explicitamente permitido
-    match /{document=**} {
-      allow read, write: if false;
+      // Granular update rules for specific fields
+      // This allows authenticated users to perform specific actions without having full write access
+      // allow update: if request.auth != null && (
+      //   (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'comments']) &&
+      //     request.resource.data.upvotes == resource.data.upvotes + 1) || // Upvoting
+      //   isAdmin() // Admins can still update anything
+      // );
     }
   }
 }
