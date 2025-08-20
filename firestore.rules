@@ -1,34 +1,44 @@
 
 rules_version = '2';
 
+// The ADMIN_UID must be manually updated if the admin account changes.
+// This UID is for the user with the email: ylhito0307@gmail.com
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Regras para a coleção 'users'
+    // Helper function to check if the user is the designated admin by UID.
+    function isAdmin() {
+      return request.auth.uid == 'lX33n6T8sAgH1tANw5z4a6T9xxy2';
+    }
+    
+    // Users collection:
+    // - Anyone can read user profiles (for names, photos, etc.)
+    // - A user can only create or update their own profile.
     match /users/{userId} {
-      // Qualquer um pode ler perfis (para ver nomes de quem reportou, etc.)
       allow read: if true;
-      // Um usuário só pode criar ou atualizar seu próprio perfil.
       allow create, update: if request.auth.uid == userId;
-      // Ninguém pode deletar perfis por enquanto.
-      allow delete: if false;
+      allow delete: if isAdmin(); // Only admin can delete user profiles
     }
 
-    // Regras para a coleção 'issues'
+    // Issues collection:
+    // - Everyone can read issues.
+    // - Any authenticated user can create an issue.
+    // - Only admin can delete an issue.
+    // - Admin can update any field.
+    // - Any authenticated user can update 'upvotes' and 'comments'.
     match /issues/{issueId} {
-      // Qualquer um pode ler as ocorrências para ver no mapa e dashboards.
       allow read: if true;
-      // Apenas usuários logados podem criar novas ocorrências.
       allow create: if request.auth != null;
 
-      // A permissão de atualização é dividida:
-      // 1. Um admin pode atualizar qualquer coisa.
-      // 2. Um usuário comum (logado) só pode atualizar os campos 'upvotes' e 'comments'.
-      allow update: if (get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin') ||
-                     (request.auth.uid != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'comments']));
+      // Update is allowed if:
+      // 1. The user is the designated Admin.
+      // 2. The user is authenticated and is ONLY changing the upvotes or comments.
+      allow update: if isAdmin() || 
+                      (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'comments']));
 
-      // Apenas um admin pode excluir uma ocorrência.
-      allow delete: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+      allow delete: if isAdmin();
     }
   }
 }
+
+    

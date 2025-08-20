@@ -19,6 +19,9 @@ import { auth, db } from '@/lib/firebase';
 import type { AppUser, AppUserData } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
+// Hardcoded Admin UID for ylhito0307@gmail.com
+const ADMIN_UID = 'lX33n6T8sAgH1tANw5z4a6T9xxy2';
+
 interface AuthContextType {
   authUser: User | null;
   appUser: AppUser | null;
@@ -82,7 +85,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // If it doesn't exist, create it.
     const newName = name || user.displayName || user.email?.split('@')[0] || 'Usuário';
-    const isAdmin = user.email === 'ylhito0307@gmail.com';
+    
+    // Explicitly set role to 'admin' if the UID matches.
+    const isAdmin = user.uid === ADMIN_UID;
 
     const newUserDoc: AppUserData = {
         uid: user.uid,
@@ -156,3 +161,5 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
+
+    
