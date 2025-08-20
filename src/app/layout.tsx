@@ -36,25 +36,28 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   }, [isSplashPage]);
   
   useEffect(() => {
-    if (isLoading) return; // Aguarda o carregamento terminar antes de qualquer lógica
+    // Aguarda o carregamento terminar antes de qualquer lógica
+    if (isLoading) return; 
 
-    // Redireciona usuários não autenticados para a página de login
-    if (!authUser && !isPublicPage && !isAdminPage) {
-      router.push('/login');
-    }
-    
-    // Redireciona usuários autenticados para a home se tentarem acessar login/register
-    if (authUser && isPublicPage) {
-      router.push('/');
-    }
-
-    // Protege a rota de admin
-    if (isAdminPage && appUser?.role !== 'admin') {
-        router.push('/');
+    // Se já temos a informação do usuário, podemos tomar decisões
+    if (appUser) {
+        // Redireciona usuários autenticados para a home se tentarem acessar login/register
+        if (isPublicPage) {
+            router.push('/');
+        }
+        // Protege a rota de admin
+        if (isAdminPage && appUser.role !== 'admin') {
+            router.push('/');
+        }
+    } else { // Se não há appUser (não está logado)
+        // Redireciona para login se tentar acessar páginas protegidas
+        if (!isPublicPage) {
+             router.push('/login');
+        }
     }
   }, [isLoading, authUser, appUser, isPublicPage, isAdminPage, router, pathname]);
 
-   if (isLoading && (!isPublicPage || isAdminPage)) {
+   if (isLoading && !isPublicPage) {
     return (
       <body className="flex h-screen w-full items-center justify-center bg-background">
         <p>Verificando autenticação...</p>
@@ -68,7 +71,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           <SplashScreen isFinishing={isSplashFinishing} />
         ) : (
           <>
-            {!isPublicPage && !isAdminPage && <Header />}
+            {!isPublicPage && <Header />}
             <main>{children}</main>
             <Toaster />
           </>

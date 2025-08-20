@@ -41,15 +41,17 @@ export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { logout } = useAuth();
+  const { logout, appUser } = useAuth();
 
   useEffect(() => {
-      const unsubscribe = listenToIssues((issues) => {
-        setIssues(issues);
-        setLoading(false);
-      });
-      return () => unsubscribe();
-  }, []);
+      if (appUser) { // Only listen to issues if user is authenticated
+        const unsubscribe = listenToIssues((issues) => {
+          setIssues(issues);
+          setLoading(false);
+        });
+        return () => unsubscribe();
+      }
+  }, [appUser]);
 
   const handleStatusChange = async (issueId: string, newStatus: Issue['status']) => {
     try {
