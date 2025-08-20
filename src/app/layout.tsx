@@ -10,18 +10,20 @@ import 'leaflet/dist/leaflet.css';
 import SplashScreen from '@/components/splash-screen';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
+import { AdminAuthProvider } from '@/context/admin-auth-context';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { authUser, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  const isPublicPage = ['/login', '/register'].includes(pathname);
-  const [isSplashLoading, setIsSplashLoading] = useState(true);
+  const isPublicPage = ['/login', '/register', '/admin/login'].includes(pathname);
+  const isSplashPage = !isPublicPage && !pathname.startsWith('/admin');
+  const [isSplashLoading, setIsSplashLoading] = useState(isSplashPage);
   const [isSplashFinishing, setIsSplashFinishing] = useState(false);
 
   useEffect(() => {
-    if (isPublicPage) {
+    if (!isSplashPage) {
       setIsSplashLoading(false);
       return;
     }
@@ -31,24 +33,28 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
       clearTimeout(finishTimer);
       clearTimeout(removeTimer);
     };
-  }, [isPublicPage]);
+  }, [isSplashPage]);
   
   useEffect(() => {
     if (!isLoading && !authUser && !isPublicPage) {
       router.push('/login');
     }
-    if (!isLoading && authUser && isPublicPage) {
+    if (!isLoading && authUser && (pathname === '/login' || pathname === '/register')) {
       router.push('/');
     }
-  }, [isLoading, authUser, isPublicPage, router]);
+  }, [isLoading, authUser, isPublicPage, router, pathname]);
+
+   if (isLoading && !isPublicPage) {
+    return (
+      <body className="flex h-screen w-full items-center justify-center bg-background">
+        <p>Verificando autenticação...</p>
+      </body>
+    );
+  }
 
   return (
       <body className={cn('min-h-screen bg-background font-sans antialiased')}>
-        {isLoading && !isPublicPage ? (
-          <div className="flex h-screen w-full items-center justify-center bg-background">
-            <p>Verificando autenticação...</p>
-          </div>
-        ) : isSplashLoading && !isPublicPage ? (
+        {isSplashLoading && isSplashPage ? (
           <SplashScreen isFinishing={isSplashFinishing} />
         ) : (
           <>
@@ -76,7 +82,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <AuthProvider>
-        <LayoutContent>{children}</LayoutContent>
+        <AdminAuthProvider>
+          <LayoutContent>{children}</LayoutContent>
+        </AdminAuthProvider>
       </AuthProvider>
     </html>
   );

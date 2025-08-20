@@ -53,17 +53,6 @@ const Header: React.FC = () => {
             {label}
           </Link>
         ))}
-         {appUser?.role === 'admin' && (
-          <Link
-            href="/admin"
-            className={cn(
-                'transition-colors hover:text-primary',
-                pathname === '/admin' ? 'text-primary font-semibold' : 'text-foreground/80',
-            )}
-          >
-            Admin
-          </Link>
-        )}
       </nav>
     );
   };
