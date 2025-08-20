@@ -17,6 +17,7 @@ import {
 import { doc, getDoc, setDoc, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
 import type { AppUser, AppUserData } from '@/lib/types';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuthContextType {
   authUser: User | null;
@@ -35,6 +36,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [appUser, setAppUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
+  const { toast } = useToast();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
@@ -50,9 +52,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               createdAt: (data.createdAt as Timestamp).toDate()
           });
         } else {
-            // This case might happen with Google sign-in for the first time
-            // Or if user doc creation failed previously.
-            await handleNewUser(user, user.displayName);
+            await handleNewUser(user);
         }
       } else {
         setAuthUser(null);
@@ -68,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userRef = doc(db, 'users', user.uid);
     const docSnap = await getDoc(userRef);
 
-    if (docSnap.exists()) { // User doc already exists
+    if (docSnap.exists()) { 
         const data = docSnap.data() as AppUserData;
         setAppUser({
             ...data,
@@ -76,12 +76,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         });
         return;
     }
-
+    
+    // For first-time Google sign in, use Google's display name.
+    const newName = name || user.displayName || user.email?.split('@')[0] || 'Usuário';
     const isFirstUser = user.email === 'admin@example.com';
+
     const newUserDoc: AppUserData = {
         uid: user.uid,
         email: user.email,
-        name: name || user.email?.split('@')[0] || 'Usuário',
+        name: newName,
         photoURL: user.photoURL,
         role: isFirstUser ? 'admin' : 'user',
         createdAt: serverTimestamp() as Timestamp,
@@ -90,8 +93,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     await setDoc(userRef, newUserDoc);
 
     setAppUser({
-        ...newUserDoc,
-        createdAt: new Date(), // Set client-side date
+        uid: newUserDoc.uid,
+        email: newUserDoc.email,
+        name: newUserDoc.name,
+        photoURL: newUserDoc.photoURL,
+        role: newUserDoc.role,
+        createdAt: new Date(), 
     });
   }
 
@@ -106,8 +113,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
-    const result = await signInWithPopup(auth, provider);
-    await handleNewUser(result.user);
+    try {
+        const result = await signInWithPopup(auth, provider);
+        await handleNewUser(result.user);
+    } catch (error: any) {
+        // Don't show an error if the user intentionally closed the popup.
+        if (error.code === 'auth/popup-closed-by-user') {
+            return;
+        }
+        toast({
+            variant: 'destructive',
+            title: 'Falha no Login com Google',
+            description: error.message || 'Não foi possível autenticar com o Google.',
+        });
+    }
   };
 
   const logout = async () => {
