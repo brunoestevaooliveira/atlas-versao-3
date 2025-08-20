@@ -1,13 +1,25 @@
 
+
 'use client';
 
 import Link from 'next/link';
-import { Compass, FilePlus, BarChart, Search, LineChart, Shield } from 'lucide-react';
+import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut, User } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 import { Menu } from 'lucide-react';
 import { Sheet, SheetTrigger, SheetContent } from './ui/sheet';
+import { useAuth } from '@/context/auth-context';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+
 
 const navLinks = [
   { href: '/', label: 'Mapa', icon: <Compass className="h-5 w-5" /> },
@@ -15,28 +27,44 @@ const navLinks = [
   { href: '/tracking', label: 'Acompanhar', icon: <BarChart className="h-5 w-5" /> },
   { href: '/dashboard', label: 'Dashboard', icon: <LineChart className="h-5 w-5" /> },
   { href: '/search', label: 'Buscar', icon: <Search className="h-5 w-5" /> },
-  { href: '/admin', label: 'Admin', icon: <Shield className="h-5 w-5" /> },
 ];
 
 const Header: React.FC = () => {
   const pathname = usePathname();
+  const { appUser, logout } = useAuth();
+
+  const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+  }
 
   const NavContent = () => {
     return (
-        <nav className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 text-sm font-medium">
+      <nav className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 text-sm font-medium">
         {navLinks.map(({ href, label }) => (
-            <Link
+          <Link
             key={href}
             href={href}
             className={cn(
-                'transition-colors hover:text-primary',
-                pathname === href ? 'text-primary font-semibold' : 'text-foreground/80',
+              'transition-colors hover:text-primary',
+              pathname === href ? 'text-primary font-semibold' : 'text-foreground/80',
             )}
-            >
+          >
             {label}
-            </Link>
+          </Link>
         ))}
-        </nav>
+         {appUser?.role === 'admin' && (
+          <Link
+            href="/admin"
+            className={cn(
+                'transition-colors hover:text-primary',
+                pathname === '/admin' ? 'text-primary font-semibold' : 'text-foreground/80',
+            )}
+          >
+            Admin
+          </Link>
+        )}
+      </nav>
     );
   };
 
@@ -50,8 +78,30 @@ const Header: React.FC = () => {
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center gap-4">
-         <NavContent />
+        <div className="hidden md:flex items-center gap-6">
+          <NavContent />
+          <div className="w-px h-6 bg-border" />
+           <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                <Avatar>
+                  <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
+                  <AvatarFallback>{getInitials(appUser?.name)}</AvatarFallback>
+                </Avatar>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="w-56" align="end">
+              <DropdownMenuLabel>
+                <p>Minha Conta</p>
+                <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
+                </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={logout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                <span>Sair</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         
         <div className="md:hidden flex">
@@ -65,6 +115,10 @@ const Header: React.FC = () => {
             <SheetContent side="right" className="bg-white">
               <div className="flex flex-col gap-6 pt-8">
                 <NavContent />
+                <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                </DropdownMenuItem>
               </div>
             </SheetContent>
           </Sheet>

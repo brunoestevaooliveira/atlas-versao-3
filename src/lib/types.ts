@@ -1,4 +1,5 @@
 
+
 import { Timestamp, GeoPoint } from 'firebase/firestore';
 
 export type Comment = {
@@ -49,6 +50,16 @@ export type AppUser = {
     uid: string;
     email: string | null;
     name: string | null;
-    createdAt: Timestamp | Date; // Allow both types for client/server consistency
+    photoURL?: string | null;
+    createdAt: Date;
     role: 'user' | 'admin';
 };
+
+export type AppUserData = {
+    uid: string;
+    email: string | null;
+    name: string | null;
+    photoURL?: string | null;
+    createdAt: Timestamp;
+    role: 'user' | 'admin';
+}

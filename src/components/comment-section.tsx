@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -12,6 +13,8 @@ import { ptBR } from 'date-fns/locale';
 import { ScrollArea } from './ui/scroll-area';
 import { Send, User } from 'lucide-react';
 import { Separator } from './ui/separator';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
 
 interface CommentSectionProps {
   issueId: string;
@@ -22,15 +25,26 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { appUser } = useAuth();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
+     if (!appUser) {
+        toast({
+            variant: 'destructive',
+            title: 'Acesso Negado',
+            description: 'Você precisa estar logado para comentar.',
+        });
+        return router.push('/login');
+    }
+
     setLoading(true);
     try {
       await addCommentToIssue(issueId, {
-        author: 'Usuário Anônimo',
+        author: appUser.name || 'Usuário Anônimo',
         content: newComment,
       });
       setNewComment('');
@@ -58,9 +72,9 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           rows={3}
-          disabled={loading}
+          disabled={loading || !appUser}
         />
-        <Button type="submit" disabled={loading}>
+        <Button type="submit" disabled={loading || !appUser}>
           <Send className="mr-2 h-4 w-4" />
           {loading ? 'Enviando...' : 'Enviar Comentário'}
         </Button>

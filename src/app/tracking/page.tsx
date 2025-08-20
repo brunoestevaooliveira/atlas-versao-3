@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -8,6 +9,8 @@ import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
 import type { Issue } from '@/lib/types';
 import { BarChart, CheckCircle, Hourglass, ListFilter } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
@@ -15,6 +18,8 @@ export default function TrackingPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
   const { toast } = useToast();
+  const { appUser } = useAuth();
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = listenToIssues(setIssues);
@@ -22,17 +27,27 @@ export default function TrackingPage() {
   }, []);
 
   useEffect(() => {
+    if (!appUser) return;
     try {
-      const storedUpvotes = localStorage.getItem(UPVOTED_ISSUES_KEY);
+      const storedUpvotes = localStorage.getItem(`${UPVOTED_ISSUES_KEY}_${appUser.uid}`);
       if (storedUpvotes) {
         setUpvotedIssues(new Set(JSON.parse(storedUpvotes)));
       }
     } catch (error) {
       console.error('Failed to parse upvoted issues from localStorage', error);
     }
-  }, []);
+  }, [appUser]);
 
   const handleUpvote = async (issueId: string, currentUpvotes: number) => {
+    if (!appUser) {
+      toast({
+        variant: 'destructive',
+        title: 'Acesso Negado',
+        description: 'Você precisa estar logado para apoiar uma ocorrência.',
+      });
+      return router.push('/login');
+    }
+    
     if (upvotedIssues.has(issueId)) {
       return; 
     }
@@ -44,7 +59,7 @@ export default function TrackingPage() {
     try {
       await updateIssueUpvotes(issueId, currentUpvotes + 1);
       // Persist to localStorage only on success
-      localStorage.setItem(UPVOTED_ISSUES_KEY, JSON.stringify(Array.from(newUpvotedSet)));
+      localStorage.setItem(`${UPVOTED_ISSUES_KEY}_${appUser.uid}`, JSON.stringify(Array.from(newUpvotedSet)));
     } catch (error) {
        // Revert the optimistic update on error
        const revertedUpvotedSet = new Set(upvotedIssues);

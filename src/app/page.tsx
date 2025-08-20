@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -16,6 +17,8 @@ import type { Issue } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useAuth } from '@/context/auth-context';
+import { useRouter } from 'next/navigation';
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
@@ -25,6 +28,9 @@ export default function MapPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showIssues, setShowIssues] = useState(true);
   const { toast } = useToast();
+  const { appUser } = useAuth();
+  const router = useRouter();
+
 
   const allCategories = useMemo(() => {
     return [...new Set(issues.map(issue => issue.category))];
@@ -42,15 +48,16 @@ export default function MapPage() {
   }, []);
 
   useEffect(() => {
+    if (!appUser) return;
     try {
-      const storedUpvotes = localStorage.getItem(UPVOTED_ISSUES_KEY);
+      const storedUpvotes = localStorage.getItem(`${UPVOTED_ISSUES_KEY}_${appUser.uid}`);
       if (storedUpvotes) {
         setUpvotedIssues(new Set(JSON.parse(storedUpvotes)));
       }
     } catch (error) {
       console.error('Failed to parse upvoted issues from localStorage', error);
     }
-  }, []);
+  }, [appUser]);
 
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
@@ -80,6 +87,15 @@ export default function MapPage() {
   };
 
   const handleUpvote = async (issueId: string, currentUpvotes: number) => {
+    if (!appUser) {
+        toast({
+            variant: 'destructive',
+            title: 'Acesso Negado',
+            description: 'Você precisa estar logado para apoiar uma ocorrência.',
+        });
+        return router.push('/login');
+    }
+
     if (upvotedIssues.has(issueId)) {
       return; 
     }
@@ -89,7 +105,7 @@ export default function MapPage() {
 
     try {
       await updateIssueUpvotes(issueId, currentUpvotes + 1);
-       localStorage.setItem(UPVOTED_ISSUES_KEY, JSON.stringify(Array.from(newUpvotedSet)));
+       localStorage.setItem(`${UPVOTED_ISSUES_KEY}_${appUser.uid}`, JSON.stringify(Array.from(newUpvotedSet)));
     } catch (error) {
        const revertedUpvotedSet = new Set(upvotedIssues);
        revertedUpvotedSet.delete(issueId);
@@ -113,11 +129,11 @@ export default function MapPage() {
 
 
   return (
-    <div className="h-screen w-screen flex flex-col">
+    <div className="h-screen w-screen flex flex-col pt-24">
       <div className="relative flex-grow">
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
-        <div className="absolute top-4 left-4 z-10 w-80 space-y-4 mt-20">
+        <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
             <CardHeader>
               <div className="relative">
@@ -175,8 +191,8 @@ export default function MapPage() {
           </Card>
         </div>
 
-        <div className="absolute top-4 right-4 z-10 w-96 mt-20">
-           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-8rem)] flex flex-col">
+        <div className="absolute top-4 right-4 z-10 w-96">
+           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-10rem)] flex flex-col">
             <CardHeader>
               <CardTitle>Ocorrências Recentes</CardTitle>
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>

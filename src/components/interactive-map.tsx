@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -7,7 +8,7 @@ import dynamic from 'next/dynamic';
 
 const Map = dynamic(() => import('@/components/map'), { 
   ssr: false,
-  loading: () => <div className="h-full w-full bg-muted animate-pulse rounded-lg" />
+  loading: () => <div className="h-full w-full bg-muted animate-pulse" />
 });
 
 interface InteractiveMapProps {

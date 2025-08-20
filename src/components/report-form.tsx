@@ -1,15 +1,17 @@
 
+
 "use client";
 
 import { useMemo, useState } from "react";
 import { addIssueClient } from "@/services/issue-service";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Send, Loader2 } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/auth-context";
 
 type FormState = {
   title: string;
@@ -44,6 +46,8 @@ function parseLatLng(text: string | null): { lat: number; lng: number } | null {
 export default function ReportForm() {
   const params = useSearchParams();
   const { toast } = useToast();
+  const { appUser } = useAuth();
+  const router = useRouter();
 
   const initialLocation = useMemo(() => {
     const lat = params.get("lat");
@@ -67,6 +71,15 @@ export default function ReportForm() {
     
     if (loading) return;
 
+    if (!appUser) {
+        toast({
+            variant: 'destructive',
+            title: 'Acesso Negado',
+            description: 'Você precisa estar logado para reportar uma ocorrência.',
+        });
+        return router.push('/login');
+    }
+
     if (!form.address.trim()) {
       toast({
         variant: 'destructive',
@@ -82,15 +95,13 @@ export default function ReportForm() {
       const loc = parseLatLng(form.locationText);
       if (!loc) throw new Error("Localização inválida. Clique no mapa para definir um ponto.");
 
-      const reporterName = 'Cidadão Anônimo';
-
       await addIssueClient({
         title: form.title,
         description: form.description,
         category: form.category,
         location: loc,
         address: form.address,
-        reporter: reporterName,
+        reporter: appUser.name || 'Cidadão Anônimo',
       });
 
       toast({
