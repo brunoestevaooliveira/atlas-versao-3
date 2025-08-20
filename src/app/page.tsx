@@ -1,8 +1,7 @@
 
-
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Layers, Search, ThumbsUp, MapPin, Filter } from 'lucide-react';
@@ -129,7 +128,7 @@ export default function MapPage() {
   
 
   return (
-    <div className="h-screen w-screen flex flex-col pt-24">
+    <div className="h-screen w-screen flex flex-col pt-24 bg-muted">
       <div className="relative flex-grow">
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
@@ -197,7 +196,7 @@ export default function MapPage() {
               <CardTitle>Ocorrências Recentes</CardTitle>
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow p-0">
+            <CardContent className="flex-grow p-0 overflow-hidden">
               <ScrollArea className="h-full p-6 pt-0">
                 <div className="space-y-4">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
