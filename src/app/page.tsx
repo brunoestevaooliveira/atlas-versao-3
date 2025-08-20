@@ -30,7 +30,7 @@ export default function MapPage() {
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
-  const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = useRef<HTMLDivElement>(null);
 
 
   const allCategories = useMemo(() => {
@@ -129,8 +129,8 @@ export default function MapPage() {
   };
   
   const handleScrollDown = () => {
-    if (scrollAreaViewportRef.current) {
-        scrollAreaViewportRef.current.scrollBy({ top: 200, behavior: 'smooth' });
+    if (scrollAreaRef.current) {
+        scrollAreaRef.current.scrollBy({ top: 200, behavior: 'smooth' });
     }
   };
 
@@ -205,7 +205,7 @@ export default function MapPage() {
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow overflow-hidden">
-              <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
+              <ScrollArea className="h-full" viewportRef={scrollAreaRef}>
                 <div className="space-y-4 pr-6">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
                     <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80 space-y-2">
@@ -251,4 +251,3 @@ export default function MapPage() {
     </div>
   );
 }
-
