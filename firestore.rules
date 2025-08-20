@@ -1,19 +1,39 @@
-
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Issues can be read by any authenticated user.
-    // Only authenticated users can create, update, or delete issues.
-    match /issues/{issueId} {
-      allow read, create, update, delete: if request.auth != null;
+    
+    // Regras para a coleção 'users'
+    match /users/{userId} {
+      // Qualquer um pode ler perfis de usuário (para exibir nomes, etc.)
+      allow read: if true;
+      
+      // Um usuário só pode criar ou atualizar seu próprio documento.
+      allow create, update: if request.auth != null && request.auth.uid == userId;
+
+      // Apenas administradores podem apagar usuários (opcional, mas seguro)
+      allow delete: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
     }
 
-    // Users can create and read their own user document.
-    // They cannot update or delete their document, or access others' documents.
-    match /users/{userId} {
-      allow read, create: if request.auth != null && request.auth.uid == userId;
-      allow update, delete: if false; 
+    // Regras para a coleção 'issues'
+    match /issues/{issueId} {
+      // Qualquer um (logado ou não) pode ler as ocorrências
+      allow read: if true;
+      
+      // Apenas usuários autenticados podem criar novas ocorrências
+      allow create: if request.auth != null;
+      
+      // Apenas um admin pode modificar o documento inteiro ou apagar
+      allow update, delete: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+
+      // Regra específica para permitir que usuários autenticados apoiem (upvote) ou comentem
+      allow update: if request.auth != null 
+                    && (request.resource.data.keys().hasOnly(['upvotes', 'comments']));
+    }
+    
+    // Regra de fallback: nega tudo que não foi explicitamente permitido
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
 }
