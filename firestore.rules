@@ -1,44 +1,22 @@
-
 rules_version = '2';
 
-// The ADMIN_UID must be manually updated if the admin account changes.
-// This UID is for the user with the email: ylhito0307@gmail.com
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Helper function to check if the user is the designated admin by UID.
-    function isAdmin() {
-      return request.auth.uid == 'lX33n6T8sAgH1tANw5z4a6T9xxy2';
-    }
-    
-    // Users collection:
-    // - Anyone can read user profiles (for names, photos, etc.)
-    // - A user can only create or update their own profile.
+    // Regras para a coleção 'users'
+    // Permite que usuários leiam perfis, mas só atualizem o seu próprio.
     match /users/{userId} {
       allow read: if true;
       allow create, update: if request.auth.uid == userId;
-      allow delete: if isAdmin(); // Only admin can delete user profiles
     }
 
-    // Issues collection:
-    // - Everyone can read issues.
-    // - Any authenticated user can create an issue.
-    // - Only admin can delete an issue.
-    // - Admin can update any field.
-    // - Any authenticated user can update 'upvotes' and 'comments'.
+    // Regras para a coleção 'issues'
+    // Permite que qualquer pessoa leia as ocorrências.
+    // Permite que qualquer usuário LOGADO crie, atualize e delete ocorrências.
+    // Esta é uma regra simplificada para resolver o problema de permissão.
     match /issues/{issueId} {
       allow read: if true;
-      allow create: if request.auth != null;
-
-      // Update is allowed if:
-      // 1. The user is the designated Admin.
-      // 2. The user is authenticated and is ONLY changing the upvotes or comments.
-      allow update: if isAdmin() || 
-                      (request.auth != null && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['upvotes', 'comments']));
-
-      allow delete: if isAdmin();
+      allow create, update, delete: if request.auth != null;
     }
   }
 }
-
-    
