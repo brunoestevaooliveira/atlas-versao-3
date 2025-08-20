@@ -2,10 +2,10 @@
 
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp, MapPin, Filter } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Layers, Search, ThumbsUp, MapPin, Filter, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -30,6 +30,7 @@ export default function MapPage() {
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
+  const scrollAreaViewportRef = useRef<HTMLDivElement>(null);
 
 
   const allCategories = useMemo(() => {
@@ -126,6 +127,12 @@ export default function MapPage() {
         : [...prev, category]
     );
   };
+  
+  const handleScrollDown = () => {
+    if (scrollAreaViewportRef.current) {
+        scrollAreaViewportRef.current.scrollBy({ top: 200, behavior: 'smooth' });
+    }
+  };
 
 
   return (
@@ -198,7 +205,7 @@ export default function MapPage() {
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow overflow-hidden">
-              <ScrollArea className="h-full">
+              <ScrollArea className="h-full" viewportRef={scrollAreaViewportRef}>
                 <div className="space-y-4 pr-6">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
                     <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80 space-y-2">
@@ -230,9 +237,18 @@ export default function MapPage() {
                 </div>
               </ScrollArea>
             </CardContent>
+             {filteredIssues.length > 3 && (
+                <CardFooter className="justify-center border-t pt-4">
+                    <Button variant="ghost" size="sm" onClick={handleScrollDown}>
+                        <ChevronDown className="h-5 w-5 mr-2" />
+                        Ver mais
+                    </Button>
+                </CardFooter>
+            )}
           </Card>
         </div>
       </div>
     </div>
   );
 }
+
