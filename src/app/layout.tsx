@@ -36,10 +36,10 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   }, [isSplashPage]);
   
   useEffect(() => {
-    if (isLoading) return; // Aguarda o carregamento terminar
+    if (isLoading) return; // Aguarda o carregamento terminar antes de qualquer lógica
 
     // Redireciona usuários não autenticados para a página de login
-    if (!authUser && !isPublicPage) {
+    if (!authUser && !isPublicPage && !isAdminPage) {
       router.push('/login');
     }
     
@@ -68,7 +68,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           <SplashScreen isFinishing={isSplashFinishing} />
         ) : (
           <>
-            {!isPublicPage && <Header />}
+            {!isPublicPage && !isAdminPage && <Header />}
             <main>{children}</main>
             <Toaster />
           </>
