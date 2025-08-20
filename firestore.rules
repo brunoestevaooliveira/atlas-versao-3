@@ -3,32 +3,17 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Regras para a coleção 'users'
-    match /users/{userId} {
-      // Qualquer usuário autenticado pode criar seu próprio perfil
-      allow create: if request.auth != null && request.auth.uid == userId;
-      
-      // Um usuário só pode ler ou atualizar seus próprios dados
-      allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+    // Issues can be read by any authenticated user.
+    // Only authenticated users can create, update, or delete issues.
+    match /issues/{issueId} {
+      allow read, create, update, delete: if request.auth != null;
     }
 
-    // Regras para a coleção 'issues'
-    match /issues/{issueId} {
-      // Qualquer pessoa pode ler as ocorrências
-      allow read: if true;
-      
-      // Apenas usuários autenticados podem criar ocorrências
-      allow create: if request.auth != null;
-      
-      // Qualquer pessoa pode apoiar (atualizar) uma ocorrência.
-      // A lógica para prevenir múltiplos votos está no lado do cliente.
-      // O status só pode ser alterado por um admin (lógica no backend/função de admin).
-      allow update: if true;
-      
-      // Apenas admins (cuja role está no documento do usuário) podem deletar.
-      // Esta regra é para segurança, a lógica de UI/backend reforça isso.
-      allow delete: if request.auth != null && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    // Users can create and read their own user document.
+    // They cannot update or delete their document, or access others' documents.
+    match /users/{userId} {
+      allow read, create: if request.auth != null && request.auth.uid == userId;
+      allow update, delete: if false; 
     }
   }
 }
