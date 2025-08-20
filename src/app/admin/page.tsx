@@ -212,17 +212,22 @@ function AdminDashboard() {
 }
 
 function ProtectedAdminPage() {
-  const { appUser, isLoading } = useAuth(); // Usando o contexto principal
+  const { appUser, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // Se não estiver carregando e o usuário não for admin, redireciona para a home.
-    if (!isLoading && (!appUser || appUser.role !== 'admin')) {
-      router.push('/');
+    // Apenas toma uma decisão depois que o carregamento terminar
+    if (!isLoading) {
+      // Se não houver usuário ou o usuário não for admin, redireciona para a home.
+      if (!appUser || appUser.role !== 'admin') {
+        router.push('/');
+      }
     }
   }, [appUser, isLoading, router]);
-
-  if (isLoading || !appUser || appUser.role !== 'admin') {
+  
+  // Enquanto estiver carregando, exibe a mensagem de verificação.
+  // Isso evita o redirecionamento prematuro.
+  if (isLoading) {
     return (
       <div className="flex h-screen w-full items-center justify-center">
         <p>Verificando autorização de administrador...</p>
@@ -230,7 +235,19 @@ function ProtectedAdminPage() {
     );
   }
 
-  return <AdminDashboard />;
+  // Se, após o carregamento, o usuário for um administrador, renderiza o dashboard.
+  // Se não for, o useEffect já terá iniciado o redirecionamento, mas podemos
+  // retornar null ou a tela de carregamento para evitar um piscar de conteúdo.
+  if (appUser && appUser.role === 'admin') {
+    return <AdminDashboard />;
+  }
+
+  // Retorna a tela de carregamento enquanto o redirecionamento acontece.
+  return (
+    <div className="flex h-screen w-full items-center justify-center">
+        <p>Redirecionando...</p>
+    </div>
+  );
 }
 
 
