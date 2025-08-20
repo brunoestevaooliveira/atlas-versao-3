@@ -37,31 +37,21 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useAdminAuth } from '@/context/admin-auth-context';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
 
-function ProtectedAdminPage() {
-  const { appUser, isLoading } = useAdminAuth();
-  const router = useRouter();
-
+function AdminDashboard() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { logout } = useAdminAuth();
+  const { logout } = useAuth(); // Usando o logout do contexto principal
 
   useEffect(() => {
-    if (!isLoading && !appUser) {
-      router.push('/admin/login');
-    }
-  }, [appUser, isLoading, router]);
-
-  useEffect(() => {
-    if (appUser) {
       const unsubscribe = listenToIssues((issues) => {
         setIssues(issues);
         setLoading(false);
       });
       return () => unsubscribe();
-    }
-  }, [appUser]);
+  }, []);
 
   const handleStatusChange = async (issueId: string, newStatus: Issue['status']) => {
     try {
@@ -109,14 +99,6 @@ function ProtectedAdminPage() {
         return 'default';
     }
   };
-
-  if (isLoading || !appUser) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <p>Verificando autorização de administrador...</p>
-      </div>
-    );
-  }
 
 
   return (
@@ -229,6 +211,28 @@ function ProtectedAdminPage() {
     </div>
   );
 }
+
+function ProtectedAdminPage() {
+  const { appUser, isLoading } = useAdminAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && (!appUser || appUser.role !== 'admin')) {
+      router.push('/admin/login');
+    }
+  }, [appUser, isLoading, router]);
+
+  if (isLoading || !appUser || appUser.role !== 'admin') {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <p>Verificando autorização de administrador...</p>
+      </div>
+    );
+  }
+
+  return <AdminDashboard />;
+}
+
 
 export default function AdminPage() {
   return <ProtectedAdminPage />;

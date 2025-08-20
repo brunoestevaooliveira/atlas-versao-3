@@ -11,11 +11,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Shield, Loader2, Home } from 'lucide-react';
 import { useAdminAuth } from '@/context/admin-auth-context';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/auth-context';
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useAdminAuth();
+  const { login } = useAuth(); // Usar o login do contexto principal
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
@@ -25,7 +26,7 @@ export default function AdminLoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      // The redirect is handled in the context now
+      // A verificação de admin e redirecionamento será feita pelo AuthProvider/ProtectedAdminPage
     } catch (error: any) {
       toast({
         variant: 'destructive',

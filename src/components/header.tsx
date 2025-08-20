@@ -53,6 +53,18 @@ const Header: React.FC = () => {
             {label}
           </Link>
         ))}
+         {appUser?.role === 'admin' && (
+          <Link
+            href="/admin"
+            className={cn(
+              'transition-colors hover:text-primary flex items-center gap-2',
+              pathname.startsWith('/admin') ? 'text-primary font-semibold' : 'text-foreground/80',
+            )}
+          >
+            <Shield className="h-5 w-5" />
+            Admin
+          </Link>
+        )}
       </nav>
     );
   };
@@ -104,6 +116,7 @@ const Header: React.FC = () => {
             <SheetContent side="right" className="bg-white">
               <div className="flex flex-col gap-6 pt-8">
                 <NavContent />
+                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sair</span>

@@ -82,14 +82,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // If it doesn't exist, create it.
     const newName = name || user.displayName || user.email?.split('@')[0] || 'Usuário';
-    const isFirstUser = user.email === 'admin@example.com';
+    const isAdmin = user.email === 'ylhito0307@gmail.com';
 
     const newUserDoc: AppUserData = {
         uid: user.uid,
         email: user.email,
         name: newName,
         photoURL: user.photoURL,
-        role: isFirstUser ? 'admin' : 'user',
+        role: isAdmin ? 'admin' : 'user',
         createdAt: serverTimestamp() as Timestamp,
     };
     
