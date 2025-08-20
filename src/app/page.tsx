@@ -191,15 +191,15 @@ export default function MapPage() {
           </Card>
         </div>
 
-        <div className="absolute top-4 right-4 z-10 w-96">
-           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 max-h-[calc(100vh-10rem)] flex flex-col">
+        <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
+           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 h-full flex flex-col">
             <CardHeader>
               <CardTitle>Ocorrências Recentes</CardTitle>
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow overflow-hidden">
-              <ScrollArea className="h-full">
-                <div className="space-y-4 pr-6">
+            <CardContent className="flex-grow p-0">
+              <ScrollArea className="h-full p-6 pt-0">
+                <div className="space-y-4">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
                     <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80 space-y-2">
                       <div className="flex justify-between items-start">
