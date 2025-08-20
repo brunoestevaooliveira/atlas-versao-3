@@ -155,9 +155,9 @@ export default function AdminPage() {
                       </TableCell>
                       <TableCell>
                         <Select
-                          defaultValue={issue.status}
-                          onValueChange={(newStatus) =>
-                            handleStatusChange(issue.id, newStatus as Issue['status'])
+                          value={issue.status}
+                          onValueChange={(newStatus: Issue['status']) =>
+                            handleStatusChange(issue.id, newStatus)
                           }
                         >
                           <SelectTrigger className="w-[180px]">
