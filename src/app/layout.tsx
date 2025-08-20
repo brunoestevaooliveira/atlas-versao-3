@@ -10,14 +10,13 @@ import 'leaflet/dist/leaflet.css';
 import SplashScreen from '@/components/splash-screen';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
-import { AdminAuthProvider } from '@/context/admin-auth-context';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { authUser, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
-  const isPublicPage = ['/login', '/register', '/admin/login'].includes(pathname);
+  const isPublicPage = ['/login', '/register'].includes(pathname);
   const isSplashPage = !isPublicPage && !pathname.startsWith('/admin');
   const [isSplashLoading, setIsSplashLoading] = useState(isSplashPage);
   const [isSplashFinishing, setIsSplashFinishing] = useState(false);
@@ -82,9 +81,7 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <AuthProvider>
-        <AdminAuthProvider>
           <LayoutContent>{children}</LayoutContent>
-        </AdminAuthProvider>
       </AuthProvider>
     </html>
   );

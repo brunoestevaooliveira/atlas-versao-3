@@ -35,7 +35,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { LogOut, Shield, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { useAdminAuth } from '@/context/admin-auth-context';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 
@@ -43,7 +42,7 @@ function AdminDashboard() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const { logout } = useAuth(); // Usando o logout do contexto principal
+  const { logout } = useAuth();
 
   useEffect(() => {
       const unsubscribe = listenToIssues((issues) => {
@@ -213,12 +212,13 @@ function AdminDashboard() {
 }
 
 function ProtectedAdminPage() {
-  const { appUser, isLoading } = useAdminAuth();
+  const { appUser, isLoading } = useAuth(); // Usando o contexto principal
   const router = useRouter();
 
   useEffect(() => {
+    // Redireciona para o login principal se não for admin
     if (!isLoading && (!appUser || appUser.role !== 'admin')) {
-      router.push('/admin/login');
+      router.push('/login');
     }
   }, [appUser, isLoading, router]);
 
