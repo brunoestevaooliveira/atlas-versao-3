@@ -3,7 +3,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut, User } from 'lucide-react';
+import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -21,12 +21,12 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 
 
-const navLinks = [
-  { href: '/', label: 'Mapa', icon: <Compass className="h-5 w-5" /> },
-  { href: '/report', label: 'Reportar', icon: <FilePlus className="h-5 w-5" /> },
-  { href: '/tracking', label: 'Acompanhar', icon: <BarChart className="h-5 w-5" /> },
-  { href: '/dashboard', label: 'Dashboard', icon: <LineChart className="h-5 w-5" /> },
-  { href: '/search', label: 'Buscar', icon: <Search className="h-5 w-5" /> },
+const baseNavLinks = [
+  { href: '/', label: 'Mapa' },
+  { href: '/report', label: 'Reportar' },
+  { href: '/tracking', label: 'Acompanhar' },
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/search', label: 'Buscar' },
 ];
 
 const Header: React.FC = () => {
@@ -39,6 +39,11 @@ const Header: React.FC = () => {
   }
 
   const NavContent = () => {
+    const navLinks = [...baseNavLinks];
+    if (appUser?.role === 'admin') {
+      navLinks.push({ href: '/admin', label: 'Admin' });
+    }
+
     return (
       <nav className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 text-sm font-medium">
         {navLinks.map(({ href, label }) => (
@@ -46,25 +51,14 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'transition-colors hover:text-primary',
+              'transition-colors hover:text-primary flex items-center gap-2',
               pathname === href ? 'text-primary font-semibold' : 'text-foreground/80',
             )}
           >
+            {label === 'Admin' && <Shield className="h-5 w-5" />}
             {label}
           </Link>
         ))}
-         {appUser?.role === 'admin' && (
-          <Link
-            href="/admin"
-            className={cn(
-              'transition-colors hover:text-primary flex items-center gap-2',
-              pathname.startsWith('/admin') ? 'text-primary font-semibold' : 'text-foreground/80',
-            )}
-          >
-            <Shield className="h-5 w-5" />
-            Admin
-          </Link>
-        )}
       </nav>
     );
   };
@@ -109,7 +103,30 @@ const Header: React.FC = () => {
           )}
         </div>
         
-        <div className="md:hidden flex">
+        <div className="md:hidden flex items-center">
+           {appUser && (
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full mr-2">
+                  <Avatar>
+                    <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
+                    <AvatarFallback>{getInitials(appUser?.name)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel>
+                  <p>Minha Conta</p>
+                  <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
+                  </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+           )}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -120,15 +137,6 @@ const Header: React.FC = () => {
             <SheetContent side="right" className="bg-white">
               <div className="flex flex-col gap-6 pt-8">
                 <NavContent />
-                {appUser && (
-                  <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout}>
-                      <LogOut className="mr-2 h-4 w-4" />
-                      <span>Sair</span>
-                  </DropdownMenuItem>
-                  </>
-                )}
               </div>
             </SheetContent>
           </Sheet>
