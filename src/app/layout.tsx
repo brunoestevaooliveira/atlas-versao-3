@@ -12,12 +12,13 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { authUser, isLoading } = useAuth();
+  const { authUser, appUser, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   const isPublicPage = ['/login', '/register'].includes(pathname);
-  const isSplashPage = !isPublicPage && !pathname.startsWith('/admin');
+  const isAdminPage = pathname.startsWith('/admin');
+  const isSplashPage = !isPublicPage && !isAdminPage;
   const [isSplashLoading, setIsSplashLoading] = useState(isSplashPage);
   const [isSplashFinishing, setIsSplashFinishing] = useState(false);
 
@@ -35,15 +36,25 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   }, [isSplashPage]);
   
   useEffect(() => {
-    if (!isLoading && !authUser && !isPublicPage) {
+    if (isLoading) return; // Aguarda o carregamento terminar
+
+    // Redireciona usuários não autenticados para a página de login
+    if (!authUser && !isPublicPage) {
       router.push('/login');
     }
-    if (!isLoading && authUser && (pathname === '/login' || pathname === '/register')) {
+    
+    // Redireciona usuários autenticados para a home se tentarem acessar login/register
+    if (authUser && isPublicPage) {
       router.push('/');
     }
-  }, [isLoading, authUser, isPublicPage, router, pathname]);
 
-   if (isLoading && !isPublicPage) {
+    // Protege a rota de admin
+    if (isAdminPage && appUser?.role !== 'admin') {
+        router.push('/');
+    }
+  }, [isLoading, authUser, appUser, isPublicPage, isAdminPage, router, pathname]);
+
+   if (isLoading && (!isPublicPage || isAdminPage)) {
     return (
       <body className="flex h-screen w-full items-center justify-center bg-background">
         <p>Verificando autenticação...</p>

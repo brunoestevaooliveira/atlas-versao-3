@@ -35,10 +35,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { LogOut, Shield, Trash2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/auth-context';
 
-function AdminDashboard() {
+export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -209,44 +208,4 @@ function AdminDashboard() {
       </Card>
     </div>
   );
-}
-
-function ProtectedAdminPage() {
-  const { appUser, isLoading } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    // Se o carregamento terminou e o usuário não é admin, redireciona.
-    if (!isLoading && appUser?.role !== 'admin') {
-      router.push('/');
-    }
-  }, [appUser, isLoading, router]);
-  
-  // Exibe a tela de carregamento enquanto o status de autenticação está sendo verificado
-  // ou enquanto o appUser ainda não foi carregado. Isso resolve a condição de corrida.
-  if (isLoading || !appUser) {
-    return (
-      <div className="flex h-screen w-full items-center justify-center">
-        <p>Verificando autorização de administrador...</p>
-      </div>
-    );
-  }
-
-  // Se o usuário é um administrador, renderiza o dashboard.
-  // Caso contrário, retorna null pois o useEffect já iniciou o redirecionamento.
-  if (appUser.role === 'admin') {
-    return <AdminDashboard />;
-  }
-
-  // Se não for admin, o useEffect já está redirecionando. Exibe tela de carregamento.
-  return (
-    <div className="flex h-screen w-full items-center justify-center">
-        <p>Acesso negado. Redirecionando...</p>
-    </div>
-  );
-}
-
-
-export default function AdminPage() {
-  return <ProtectedAdminPage />;
 }
