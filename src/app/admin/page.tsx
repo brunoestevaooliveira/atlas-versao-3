@@ -216,9 +216,9 @@ function ProtectedAdminPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redireciona para o login principal se não for admin
+    // Se não estiver carregando e o usuário não for admin, redireciona para a home.
     if (!isLoading && (!appUser || appUser.role !== 'admin')) {
-      router.push('/login');
+      router.push('/');
     }
   }, [appUser, isLoading, router]);
 
