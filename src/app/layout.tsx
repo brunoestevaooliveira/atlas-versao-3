@@ -42,17 +42,13 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     }
   }, [isLoading, authUser, isPublicPage, router]);
 
-  if (isLoading && !isPublicPage) {
-    return (
-       <div className="flex h-screen w-full items-center justify-center bg-background">
-        <p>Verificando autenticação...</p>
-      </div>
-    );
-  }
-
   return (
       <body className={cn('min-h-screen bg-background font-sans antialiased')}>
-        {isSplashLoading && !isPublicPage ? (
+        {isLoading && !isPublicPage ? (
+          <div className="flex h-screen w-full items-center justify-center bg-background">
+            <p>Verificando autenticação...</p>
+          </div>
+        ) : isSplashLoading && !isPublicPage ? (
           <SplashScreen isFinishing={isSplashFinishing} />
         ) : (
           <>
