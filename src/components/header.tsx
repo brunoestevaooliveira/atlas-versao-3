@@ -81,28 +81,32 @@ const Header: React.FC = () => {
 
         <div className="hidden md:flex items-center gap-6">
           <NavContent />
-          <div className="w-px h-6 bg-border" />
-           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                <Avatar>
-                  <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
-                  <AvatarFallback>{getInitials(appUser?.name)}</AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end">
-              <DropdownMenuLabel>
-                <p>Minha Conta</p>
-                <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
-                </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={logout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Sair</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {appUser && (
+            <>
+            <div className="w-px h-6 bg-border" />
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                  <Avatar>
+                    <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
+                    <AvatarFallback>{getInitials(appUser?.name)}</AvatarFallback>
+                  </Avatar>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel>
+                  <p>Minha Conta</p>
+                  <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
+                  </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={logout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Sair</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            </>
+          )}
         </div>
         
         <div className="md:hidden flex">
@@ -116,11 +120,15 @@ const Header: React.FC = () => {
             <SheetContent side="right" className="bg-white">
               <div className="flex flex-col gap-6 pt-8">
                 <NavContent />
-                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Sair</span>
-                </DropdownMenuItem>
+                {appUser && (
+                  <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Sair</span>
+                  </DropdownMenuItem>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>
