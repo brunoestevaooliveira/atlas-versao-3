@@ -19,9 +19,6 @@ import { auth, db } from '@/lib/firebase';
 import type { AppUser, AppUserData } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
-// Hardcoded Admin UID for ylhito0307@gmail.com
-const ADMIN_UID = 'lX33n6T8sAgH1tANw5z4a6T9xxy2';
-
 interface AuthContextType {
   authUser: User | null;
   appUser: AppUser | null;
@@ -86,15 +83,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // If it doesn't exist, create it.
     const newName = name || user.displayName || user.email?.split('@')[0] || 'Usuário';
     
-    // Explicitly set role to 'admin' if the UID matches.
-    const isAdmin = user.uid === ADMIN_UID;
-
     const newUserDoc: AppUserData = {
         uid: user.uid,
         email: user.email,
         name: newName,
         photoURL: user.photoURL,
-        role: isAdmin ? 'admin' : 'user',
+        role: 'user', // Default role is 'user'
         createdAt: serverTimestamp() as Timestamp,
     };
     
@@ -130,14 +124,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             description: 'Bem-vindo(a).',
         });
     } catch (error: any) {
-        if (error.code === 'auth/popup-closed-by-user') {
-            return;
+        let description = error.message || 'Não foi possível autenticar com o Google.';
+        if (error.code === 'auth/unauthorized-domain') {
+            description = 'Este domínio não está autorizado para login. Por favor, adicione-o no Console do Firebase > Authentication > Settings > Authorized domains.';
+        } else if (error.code === 'auth/popup-closed-by-user') {
+            return; // Don't show a toast for this case
         }
+        
         console.error("Google Sign-In Error:", error);
         toast({
             variant: 'destructive',
             title: 'Falha no Login com Google',
-            description: error.message || 'Não foi possível autenticar com o Google.',
+            description: description,
         });
     }
   };
@@ -161,5 +159,3 @@ export const useAuth = (): AuthContextType => {
   }
   return context;
 };
-
-    
