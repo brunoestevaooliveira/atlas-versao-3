@@ -7,12 +7,22 @@ import IssueCard from '@/components/issue-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
 import type { Issue } from '@/lib/types';
-import { BarChart, CheckCircle, Hourglass, ListFilter } from 'lucide-react';
+import { BarChart, CheckCircle, Hourglass, ListFilter, Inbox } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
+
+const EmptyState = ({ tabName }: { tabName: string }) => (
+  <div className="text-center py-20 col-span-full">
+    <Inbox className="mx-auto h-12 w-12 text-muted-foreground/50" />
+    <h3 className="mt-4 text-lg font-semibold">Nenhuma ocorrência encontrada</h3>
+    <p className="mt-2 text-sm text-muted-foreground">
+      Não há ocorrências com o status "{tabName}" no momento.
+    </p>
+  </div>
+);
 
 export default function TrackingPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -52,16 +62,13 @@ export default function TrackingPage() {
       return; 
     }
     
-    // Optimistically update the UI
     const newUpvotedSet = new Set(upvotedIssues).add(issueId);
     setUpvotedIssues(newUpvotedSet);
 
     try {
       await updateIssueUpvotes(issueId, currentUpvotes + 1);
-      // Persist to localStorage only on success
       localStorage.setItem(`${UPVOTED_ISSUES_KEY}_${appUser.uid}`, JSON.stringify(Array.from(newUpvotedSet)));
     } catch (error) {
-       // Revert the optimistic update on error
        const revertedUpvotedSet = new Set(upvotedIssues);
        revertedUpvotedSet.delete(issueId);
        setUpvotedIssues(revertedUpvotedSet);
@@ -106,50 +113,50 @@ export default function TrackingPage() {
         <div className="mt-8">
           <TabsContent value="all">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {issues.map((issue) => (
+              {issues.length > 0 ? issues.map((issue) => (
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
                   onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
-              ))}
+              )) : <EmptyState tabName="Todas" />}
             </div>
           </TabsContent>
           <TabsContent value="received">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {receivedIssues.map((issue) => (
+              {receivedIssues.length > 0 ? receivedIssues.map((issue) => (
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
                   onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
-              ))}
+              )) : <EmptyState tabName="Recebidas" />}
             </div>
           </TabsContent>
           <TabsContent value="inProgress">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {inProgressIssues.map((issue) => (
+              {inProgressIssues.length > 0 ? inProgressIssues.map((issue) => (
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
                   onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                   isUpvoted={upvotedIssues.has(issue.id)}
                 />
-              ))}
+              )) : <EmptyState tabName="Em Análise" />}
             </div>
           </TabsContent>
           <TabsContent value="resolved">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {resolvedIssues.map((issue) => (
+              {resolvedIssues.length > 0 ? resolvedIssues.map((issue) => (
                  <IssueCard 
                     key={issue.id} 
                     issue={issue} 
                     onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                     isUpvoted={upvotedIssues.has(issue.id)}
                   />
-              ))}
+              )) : <EmptyState tabName="Resolvidas" />}
             </div>
           </TabsContent>
         </div>

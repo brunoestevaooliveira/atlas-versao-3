@@ -8,6 +8,7 @@ import { Calendar, User, ThumbsUp, MapPin, MessageCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import CommentSection from './comment-section';
+import { Separator } from './ui/separator';
 
 interface IssueCardProps {
   issue: Issue;
@@ -31,49 +32,52 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
 
   return (
      <Dialog>
-      <Card className="flex flex-col h-full bg-card/50 border-border hover:border-primary/50 transition-colors duration-300">
+      <Card className="flex flex-col h-full bg-card/50 border-border hover:border-primary/50 transition-all duration-300 hover:shadow-md">
         <CardHeader>
-          <div className='flex justify-between items-start'>
-              <div>
-                  <Badge variant="secondary">{issue.category}</Badge>
-              </div>
-              <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
+          <div className="flex items-start justify-between gap-4">
+              <CardTitle className="text-lg font-bold">{issue.title}</CardTitle>
+              <Badge variant={getStatusVariant(issue.status)} className="flex-shrink-0">{issue.status}</Badge>
           </div>
-          <CardTitle className="pt-2 text-xl">{issue.title}</CardTitle>
+          <CardDescription className="text-sm !mt-1">{issue.category}</CardDescription>
         </CardHeader>
-        <CardContent className="flex-grow">
-          <CardDescription>{issue.description}</CardDescription>
-          {issue.address && (
-              <div className="mt-4 flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-4 w-4"/>
+        <CardContent className="flex-grow space-y-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              {issue.description}
+            </p>
+            {issue.address && (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2">
+                  <MapPin className="h-4 w-4 flex-shrink-0"/>
                   <span>{issue.address}</span>
               </div>
-          )}
+            )}
         </CardContent>
-        <CardFooter className="text-xs text-muted-foreground flex-col items-start gap-2">
-            <div className="w-full flex gap-2">
-                <Button 
-                    variant="outline" 
-                    className="w-full"
-                    onClick={() => onUpvote(issue.id, issue.upvotes)}
-                    disabled={isUpvoted}
-                >
-                    <ThumbsUp className="mr-2 h-4 w-4" />
-                    Apoiar ({issue.upvotes})
-                </Button>
-                <DialogTrigger asChild>
-                    <Button variant="outline" className="w-full">
-                        <MessageCircle className="mr-2 h-4 w-4" />
-                        Comentar ({issue.comments?.length ?? 0})
-                    </Button>
-                </DialogTrigger>
-            </div>
-            <div className="w-full flex justify-between pt-2">
-                <div className="flex items-center gap-1">
+        <Separator className="my-0" />
+        <CardFooter className="flex-col items-stretch p-0">
+           <div className="flex items-center">
+              <Button 
+                  variant="ghost" 
+                  className="w-full rounded-t-none rounded-br-none"
+                  onClick={() => onUpvote(issue.id, issue.upvotes)}
+                  disabled={isUpvoted}
+              >
+                  <ThumbsUp className="mr-2 h-4 w-4" />
+                  Apoiar ({issue.upvotes})
+              </Button>
+              <Separator orientation="vertical" className="h-10" />
+              <DialogTrigger asChild>
+                  <Button variant="ghost" className="w-full rounded-t-none rounded-bl-none">
+                      <MessageCircle className="mr-2 h-4 w-4" />
+                      Comentar ({issue.comments?.length ?? 0})
+                  </Button>
+              </DialogTrigger>
+           </div>
+           <Separator />
+           <div className="text-xs text-muted-foreground flex justify-between p-3 bg-muted/50 rounded-b-lg">
+                <div className="flex items-center gap-1.5">
                     <User className="h-3 w-3" />
                     <span>{issue.reporter}</span>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5">
                     <Calendar className="h-3 w-3" />
                     <span>{format(issue.reportedAt, 'dd/MM/yyyy', { locale: ptBR })}</span>
                 </div>
