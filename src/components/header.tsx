@@ -3,11 +3,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut } from 'lucide-react';
+import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut, Menu, Sun, Moon } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { Menu } from 'lucide-react';
 import { Sheet, SheetTrigger, SheetContent } from './ui/sheet';
 import { useAuth } from '@/context/auth-context';
 import {
@@ -19,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { useTheme } from 'next-themes';
 
 
 const baseNavLinks = [
@@ -28,6 +28,22 @@ const baseNavLinks = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/search', label: 'Buscar' },
 ];
+
+const ThemeToggle = () => {
+  const { setTheme, theme } = useTheme();
+  return (
+    <Button
+      variant="ghost"
+      size="icon"
+      onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+    >
+      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      <span className="sr-only">Toggle theme</span>
+    </Button>
+  );
+}
+
 
 const Header: React.FC = () => {
   const pathname = usePathname();
@@ -65,7 +81,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-      <div className="container flex h-16 items-center justify-between bg-white/80 backdrop-blur-sm rounded-lg shadow-md border border-gray-200 px-6">
+      <div className="container flex h-16 items-center justify-between bg-white/80 backdrop-blur-sm rounded-lg shadow-md border border-gray-200 px-6 dark:bg-card/80 dark:border-border">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
@@ -75,32 +91,35 @@ const Header: React.FC = () => {
 
         <div className="hidden md:flex items-center gap-6">
           <NavContent />
-          {appUser && (
-            <>
-            <div className="w-px h-6 bg-border" />
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                  <Avatar>
-                    <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
-                    <AvatarFallback>{getInitials(appUser?.name)}</AvatarFallback>
-                  </Avatar>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end">
-                <DropdownMenuLabel>
-                  <p>Minha Conta</p>
-                  <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
-                  </DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={logout}>
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            </>
-          )}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            {appUser && (
+              <>
+              <div className="w-px h-6 bg-border" />
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar>
+                      <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
+                      <AvatarFallback>{getInitials(appUser?.name)}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end">
+                  <DropdownMenuLabel>
+                    <p>Minha Conta</p>
+                    <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
+                    </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Sair</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              </>
+            )}
+          </div>
         </div>
         
         <div className="md:hidden flex items-center">
@@ -127,6 +146,7 @@ const Header: React.FC = () => {
               </DropdownMenuContent>
             </DropdownMenu>
            )}
+          <ThemeToggle />
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -134,7 +154,7 @@ const Header: React.FC = () => {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="bg-white">
+            <SheetContent side="right">
               <div className="flex flex-col gap-6 pt-8">
                 <NavContent />
               </div>

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -10,6 +11,7 @@ import 'leaflet/dist/leaflet.css';
 import SplashScreen from '@/components/splash-screen';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
+import { ThemeProvider } from '@/components/theme-provider';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { authUser, appUser, isLoading } = useAuth();
@@ -81,7 +83,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" suppressHydrationWarning>
        <head>
         <title>Atlas Cívico</title>
         <meta name="description" content="Plataforma cívica para mapeamento e resolução de problemas urbanos." />
@@ -90,7 +92,9 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
       </head>
       <AuthProvider>
-          <LayoutContent>{children}</LayoutContent>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <LayoutContent>{children}</LayoutContent>
+        </ThemeProvider>
       </AuthProvider>
     </html>
   );
