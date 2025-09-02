@@ -2,7 +2,6 @@
 import type { Issue } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import Image from 'next/image';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Calendar, User, ThumbsUp, MapPin, MessageCircle } from 'lucide-react';
@@ -34,9 +33,6 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
      <Dialog>
       <Card className="flex flex-col h-full bg-card/50 border-border hover:border-primary/50 transition-colors duration-300">
         <CardHeader>
-          <div className="relative h-48 w-full mb-4 rounded-t-lg overflow-hidden">
-            <Image src={issue.imageUrl} alt={issue.title} layout="fill" objectFit="cover" data-ai-hint="urban problem" />
-          </div>
           <div className='flex justify-between items-start'>
               <div>
                   <Badge variant="secondary">{issue.category}</Badge>
