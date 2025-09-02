@@ -132,13 +132,13 @@ export default function MapPage() {
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
         <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
-          <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200">
+          <Card className="shadow-xl">
             <CardHeader>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Buscar por ocorrência..."
-                  className="pl-10 bg-white"
+                  className="pl-10"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -190,7 +190,7 @@ export default function MapPage() {
         </div>
 
         <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
-           <Card className="bg-white/90 backdrop-blur-sm shadow-xl border-gray-200 h-full flex flex-col overflow-y-auto">
+           <Card className="h-full flex flex-col overflow-y-auto shadow-xl">
             <CardHeader>
               <CardTitle>Ocorrências Recentes</CardTitle>
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
@@ -198,7 +198,7 @@ export default function MapPage() {
             <CardContent className="flex-grow p-6 pt-0">
                 <div className="space-y-4">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
-                    <div key={issue.id} className="p-3 rounded-lg bg-white/50 border border-gray-200/80 space-y-2">
+                    <div key={issue.id} className="p-3 rounded-lg border space-y-2 bg-background/50">
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold text-sm">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>

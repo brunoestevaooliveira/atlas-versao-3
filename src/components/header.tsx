@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import Link from 'next/link';
@@ -81,7 +80,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-      <div className="container flex h-16 items-center justify-between bg-white/80 backdrop-blur-sm rounded-lg shadow-md border border-gray-200 px-6 dark:bg-card/80 dark:border-border">
+      <div className="container flex h-16 items-center justify-between rounded-lg border bg-background/95 backdrop-blur-sm px-6 shadow-md dark:bg-card/80">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
