@@ -213,7 +213,7 @@ export default function MapPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-full text-white bg-transparent hover:bg-white/10"
+                        className="w-full text-white bg-transparent hover:bg-white/10 border border-border/50"
                         onClick={() => handleUpvote(issue.id, issue.upvotes)}
                         disabled={upvotedIssues.has(issue.id)}
                       >
