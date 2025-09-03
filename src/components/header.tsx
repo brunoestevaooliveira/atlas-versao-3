@@ -79,7 +79,8 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4 container flex h-16 items-center justify-between rounded-lg border border-white/20 bg-white/10 dark:bg-black/10 px-6 shadow-lg backdrop-blur-xl dark:backdrop-blur-xl">
+    <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
+      <div className="container flex h-16 items-center justify-between rounded-lg border border-white/20 bg-white/10 dark:bg-black/10 px-6 shadow-lg backdrop-blur-xl dark:backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
@@ -169,7 +170,7 @@ const Header: React.FC = () => {
             </SheetContent>
           </Sheet>
         </div>
-
+      </div>
     </header>
   );
 };
