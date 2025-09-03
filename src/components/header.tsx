@@ -67,8 +67,8 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'px-3 py-1.5 rounded-md transition-colors text-white/80 hover:text-white hover:bg-white/10',
-              pathname === href ? 'text-white bg-white/20 font-semibold' : 'hover:bg-white/10',
+              'px-3 py-1.5 rounded-md transition-colors text-white font-semibold hover:text-white hover:bg-white/20',
+              pathname === href ? 'bg-white/30' : 'hover:bg-white/10',
             )}
           >
             {label}
