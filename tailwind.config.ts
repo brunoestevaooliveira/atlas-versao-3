@@ -73,6 +73,10 @@ export default {
            DEFAULT: "hsl(200 90% 57%)",
            foreground: "hsl(200 100% 5%)",
         },
+        stone: {
+          '900': '#1F1F23',
+          '950': '#2A2026'
+        }
       },
       borderRadius: {
         lg: "1rem", // Aumentado

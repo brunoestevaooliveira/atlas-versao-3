@@ -1,4 +1,3 @@
-
 import type { Issue } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -62,7 +61,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
                   variant="ghost" 
                   className={cn(
                     "w-full rounded-t-none rounded-br-none transition-all duration-200 hover:-translate-y-px",
-                    isUpvoted ? "bg-primary/10 text-primary" : "text-[#EA580C] bg-[#FFF7ED] border-[#FED7AA] hover:bg-[#ffedd5]"
+                     isUpvoted ? "bg-primary/10 text-primary" : "text-amber-500 bg-gradient-to-br from-stone-900 to-stone-950 border-none shadow-inner"
                     )}
                   onClick={() => onUpvote(issue.id, issue.upvotes)}
                   disabled={isUpvoted}
