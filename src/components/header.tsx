@@ -55,7 +55,8 @@ const Header: React.FC = () => {
 
   const NavContent = () => {
     const navLinks = [...baseNavLinks];
-    if (appUser?.role === 'admin') {
+    // This logic to show admin can be improved later by checking roles from a DB
+    if (appUser?.email === 'ylhito0307@gmail.com') {
       navLinks.push({ href: '/admin', label: 'Admin' });
     }
 
@@ -66,7 +67,7 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'transition-colors hover:text-brand flex items-center gap-2',
+              'transition-colors hover:text-brand-light flex items-center gap-2',
               pathname === href ? 'text-brand font-semibold' : 'text-foreground/80',
             )}
           >

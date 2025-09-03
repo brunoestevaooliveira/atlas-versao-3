@@ -197,8 +197,8 @@ export default function MapPage() {
             </CardHeader>
             <CardContent className="flex-grow p-6 pt-0">
                 <div className="space-y-4">
-                  {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
-                    <div key={issue.id} className="p-3 rounded-lg border space-y-2 bg-secondary">
+                  {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
+                    <div key={issue.id} className="p-3 rounded-lg border space-y-2 bg-background/50">
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold text-sm">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
