@@ -193,7 +193,7 @@ export default function MapPage() {
         <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
            <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
             <CardHeader>
-              <CardTitle className="text-xl text-foreground">Ocorrências Recentes</CardTitle>
+              <CardTitle className="text-xl text-foreground dark:text-foreground">Ocorrências Recentes</CardTitle>
               <CardDescription className="text-muted-foreground">Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">

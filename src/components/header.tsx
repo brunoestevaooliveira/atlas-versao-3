@@ -80,11 +80,11 @@ const Header: React.FC = () => {
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-       <div className="container flex h-16 items-center justify-between rounded-lg border border-border/10 bg-background/80 px-6 shadow-lg backdrop-blur-lg">
+       <div className="container flex h-16 items-center justify-between rounded-lg border border-border/10 bg-background/80 dark:bg-background/80 px-6 shadow-lg backdrop-blur-lg dark:backdrop-blur-lg">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
-            <span className='text-foreground'>Santa Maria Ativa</span>
+            <span className='text-foreground dark:text-foreground'>Santa Maria Ativa</span>
           </Link>
         </div>
 
