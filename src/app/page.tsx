@@ -17,6 +17,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
@@ -190,7 +191,7 @@ export default function MapPage() {
         </div>
 
         <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
-           <Card className="h-full flex flex-col shadow-lg bg-card dark:bg-[rgba(36,40,48,0.85)] dark:bg-card/90 backdrop-blur-lg border-l border-[rgba(255,107,53,0.08)]">
+           <Card className="h-full flex flex-col shadow-lg bg-card/80 dark:bg-card/90 backdrop-blur-lg border-l border-[rgba(255,107,53,0.08)]">
             <CardHeader>
               <CardTitle className="text-xl">Ocorrências Recentes</CardTitle>
               <CardDescription className="text-muted-foreground">Veja os problemas reportados pela comunidade.</CardDescription>
@@ -200,7 +201,7 @@ export default function MapPage() {
                   {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
                     <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
                       <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-base text-foreground">{issue.title}</h4>
+                        <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
                       <p className="text-sm text-primary font-medium">{issue.category}</p>
@@ -213,7 +214,10 @@ export default function MapPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-full text-white bg-transparent hover:bg-white/10 border border-border/50"
+                        className={cn(
+                            "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-black/10 dark:border-white/20 text-black dark:text-white",
+                            upvotedIssues.has(issue.id) && "opacity-50 cursor-not-allowed"
+                        )}
                         onClick={() => handleUpvote(issue.id, issue.upvotes)}
                         disabled={upvotedIssues.has(issue.id)}
                       >
