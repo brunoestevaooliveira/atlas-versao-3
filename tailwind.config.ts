@@ -62,22 +62,22 @@ export default {
           '5': "hsl(var(--chart-5))",
         },
         success: {
-          DEFAULT: "hsl(158 84% 48%)", // #10b981
-          foreground: "hsl(158 100% 5%)",
+          DEFAULT: "hsl(142 90% 45%)", // Green
+          foreground: "hsl(142 100% 95%)",
         },
         warning: {
-          DEFAULT: "hsl(38 92% 50%)", // #f59e0b
+          DEFAULT: "hsl(38 92% 50%)", // Amber
           foreground: "hsl(38 100% 5%)",
         },
         info: {
-           DEFAULT: "hsl(200 90% 57%)", // #38bdf8
+           DEFAULT: "hsl(200 90% 57%)",
            foreground: "hsl(200 100% 5%)",
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "1rem", // Aumentado
+        md: "calc(1rem - 4px)", // Aumentado
+        sm: "calc(1rem - 8px)", // Aumentado
       },
       keyframes: {
         'accordion-down': {
