@@ -128,11 +128,11 @@ export default function MapPage() {
   
 
   return (
-    <div className="h-screen w-screen flex flex-col pt-24 overflow-hidden">
+    <div className="h-screen w-screen flex flex-col pt-0 overflow-hidden">
       <div className="relative flex-grow">
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
-        <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
+        <div className="absolute top-24 left-4 z-10 w-80 space-y-4">
           <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
             <CardHeader>
               <div className="relative">
@@ -190,7 +190,7 @@ export default function MapPage() {
           </Card>
         </div>
 
-        <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
+        <div className="absolute top-24 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
            <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
             <CardHeader>
               <CardTitle className="text-xl text-foreground dark:text-foreground">Ocorrências Recentes</CardTitle>

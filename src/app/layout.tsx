@@ -64,7 +64,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         ) : (
           <>
             {!isPublicPage && <Header />}
-            <main>{children}</main>
+            <main className="pt-24">{children}</main>
             <Toaster />
           </>
         )}
