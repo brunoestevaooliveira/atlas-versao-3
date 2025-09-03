@@ -80,8 +80,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" suppressHydrationWarning>
        <head>
-        <title>Atlas Cívico</title>
-        <meta name="description" content="Plataforma cívica para mapeamento e resolução de problemas urbanos." />
+        <title>Santa Maria Ativa</title>
+        <meta name="description" content="Plataforma cívica para mapeamento e resolução de problemas urbanos em Santa Maria-DF." />
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
       <body className={cn('min-h-screen bg-background font-sans antialiased')}>
         <AuthProvider>

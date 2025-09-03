@@ -18,7 +18,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
+        sans: ['"PT Sans"', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -61,10 +61,18 @@ export default {
           '4': "hsl(var(--chart-4))",
           '5': "hsl(var(--chart-5))",
         },
-        success: '#10b981',
-        warning: '#f59e0b',
-        info: '#38bdf8',
-        pending: '#eab308',
+        success: {
+          DEFAULT: "hsl(158 84% 48%)", // #10b981
+          foreground: "hsl(158 100% 5%)",
+        },
+        warning: {
+          DEFAULT: "hsl(38 92% 50%)", // #f59e0b
+          foreground: "hsl(38 100% 5%)",
+        },
+        info: {
+           DEFAULT: "hsl(200 90% 57%)", // #38bdf8
+           foreground: "hsl(200 100% 5%)",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

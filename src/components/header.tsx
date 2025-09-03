@@ -35,6 +35,7 @@ const ThemeToggle = () => {
       variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      className="!bg-muted !border-border/50 border rounded-full transition-all duration-300 hover:!bg-muted/80 hover:scale-105 hover:shadow-md"
     >
       <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
       <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
@@ -66,8 +67,8 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'px-3 py-1.5 rounded-md transition-colors hover:text-primary hover:bg-accent/50',
-              pathname === href ? 'text-primary bg-accent/70 font-semibold' : 'text-muted-foreground',
+              'px-3 py-1.5 rounded-md transition-colors text-slate-400 hover:text-primary hover:bg-primary/10',
+              pathname === href ? 'text-primary bg-primary/10 font-semibold' : 'hover:bg-accent/50',
             )}
           >
             {label}
@@ -79,17 +80,17 @@ const Header: React.FC = () => {
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-       <div className="container flex h-16 items-center justify-between rounded-lg border border-white/10 bg-background/80 dark:bg-background/80 backdrop-blur-sm px-6 shadow-lg">
+       <div className="container flex h-16 items-center justify-between rounded-lg border border-white/5 bg-background/80 dark:bg-[rgba(36,40,48,0.85)] backdrop-blur-sm px-6 shadow-lg">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
-            <span className='text-foreground'>Atlas Cívico</span>
+            <span className='text-foreground'>Santa Maria Ativa</span>
           </Link>
         </div>
 
         <div className="hidden md:flex items-center gap-6">
           <NavContent />
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <ThemeToggle />
             {appUser && (
               <>
@@ -97,9 +98,9 @@ const Header: React.FC = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-                    <Avatar>
+                    <Avatar className="h-10 w-10 border-2 border-primary/50 hover:border-primary transition-all">
                       <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
-                      <AvatarFallback>{getInitials(appUser?.name)}</AvatarFallback>
+                      <AvatarFallback className="bg-primary/20 text-primary font-bold">{getInitials(appUser?.name)}</AvatarFallback>
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
@@ -130,10 +131,10 @@ const Header: React.FC = () => {
              <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full mr-2">
-                  <Avatar>
-                    <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
-                    <AvatarFallback>{getInitials(appUser?.name)}</AvatarFallback>
-                  </Avatar>
+                   <Avatar className="h-10 w-10 border-2 border-primary/50">
+                      <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
+                      <AvatarFallback className="bg-primary/20 text-primary font-bold">{getInitials(appUser?.name)}</AvatarFallback>
+                    </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end">

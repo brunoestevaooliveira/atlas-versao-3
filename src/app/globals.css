@@ -11,19 +11,19 @@
     --card-foreground: 216 12% 15%; /* #212529 */
     --popover: 240 100% 100%; /* #ffffff */
     --popover-foreground: 216 12% 15%; /* #212529 */
-    --primary: 221 83% 53%; /* Azul primário */
+    --primary: 142 90% 45%; /* #10b981 */
     --primary-foreground: 240 100% 100%; /* #ffffff */
     --secondary: 220 17% 98%; /* #f8f9fa */
     --secondary-foreground: 216 12% 15%; /* #212529 */
     --muted: 217 16% 91%; /* #e9ecef */
     --muted-foreground: 218 8% 40%; /* #6c757d */
-    --accent: 15 100% 60%; /* Laranja da marca */
+    --accent: 14 100% 60%; /* Lighter green #34C924 */
     --accent-foreground: 240 100% 100%; /* #ffffff */
     --destructive: 356 84% 60%; /* #ef4444 */
     --destructive-foreground: 240 100% 100%;
     --border: 217 16% 91%; /* #e9ecef */
     --input: 217 16% 91%; /* #e9ecef */
-    --ring: 221 83% 53%; /* Azul para anel de foco */
+    --ring: 142 90% 45%; /* Green for focus ring */
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -44,7 +44,7 @@
     --secondary-foreground: 220 13% 91%; /* #e4e6eb; */
     --muted: 220 13% 22%;          /* #2d3239; */
     --muted-foreground: 220 8% 60%; /* #8a8d91; */
-    --accent: 25 95% 53%;          /* Laranja de Destaque #F97316 */
+    --accent: 14 100% 60%;          /* Lighter Green #34C924 */
     --accent-foreground: 240 100% 100%;
     --destructive: 356 84% 60%;   /* #ef4444 */
     --destructive-foreground: 240 100% 100%;
@@ -67,10 +67,12 @@
   body {
     @apply bg-background text-foreground;
     line-height: 1.6;
+    font-family: 'PT Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-semibold text-foreground;
+    font-family: 'PT Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     line-height: 1.3;
   }
   
