@@ -36,7 +36,7 @@ const ThemeToggle = () => {
       size="icon"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-white" />
+      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground dark:text-white" />
       <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-white" />
       <span className="sr-only">Toggle theme</span>
     </Button>
@@ -66,8 +66,8 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'px-3 py-1.5 rounded-md transition-colors text-white font-semibold hover:text-white hover:bg-white/20',
-              pathname === href ? 'bg-white/30' : 'hover:bg-white/10',
+              'px-3 py-1.5 rounded-md transition-colors text-foreground dark:text-white font-semibold hover:bg-black/10 dark:hover:bg-white/20',
+              pathname === href ? 'bg-black/10 dark:bg-white/30' : 'hover:bg-black/5 dark:hover:bg-white/10',
             )}
           >
             {label}
@@ -79,7 +79,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-      <div className="container flex h-16 items-center justify-between rounded-lg border border-white/20 bg-white/30 px-6 shadow-lg backdrop-blur-xl dark:bg-black/30">
+      <div className="container flex h-16 items-center justify-between rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 px-6 shadow-lg backdrop-blur-xl">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
