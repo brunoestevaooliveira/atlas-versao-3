@@ -132,7 +132,7 @@ export default function MapPage() {
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
         <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
-          <Card className="shadow-xl bg-secondary/80 dark:bg-secondary/90 backdrop-blur-lg border-white/5">
+          <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
             <CardHeader>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -190,7 +190,7 @@ export default function MapPage() {
         </div>
 
         <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
-           <Card className="h-full flex flex-col shadow-xl bg-secondary/80 dark:bg-secondary/90 backdrop-blur-lg border-white/5">
+           <Card className="h-full flex flex-col shadow-lg bg-card/90 dark:bg-[rgba(36,40,48,0.85)] backdrop-blur-lg border-l border-[rgba(255,107,53,0.08)]">
             <CardHeader>
               <CardTitle className="text-xl">Ocorrências Recentes</CardTitle>
               <CardDescription className="text-muted-foreground">Veja os problemas reportados pela comunidade.</CardDescription>
@@ -198,7 +198,7 @@ export default function MapPage() {
             <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
                 <div className="space-y-4">
                   {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
-                    <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors">
+                    <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold text-sm text-foreground">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
@@ -207,13 +207,13 @@ export default function MapPage() {
                       {issue.address && (
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <MapPin className="h-3 w-3"/>
-                            <span>{issue.address}</span>
+                            <span className="text-slate-400">{issue.address}</span>
                         </div>
                       )}
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-full border border-primary/20 bg-primary/5 text-primary/80 hover:bg-primary/10 hover:text-primary"
+                        className="w-full border border-accent/20 bg-accent/10 text-accent hover:bg-accent/20 hover:text-accent/90 transition-all duration-200 hover:-translate-y-px"
                         onClick={() => handleUpvote(issue.id, issue.upvotes)}
                         disabled={upvotedIssues.has(issue.id)}
                       >

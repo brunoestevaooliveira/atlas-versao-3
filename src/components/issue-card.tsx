@@ -34,7 +34,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
   return (
      <Dialog>
       <Card className={cn(
-        "flex flex-col h-full bg-secondary/50",
+        "flex flex-col h-full bg-secondary/50 border border-white/5 shadow-md",
         "transition-all duration-300 hover:bg-muted/80 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1"
         )}>
         <CardHeader>
@@ -45,13 +45,13 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
           <CardDescription className="text-sm !mt-1 text-primary font-semibold">{issue.category}</CardDescription>
         </CardHeader>
         <CardContent className="flex-grow space-y-4">
-            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+            <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">
               {issue.description}
             </p>
             {issue.address && (
-              <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2">
+              <div className="flex items-center gap-2 text-xs text-slate-400 pt-2">
                   <MapPin className="h-4 w-4 flex-shrink-0 text-primary"/>
-                  <span>{issue.address}</span>
+                  <span className="text-muted-foreground">{issue.address}</span>
               </div>
             )}
         </CardContent>
@@ -61,7 +61,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
               <Button 
                   variant="ghost" 
                   className={cn(
-                    "w-full rounded-t-none rounded-br-none text-primary/80 bg-primary/5 hover:bg-primary/10 hover:text-primary",
+                    "w-full rounded-t-none rounded-br-none text-accent bg-accent/10 border border-accent/20 hover:bg-accent/20 transition-all duration-200 hover:-translate-y-px",
                     isUpvoted && "text-primary bg-primary/10"
                     )}
                   onClick={() => onUpvote(issue.id, issue.upvotes)}
@@ -79,7 +79,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
               </DialogTrigger>
            </div>
            <Separator className="bg-border/50"/>
-           <div className="text-xs text-muted-foreground flex justify-between p-3 bg-background/50 rounded-b-lg">
+           <div className="text-xs text-slate-500 flex justify-between p-3 bg-background/50 rounded-b-lg">
                 <div className="flex items-center gap-1.5">
                     <User className="h-3 w-3" />
                     <span>{issue.reporter}</span>
