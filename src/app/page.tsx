@@ -191,9 +191,9 @@ export default function MapPage() {
         </div>
 
         <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
-           <Card className="h-full flex flex-col shadow-lg bg-card/80 dark:bg-card/90 backdrop-blur-lg border-l border-[rgba(255,107,53,0.08)]">
+           <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
             <CardHeader>
-              <CardTitle className="text-xl">Ocorrências Recentes</CardTitle>
+              <CardTitle className="text-xl text-foreground">Ocorrências Recentes</CardTitle>
               <CardDescription className="text-muted-foreground">Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
@@ -215,7 +215,7 @@ export default function MapPage() {
                         size="sm"
                         variant="ghost"
                         className={cn(
-                            "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-black/10 dark:border-white/20 text-black dark:text-white",
+                            "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-border/20 text-black dark:text-white",
                             upvotedIssues.has(issue.id) && "opacity-50 cursor-not-allowed"
                         )}
                         onClick={() => handleUpvote(issue.id, issue.upvotes)}

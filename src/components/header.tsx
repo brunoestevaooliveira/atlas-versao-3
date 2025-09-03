@@ -67,7 +67,7 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'px-3 py-1.5 rounded-md transition-colors text-slate-600 dark:text-slate-400 hover:text-primary hover:bg-primary/10',
+              'px-3 py-1.5 rounded-md transition-colors text-slate-600 dark:text-slate-300 hover:text-primary hover:bg-primary/10',
               pathname === href ? 'text-primary bg-primary/10 font-semibold' : 'hover:bg-accent/50',
             )}
           >
@@ -80,7 +80,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-       <div className="container flex h-16 items-center justify-between rounded-lg border border-black/5 dark:border-white/5 bg-card/80 dark:bg-card/90 backdrop-blur-lg px-6 shadow-lg">
+       <div className="container flex h-16 items-center justify-between rounded-lg border border-border/10 bg-background/80 px-6 shadow-lg backdrop-blur-lg">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
