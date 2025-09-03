@@ -86,7 +86,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('min-h-screen bg-background font-sans antialiased')}>
+      <body className={cn('min-h-screen font-sans antialiased')}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
               <LayoutContent>{children}</LayoutContent>
