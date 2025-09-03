@@ -55,8 +55,7 @@ const Header: React.FC = () => {
 
   const NavContent = () => {
     const navLinks = [...baseNavLinks];
-    // This logic to show admin can be improved later by checking roles from a DB
-    if (appUser?.email === 'ylhito0307@gmail.com') {
+    if (appUser?.role === 'admin') {
       navLinks.push({ href: '/admin', label: 'Admin' });
     }
 
@@ -67,8 +66,8 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'transition-colors hover:text-brand-light flex items-center gap-2',
-              pathname === href ? 'text-brand font-semibold' : 'text-foreground/80',
+              'transition-colors hover:text-primary flex items-center gap-2',
+              pathname === href ? 'text-primary font-semibold' : 'text-muted-foreground',
             )}
           >
             {label === 'Admin' && <Shield className="h-5 w-5" />}
@@ -81,10 +80,10 @@ const Header: React.FC = () => {
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-      <div className="container flex h-16 items-center justify-between rounded-lg border bg-card/80 backdrop-blur-sm px-6 shadow-md">
+      <div className="container flex h-16 items-center justify-between rounded-lg border bg-card/80 dark:bg-card/70 backdrop-blur-sm px-6 shadow-md">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-            <Compass className="h-6 w-6 text-brand" />
+            <Compass className="h-6 w-6 text-primary" />
             <span className='text-foreground'>Atlas Cívico</span>
           </Link>
         </div>

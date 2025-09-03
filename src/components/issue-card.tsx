@@ -17,7 +17,7 @@ interface IssueCardProps {
 }
 
 const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => {
-  const getStatusVariant = (status: Issue['status']): "success" | "warning" | "info" => {
+  const getStatusVariant = (status: Issue['status']): "success" | "warning" | "info" | "default" => {
     switch (status) {
       case 'Resolvido':
         return 'success';
@@ -26,27 +26,27 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
       case 'Recebido':
         return 'info';
       default:
-        return 'info';
+        return 'default';
     }
   };
 
   return (
      <Dialog>
-      <Card className="flex flex-col h-full bg-secondary hover:border-primary/50 transition-all duration-300 hover:shadow-md">
+      <Card className="flex flex-col h-full bg-card hover:border-primary/50 transition-all duration-300 hover:shadow-lg border border-border/80">
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
               <CardTitle className="text-lg font-bold">{issue.title}</CardTitle>
               <Badge variant={getStatusVariant(issue.status)} className="flex-shrink-0">{issue.status}</Badge>
           </div>
-          <CardDescription className="text-sm !mt-1 text-brand">{issue.category}</CardDescription>
+          <CardDescription className="text-sm !mt-1 text-primary">{issue.category}</CardDescription>
         </CardHeader>
         <CardContent className="flex-grow space-y-4">
-            <p className="text-sm text-muted-foreground leading-relaxed">
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
               {issue.description}
             </p>
             {issue.address && (
               <div className="flex items-center gap-2 text-xs text-muted-foreground pt-2">
-                  <MapPin className="h-4 w-4 flex-shrink-0 text-brand"/>
+                  <MapPin className="h-4 w-4 flex-shrink-0 text-primary"/>
                   <span>{issue.address}</span>
               </div>
             )}
@@ -56,16 +56,16 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
            <div className="flex items-center">
               <Button 
                   variant="ghost" 
-                  className="w-full rounded-t-none rounded-br-none"
+                  className="w-full rounded-t-none rounded-br-none text-muted-foreground hover:bg-primary/10 hover:text-primary"
                   onClick={() => onUpvote(issue.id, issue.upvotes)}
                   disabled={isUpvoted}
               >
-                  <ThumbsUp className="mr-2 h-4 w-4 text-brand" />
+                  <ThumbsUp className="mr-2 h-4 w-4" />
                   Apoiar ({issue.upvotes})
               </Button>
               <Separator orientation="vertical" className="h-10" />
               <DialogTrigger asChild>
-                  <Button variant="ghost" className="w-full rounded-t-none rounded-bl-none">
+                  <Button variant="ghost" className="w-full rounded-t-none rounded-bl-none text-muted-foreground hover:bg-primary/10 hover:text-primary">
                       <MessageCircle className="mr-2 h-4 w-4" />
                       Comentar ({issue.comments?.length ?? 0})
                   </Button>
