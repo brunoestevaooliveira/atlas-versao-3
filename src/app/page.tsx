@@ -204,7 +204,7 @@ export default function MapPage() {
                         <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
-                      <p className="text-sm text-primary font-medium">{issue.category}</p>
+                      <p className="text-sm text-primary font-semibold">{issue.category}</p>
                       {issue.address && (
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <MapPin className="h-3 w-3"/>
