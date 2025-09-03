@@ -132,13 +132,13 @@ export default function MapPage() {
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
         <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
-          <Card className="shadow-xl bg-card/80 backdrop-blur-sm">
+          <Card className="shadow-xl bg-secondary/80 dark:bg-secondary/90 backdrop-blur-lg border-white/5">
             <CardHeader>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
                   placeholder="Buscar por ocorrência..."
-                  className="pl-10"
+                  className="pl-10 bg-background/80 focus:border-primary"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -157,7 +157,7 @@ export default function MapPage() {
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="ghost" size="icon">
-                        <Layers className="h-5 w-5 text-brand"/>
+                        <Layers className="h-5 w-5 text-primary"/>
                         <span className="sr-only">Filtrar Camadas</span>
                     </Button>
                   </PopoverTrigger>
@@ -190,20 +190,20 @@ export default function MapPage() {
         </div>
 
         <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
-           <Card className="h-full flex flex-col overflow-y-auto shadow-xl bg-card/80 backdrop-blur-sm">
+           <Card className="h-full flex flex-col shadow-xl bg-secondary/80 dark:bg-secondary/90 backdrop-blur-lg border-white/5">
             <CardHeader>
-              <CardTitle>Ocorrências Recentes</CardTitle>
-              <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
+              <CardTitle className="text-xl">Ocorrências Recentes</CardTitle>
+              <CardDescription className="text-muted-foreground">Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow p-6 pt-0">
+            <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
                 <div className="space-y-4">
                   {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
-                    <div key={issue.id} className="p-3 rounded-lg border space-y-2 bg-background/50">
+                    <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors">
                       <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-sm">{issue.title}</h4>
+                        <h4 className="font-bold text-sm text-foreground">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
-                      <p className="text-xs text-muted-foreground">{issue.category}</p>
+                      <p className="text-xs text-primary font-medium">{issue.category}</p>
                       {issue.address && (
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                             <MapPin className="h-3 w-3"/>
@@ -213,11 +213,11 @@ export default function MapPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="w-full border"
+                        className="w-full border border-primary/20 bg-primary/5 text-primary/80 hover:bg-primary/10 hover:text-primary"
                         onClick={() => handleUpvote(issue.id, issue.upvotes)}
                         disabled={upvotedIssues.has(issue.id)}
                       >
-                        <ThumbsUp className="mr-2 h-4 w-4 text-brand" />
+                        <ThumbsUp className="mr-2 h-4 w-4" />
                         Apoiar ({issue.upvotes})
                       </Button>
                     </div>

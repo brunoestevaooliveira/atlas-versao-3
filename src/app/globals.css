@@ -24,7 +24,7 @@
     --border: 217 16% 91%; /* #e9ecef */
     --input: 217 16% 91%; /* #e9ecef */
     --ring: 15 100% 60%; /* #ff6b35 */
-    --radius: 1rem;
+    --radius: 0.5rem;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -52,19 +52,48 @@
     --border: 220 13% 22%; /* #2d3239 */
     --input: 220 13% 22%; /* #2d3239 */
     --ring: 15 100% 60%; /* #ff6b35 */
-    --chart-1: 221 83% 53%; /* Blue */
-    --chart-2: 26 95% 58%; /* Orange */
-    --chart-3: 142 71% 45%; /* Green */
-    --chart-4: 38 92% 50%; /* Yellow */
-    --chart-5: 206 90% 57%; /* Sky Blue */
+    --chart-1: 221 83% 53%;
+    --chart-2: 26 95% 58%;
+    --chart-3: 142 71% 45%;
+    --chart-4: 38 92% 50%;
+    --chart-5: 206 90% 57%;
   }
 }
 
 @layer base {
   * {
     @apply border-border;
+    transition: color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
   }
   body {
     @apply bg-background text-foreground;
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-foreground;
+    line-height: 1.3;
+  }
+  
+  *:focus-visible {
+    outline: 2px solid hsl(var(--primary));
+    outline-offset: 2px;
+  }
+
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--secondary));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsla(var(--primary), 0.3);
+    @apply rounded-md;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsla(var(--primary), 0.5);
   }
 }

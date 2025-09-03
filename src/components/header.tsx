@@ -60,17 +60,16 @@ const Header: React.FC = () => {
     }
 
     return (
-      <nav className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 text-sm font-medium">
+      <nav className="flex flex-col md:flex-row items-start md:items-center gap-1 md:gap-2 text-sm font-medium">
         {navLinks.map(({ href, label }) => (
           <Link
             key={href}
             href={href}
             className={cn(
-              'transition-colors hover:text-primary flex items-center gap-2',
-              pathname === href ? 'text-primary font-semibold' : 'text-muted-foreground',
+              'px-3 py-1.5 rounded-md transition-colors hover:text-primary hover:bg-accent/50',
+              pathname === href ? 'text-primary bg-accent/70 font-semibold' : 'text-muted-foreground',
             )}
           >
-            {label === 'Admin' && <Shield className="h-5 w-5" />}
             {label}
           </Link>
         ))}
@@ -80,7 +79,7 @@ const Header: React.FC = () => {
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-      <div className="container flex h-16 items-center justify-between rounded-lg border bg-card/80 dark:bg-card/70 backdrop-blur-sm px-6 shadow-md">
+       <div className="container flex h-16 items-center justify-between rounded-lg border border-white/10 bg-background/80 dark:bg-background/80 backdrop-blur-sm px-6 shadow-lg">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
@@ -110,6 +109,11 @@ const Header: React.FC = () => {
                     <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
                     </DropdownMenuLabel>
                   <DropdownMenuSeparator />
+                  {appUser.role === 'admin' && (
+                    <DropdownMenuItem asChild>
+                       <Link href="/admin"><Shield className="mr-2 h-4 w-4" />Admin</Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem onClick={logout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     <span>Sair</span>
@@ -138,6 +142,11 @@ const Header: React.FC = () => {
                   <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
                   </DropdownMenuLabel>
                 <DropdownMenuSeparator />
+                {appUser.role === 'admin' && (
+                    <DropdownMenuItem asChild>
+                       <Link href="/admin"><Shield className="mr-2 h-4 w-4" />Admin</Link>
+                    </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={logout}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sair</span>
