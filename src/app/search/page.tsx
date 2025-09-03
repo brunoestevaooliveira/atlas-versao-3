@@ -64,7 +64,7 @@ export default function SearchPage() {
   };
 
   return (
-    <div className="container mx-auto py-8 mt-20 space-y-8">
+    <div className="container mx-auto py-8 pt-24 space-y-8 bg-background">
       <header className="space-y-2 text-center">
         <h1 className="text-4xl font-bold font-headline">Buscar Dados Cívicos</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">Explore os dados de ocorrências reportadas em Santa Maria-DF.</p>

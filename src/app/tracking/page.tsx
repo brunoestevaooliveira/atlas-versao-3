@@ -86,7 +86,7 @@ export default function TrackingPage() {
   const resolvedIssues = issues.filter(issue => issue.status === 'Resolvido');
 
   return (
-    <div className="container mx-auto py-8 mt-20">
+    <div className="container mx-auto py-8 pt-24 bg-background">
       <header className="space-y-2 text-center mb-12">
         <h1 className="text-4xl font-bold font-headline">Acompanhar Solicitações</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">

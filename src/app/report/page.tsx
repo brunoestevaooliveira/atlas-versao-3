@@ -7,7 +7,7 @@ import { FileText } from 'lucide-react';
 
 export default function ReportPage() {
   return (
-    <div className="container mx-auto py-8 mt-20 max-w-4xl space-y-6">
+    <div className="container mx-auto py-8 pt-24 max-w-4xl space-y-6 bg-background">
       <Card className="shadow-lg">
         <CardHeader className="text-center">
           <div className="mx-auto bg-primary text-primary-foreground w-16 h-16 rounded-full flex items-center justify-center mb-4">
