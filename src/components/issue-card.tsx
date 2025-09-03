@@ -61,7 +61,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
                   variant="ghost" 
                   className={cn(
                     "w-full rounded-t-none rounded-br-none transition-all duration-200 hover:-translate-y-px",
-                     isUpvoted ? "bg-primary/10 text-primary" : "text-amber-500 bg-gradient-to-br from-stone-900 to-stone-950 border-none shadow-inner"
+                     isUpvoted ? "bg-primary/10 text-primary" : "bg-transparent text-foreground hover:bg-accent/10"
                     )}
                   onClick={() => onUpvote(issue.id, issue.upvotes)}
                   disabled={isUpvoted}
