@@ -190,7 +190,7 @@ export default function MapPage() {
         </div>
 
         <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
-           <Card className="h-full flex flex-col shadow-lg bg-card/90 dark:bg-[rgba(36,40,48,0.85)] backdrop-blur-lg border-l border-[rgba(255,107,53,0.08)]">
+           <Card className="h-full flex flex-col shadow-lg bg-card dark:bg-[rgba(36,40,48,0.85)] dark:bg-card/90 backdrop-blur-lg border-l border-[rgba(255,107,53,0.08)]">
             <CardHeader>
               <CardTitle className="text-xl">Ocorrências Recentes</CardTitle>
               <CardDescription className="text-muted-foreground">Veja os problemas reportados pela comunidade.</CardDescription>
@@ -200,12 +200,12 @@ export default function MapPage() {
                   {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
                     <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
                       <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-sm text-foreground">{issue.title}</h4>
+                        <h4 className="font-bold text-base text-foreground">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </div>
-                      <p className="text-xs text-primary font-medium">{issue.category}</p>
+                      <p className="text-sm text-primary font-medium">{issue.category}</p>
                       {issue.address && (
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <MapPin className="h-3 w-3"/>
                             <span className="text-slate-400">{issue.address}</span>
                         </div>
