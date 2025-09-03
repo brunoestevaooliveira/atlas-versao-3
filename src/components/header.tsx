@@ -66,8 +66,8 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'transition-colors hover:text-primary flex items-center gap-2',
-              pathname === href ? 'text-primary font-semibold' : 'text-foreground/80',
+              'transition-colors hover:text-brand flex items-center gap-2',
+              pathname === href ? 'text-brand font-semibold' : 'text-foreground/80',
             )}
           >
             {label === 'Admin' && <Shield className="h-5 w-5" />}
@@ -80,10 +80,10 @@ const Header: React.FC = () => {
 
   return (
     <header className="absolute top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-7xl px-4">
-      <div className="container flex h-16 items-center justify-between rounded-lg border bg-background/95 backdrop-blur-sm px-6 shadow-md dark:bg-card/80">
+      <div className="container flex h-16 items-center justify-between rounded-lg border bg-card/80 backdrop-blur-sm px-6 shadow-md">
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
-            <Compass className="h-6 w-6 text-primary" />
+            <Compass className="h-6 w-6 text-brand" />
             <span className='text-foreground'>Atlas Cívico</span>
           </Link>
         </div>

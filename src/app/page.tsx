@@ -71,16 +71,16 @@ export default function MapPage() {
   }, [issues, searchQuery, selectedCategories]);
 
 
-  const getStatusVariant = (status: 'Recebido' | 'Em análise' | 'Resolvido') => {
+  const getStatusVariant = (status: 'Recebido' | 'Em análise' | 'Resolvido'): "info" | "warning" | "success" => {
     switch (status) {
       case 'Resolvido':
-        return 'default';
+        return 'success';
       case 'Em análise':
-        return 'secondary';
+        return 'warning';
       case 'Recebido':
-        return 'outline';
+        return 'info';
       default:
-        return 'default';
+        return 'info';
     }
   };
 
@@ -132,7 +132,7 @@ export default function MapPage() {
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
         <div className="absolute top-4 left-4 z-10 w-80 space-y-4">
-          <Card className="shadow-xl">
+          <Card className="shadow-xl bg-card/80 backdrop-blur-sm">
             <CardHeader>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -157,7 +157,7 @@ export default function MapPage() {
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button variant="ghost" size="icon">
-                        <Layers className="h-5 w-5"/>
+                        <Layers className="h-5 w-5 text-brand"/>
                         <span className="sr-only">Filtrar Camadas</span>
                     </Button>
                   </PopoverTrigger>
@@ -190,7 +190,7 @@ export default function MapPage() {
         </div>
 
         <div className="absolute top-4 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
-           <Card className="h-full flex flex-col overflow-y-auto shadow-xl">
+           <Card className="h-full flex flex-col overflow-y-auto shadow-xl bg-card/80 backdrop-blur-sm">
             <CardHeader>
               <CardTitle>Ocorrências Recentes</CardTitle>
               <CardDescription>Veja os problemas reportados pela comunidade.</CardDescription>
@@ -198,7 +198,7 @@ export default function MapPage() {
             <CardContent className="flex-grow p-6 pt-0">
                 <div className="space-y-4">
                   {filteredIssues.length > 0 ? filteredIssues.map((issue) => (
-                    <div key={issue.id} className="p-3 rounded-lg border space-y-2 bg-background/50">
+                    <div key={issue.id} className="p-3 rounded-lg border space-y-2 bg-secondary">
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold text-sm">{issue.title}</h4>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
@@ -212,12 +212,12 @@ export default function MapPage() {
                       )}
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="w-full"
+                        variant="ghost"
+                        className="w-full border"
                         onClick={() => handleUpvote(issue.id, issue.upvotes)}
                         disabled={upvotedIssues.has(issue.id)}
                       >
-                        <ThumbsUp className="mr-2 h-4 w-4" />
+                        <ThumbsUp className="mr-2 h-4 w-4 text-brand" />
                         Apoiar ({issue.upvotes})
                       </Button>
                     </div>

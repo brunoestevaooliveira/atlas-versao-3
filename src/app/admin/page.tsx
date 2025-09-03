@@ -87,16 +87,16 @@ export default function AdminPage() {
     }
   };
 
-  const getStatusVariant = (status: Issue['status']) => {
+  const getStatusVariant = (status: Issue['status']): "success" | "warning" | "info" => {
     switch (status) {
       case 'Resolvido':
-        return 'default';
+        return 'success';
       case 'Em análise':
-        return 'secondary';
+        return 'warning';
       case 'Recebido':
-        return 'outline';
+        return 'info';
       default:
-        return 'default';
+        return 'info';
     }
   };
 
@@ -105,7 +105,7 @@ export default function AdminPage() {
     <div className="container mx-auto py-8 mt-20 space-y-8">
       <header className="space-y-2 text-center">
         <div className="flex justify-center items-center gap-4">
-            <div className="inline-block bg-primary text-primary-foreground p-3 rounded-full">
+            <div className="inline-block bg-brand text-primary-foreground p-3 rounded-full">
                 <Shield className="w-8 h-8" />
             </div>
             <h1 className="text-4xl font-bold font-headline">Painel do Administrador</h1>

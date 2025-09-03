@@ -18,6 +18,7 @@ export default {
     },
     extend: {
       fontFamily: {
+        sans: ['Playfair Display', 'serif'],
         body: ['Playfair Display', 'serif'],
         headline: ['Playfair Display', 'serif'],
         code: ['monospace'],
@@ -63,6 +64,14 @@ export default {
           '4': "hsl(var(--chart-4))",
           '5': "hsl(var(--chart-5))",
         },
+        brand: {
+          DEFAULT: '#F97316',
+          light: '#FB923C',
+          dark: '#EA580C',
+        },
+        success: '#22C55E',
+        warning: '#F59E0B',
+        info: '#38BDF8',
       },
       borderRadius: {
         lg: 'var(--radius)',
