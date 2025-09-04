@@ -21,7 +21,7 @@ const SplashScreen: React.FC<SplashScreenProps> = ({ isFinishing }) => {
         <h1 className="text-5xl font-bold font-headline">Atlas Cívico</h1>
       </div>
       <p className="mt-4 text-muted-foreground">
-        Criado por <strong>Bruno & Valéria</strong>
+        Criado por <strong>Bruno Estevão</strong>
       </p>
     </div>
   );
