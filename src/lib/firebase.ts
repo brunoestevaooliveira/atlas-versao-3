@@ -6,12 +6,12 @@ import { getAuth } from "firebase/auth";
 
 // Configuração do seu app Firebase
 const firebaseConfig = {
-  projectId: "santa-maria-ativa",
-  appId: "1:122210829117:web:81a562bd5b7bf6c16a3b54",
-  storageBucket: "santa-maria-ativa.firebasestorage.app",
-  apiKey: "AIzaSyD4pQe9Cq9KlEqlHKBFKaBw6ZBm9WOy1MY",
-  authDomain: "santa-maria-ativa.firebaseapp.com",
-  messagingSenderId: "122210829117"
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
 };
 
 // Inicializa Firebase de forma segura (evita reinicialização)
