@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # Aplicação Atlas Cívico v3
+  atlas-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: builder
+    container_name: atlas-civico-v3
+    ports:
+      - "9002:3000"
+    volumes:
+      # Volume para hot-reload em desenvolvimento
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    command: npm run dev
+    networks:
+      - atlas-network
+    restart: unless-stopped
+
+  # Serviço de desenvolvimento com hot-reload
+  atlas-dev:
+    image: node:20-alpine
+    container_name: atlas-civico-dev
+    working_dir: /app
+    ports:
+      - "9002:9002"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+    command: sh -c "npm install && npm run dev"
+    networks:
+      - atlas-network
+    restart: unless-stopped
+
+networks:
+  atlas-network:
+    driver: bridge
+
+# Volumes nomeados para persistência
+volumes:
+  node_modules:

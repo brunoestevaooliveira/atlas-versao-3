@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Regras para a coleção 'users'
+    // Permite que usuários leiam perfis, mas só atualizem o seu próprio.
+    match /users/{userId} {
+      allow read: if true;
+      allow create, update: if request.auth.uid == userId;
+    }
+
+    // Regras para a coleção 'issues'
+    // Permite que qualquer pessoa leia as ocorrências.
+    // Permite que qualquer usuário LOGADO crie, atualize e delete ocorrências.
+    // Esta é uma regra simplificada para resolver o problema de permissão.
+    match /issues/{issueId} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+  }
+}
