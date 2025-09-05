@@ -36,35 +36,39 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   }, [isSplashPage]);
   
   useEffect(() => {
-    // Não faça nada enquanto o estado de autenticação está carregando
+    // While authentication is loading, do nothing.
     if (isLoading) {
       return; 
     }
 
-    const isAppPage = !isPublicPage;
-
-    // Se o usuário está logado e em uma página pública (login/register), redirecione para a home
+    // If user is logged in and on a public page (login/register), redirect to home
     if (appUser && isPublicPage) {
         router.push('/');
     } 
-    // Se o usuário NÃO está logado e está tentando acessar uma página protegida
-    else if (!appUser && isAppPage) {
+    // If user is NOT logged in and is trying to access a protected page
+    else if (!appUser && !isPublicPage) {
         router.push('/login');
     }
   }, [isLoading, appUser, pathname, router, isPublicPage]);
 
-   // Durante o carregamento inicial da autenticação, mostramos uma tela de carregamento genérica
-   // para evitar o "piscar" da página de login em rotas protegidas.
+   // While the initial authentication check is running, show a generic loading screen
+   // on protected pages to prevent a "flash" of the login page.
    if (isLoading && !isPublicPage) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-background">
-        {/* Placeholder for global loading state */}
+        {/* You can place a global spinner or skeleton here */}
       </div>
     );
   }
+  
+  // Show splash screen only on the root path
+  if (isSplashPage && isSplashLoading) {
+    return <SplashScreen isFinishing={isSplashFinishing} />;
+  }
 
-  // Se o usuário está logado ou em uma página pública, e o splash não está ativo, mostra o conteúdo
-  if ((appUser || isPublicPage) && !isSplashLoading) {
+  // If the user is authenticated OR is on a public page, show the content.
+  // This is the main condition to render the app.
+  if (appUser || isPublicPage) {
      return (
         <>
           {!isPublicPage && <Header />}
@@ -74,13 +78,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     );
   }
 
-  // Mostra a splash screen se for a página inicial
-  if (isSplashLoading) {
-    return <SplashScreen isFinishing={isSplashFinishing} />;
-  }
-
-  // Se nenhuma das condições acima for atendida (ex: não logado e tentando acessar a home),
-  // o useEffect já terá iniciado o redirecionamento para /login. Retornar null evita renderizações desnecessárias.
+  // If none of the above conditions are met (e.g., not logged in and trying to access a protected route),
+  // the useEffect has already initiated the redirect. Returning null prevents rendering anything
+  // while the browser navigates to the login page.
   return null;
 }
 

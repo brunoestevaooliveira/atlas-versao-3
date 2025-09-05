@@ -62,6 +62,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (appProfile) {
             setAppUser(appProfile);
         } else {
+            // This is a critical fallback for first-time sign-ins.
             await handleNewUser(user);
         }
       } else {
@@ -80,34 +81,39 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (docSnap.exists()) { 
         const data = docSnap.data() as AppUserData;
-        setAppUser({
+        const existingAppUser = {
             ...data,
             createdAt: (data.createdAt as Timestamp).toDate()
-        });
+        };
+        setAppUser(existingAppUser); // Ensure state is updated for existing users too
         return;
     }
     
     const newName = name || user.displayName || user.email?.split('@')[0] || 'Usuário';
     
-    const newUserDoc: AppUserData = {
+    const newUserDocData: AppUserData = {
         uid: user.uid,
         email: user.email,
         name: newName,
         photoURL: user.photoURL,
-        role: 'user',
+        role: 'user', // Default role
         createdAt: serverTimestamp() as Timestamp,
     };
     
-    await setDoc(userRef, newUserDoc);
+    await setDoc(userRef, newUserDocData);
 
-    setAppUser({
-        uid: newUserDoc.uid,
-        email: newUserDoc.email,
-        name: newUserDoc.name,
-        photoURL: newUserDoc.photoURL,
-        role: newUserDoc.role,
-        createdAt: new Date(),
-    });
+    const newAppUser: AppUser = {
+        uid: newUserDocData.uid,
+        email: newUserDocData.email,
+        name: newUserDocData.name,
+        photoURL: newUserDocData.photoURL,
+        role: newUserDocData.role,
+        createdAt: new Date(), // Use current date as a good approximation
+    };
+
+    // Explicitly set the appUser state immediately after creation.
+    // This is the key fix.
+    setAppUser(newAppUser);
   }
 
   const register = async (email: string, pass: string, name: string) => {
