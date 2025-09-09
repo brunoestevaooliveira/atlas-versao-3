@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -7,13 +6,15 @@ import IssueCard from '@/components/issue-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
 import type { Issue } from '@/lib/types';
-import { BarChart, CheckCircle, Hourglass, ListFilter, Inbox, Search } from 'lucide-react';
+import { BarChart, CheckCircle, Hourglass, ListFilter, Inbox, Search, User } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
@@ -34,6 +35,7 @@ export default function TrackingPage() {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [addressFilter, setAddressFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('recent');
+  const [myIssuesOnly, setMyIssuesOnly] = useState(false);
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
@@ -62,7 +64,12 @@ export default function TrackingPage() {
   const filteredAndSortedIssues = useMemo(() => {
     let filtered = issues;
 
-    // 1. Filter by status (from tabs)
+    // 1. Filter by my issues
+    if (myIssuesOnly && appUser) {
+        filtered = filtered.filter(issue => issue.reporterId === appUser.uid);
+    }
+
+    // 2. Filter by status (from tabs)
     if (activeTab !== 'all') {
       const statusMap = {
         received: 'Recebido',
@@ -73,19 +80,19 @@ export default function TrackingPage() {
       filtered = filtered.filter(issue => issue.status === statusMap[activeTab]);
     }
     
-    // 2. Filter by category
+    // 3. Filter by category
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(issue => issue.category === categoryFilter);
     }
 
-    // 3. Filter by address
+    // 4. Filter by address
     if (addressFilter.trim() !== '') {
       filtered = filtered.filter(issue => 
         issue.address.toLowerCase().includes(addressFilter.toLowerCase())
       );
     }
 
-    // 4. Sort
+    // 5. Sort
     if (sortOrder === 'upvotes') {
       filtered.sort((a, b) => b.upvotes - a.upvotes);
     } else {
@@ -93,7 +100,7 @@ export default function TrackingPage() {
     }
 
     return filtered;
-  }, [issues, activeTab, categoryFilter, addressFilter, sortOrder]);
+  }, [issues, activeTab, categoryFilter, addressFilter, sortOrder, myIssuesOnly, appUser]);
 
 
   const handleUpvote = async (issueId: string, currentUpvotes: number) => {
@@ -150,8 +157,8 @@ export default function TrackingPage() {
       </header>
 
       <Card className="mb-8 p-4 bg-muted/30">
-        <CardContent className="flex flex-col sm:flex-row gap-4 p-2">
-           <div className="relative flex-1">
+        <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
+           <div className="relative flex-1 w-full sm:w-auto">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
                 placeholder="Buscar por endereço..." 
@@ -161,7 +168,7 @@ export default function TrackingPage() {
             />
           </div>
           <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="flex-1">
+            <SelectTrigger className="flex-1 w-full sm:w-auto">
               <SelectValue placeholder="Filtrar por Categoria" />
             </SelectTrigger>
             <SelectContent>
@@ -173,7 +180,7 @@ export default function TrackingPage() {
             </SelectContent>
           </Select>
            <Select value={sortOrder} onValueChange={setSortOrder}>
-            <SelectTrigger className="flex-1">
+            <SelectTrigger className="flex-1 w-full sm:w-auto">
               <SelectValue placeholder="Ordenar por" />
             </SelectTrigger>
             <SelectContent>
@@ -181,6 +188,15 @@ export default function TrackingPage() {
               <SelectItem value="upvotes">Mais Apoiados (Prioridade)</SelectItem>
             </SelectContent>
           </Select>
+          <div className="flex items-center space-x-2">
+            <Switch 
+                id="my-issues-only" 
+                checked={myIssuesOnly}
+                onCheckedChange={setMyIssuesOnly}
+                disabled={!appUser}
+            />
+            <Label htmlFor="my-issues-only" className="whitespace-nowrap">Minhas Ocorrências</Label>
+          </div>
         </CardContent>
       </Card>
 

@@ -1,5 +1,4 @@
 
-
 import { Timestamp, GeoPoint } from 'firebase/firestore';
 
 export type Comment = {
@@ -27,6 +26,7 @@ export type Issue = {
   imageUrl: string; 
   reportedAt: Date;
   reporter: string;
+  reporterId: string; // ID do usuário que reportou
   upvotes: number;
   comments: Comment[];
 };
@@ -42,6 +42,7 @@ export type IssueData = {
   imageUrl: string;
   reportedAt: Timestamp;
   reporter: string;
+  reporterId: string; // ID do usuário que reportou
   upvotes: number;
   comments: CommentData[];
 };

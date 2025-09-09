@@ -1,5 +1,4 @@
 
-
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
@@ -121,6 +120,7 @@ export default function ReportForm() {
         location: loc,
         address: form.address,
         reporter: appUser.name || 'Cidadão Anônimo',
+        reporterId: appUser.uid,
       });
 
       toast({

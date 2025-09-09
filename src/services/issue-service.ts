@@ -39,6 +39,7 @@ const fromFirestore = (docData: any, id: string): Issue => {
     imageUrl: data.imageUrl,
     reportedAt: data.reportedAt ? (data.reportedAt as Timestamp).toDate() : new Date(),
     reporter: data.reporter,
+    reporterId: data.reporterId,
     upvotes: data.upvotes,
     comments: (data.comments || []).map(comment => ({
       ...comment,
@@ -54,6 +55,7 @@ export type NewIssue = {
   location: { lat: number; lng: number };
   address: string;
   reporter: string;
+  reporterId: string;
 };
 
 export async function addIssueClient(issue: NewIssue) {
@@ -61,6 +63,7 @@ export async function addIssueClient(issue: NewIssue) {
   if (!issue.title?.trim()) throw new Error("Título obrigatório");
   if (!issue.description?.trim()) throw new Error("Descrição obrigatória");
   if (!issue.address?.trim()) throw new Error("Endereço obrigatório");
+  if (!issue.reporterId) throw new Error("ID do relator é obrigatório");
   if (
     typeof issue.location?.lat !== "number" ||
     typeof issue.location?.lng !== "number" ||
@@ -78,6 +81,7 @@ export async function addIssueClient(issue: NewIssue) {
     status: "Recebido",
     upvotes: 0,
     reporter: issue.reporter,
+    reporterId: issue.reporterId,
     address: issue.address.trim(),
     imageUrl: `https://placehold.co/600x400.png?text=${encodeURIComponent(issue.title)}`,
     reportedAt: serverTimestamp(),
