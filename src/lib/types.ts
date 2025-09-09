@@ -1,4 +1,3 @@
-
 import { Timestamp, GeoPoint } from 'firebase/firestore';
 
 export type Comment = {

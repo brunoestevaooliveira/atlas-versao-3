@@ -65,6 +65,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (appProfile) {
             setAppUser(appProfile);
         } else {
+            // This case handles Google Sign-In for the first time
             await handleNewUser(user);
         }
       } else {
@@ -82,6 +83,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userRef = doc(db, 'users', user.uid);
     const docSnap = await getDoc(userRef);
 
+    // If user document already exists, just update the state
     if (docSnap.exists()) { 
         const data = docSnap.data() as AppUserData;
         const existingAppUser = {
@@ -92,6 +94,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
     }
     
+    // Create a new user document
     const newName = name || user.displayName || user.email?.split('@')[0] || 'Usuário';
     
     const newUserDocData: AppUserData = {
@@ -99,19 +102,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: user.email,
         name: newName,
         photoURL: user.photoURL,
-        role: 'user', 
+        role: 'user', // Set default role
         createdAt: serverTimestamp() as Timestamp,
     };
     
     await setDoc(userRef, newUserDocData);
 
+    // Create AppUser object for local state (without re-fetching)
     const newAppUser: AppUser = {
         uid: newUserDocData.uid,
         email: newUserDocData.email,
         name: newUserDocData.name,
         photoURL: newUserDocData.photoURL,
         role: newUserDocData.role,
-        createdAt: new Date(),
+        createdAt: new Date(), // Approximate, actual value is on server
     };
     setAppUser(newAppUser);
   }
@@ -128,8 +132,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-        await signInWithPopup(auth, provider);
-        // onAuthStateChanged will handle the user creation and state update.
+        const result = await signInWithPopup(auth, provider);
+        // The onAuthStateChanged listener will handle user creation/update.
+        // We no longer need to call handleNewUser here explicitly.
         toast({
             title: 'Login com Google bem-sucedido!',
             description: 'Bem-vindo(a).',
@@ -139,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (error.code === 'auth/unauthorized-domain') {
             description = 'Este domínio não está autorizado para login. Por favor, adicione-o no Console do Firebase > Authentication > Settings > Authorized domains.';
         } else if (error.code === 'auth/popup-closed-by-user') {
-            return; 
+            return; // Don't show an error if the user closes the popup
         }
         
         console.error("Google Sign-In Error:", error);
