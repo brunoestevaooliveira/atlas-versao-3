@@ -3,6 +3,9 @@ import { Timestamp, GeoPoint } from 'firebase/firestore';
 export type Comment = {
   id: string;
   author: string;
+  authorId: string;
+  authorPhotoURL?: string | null;
+  authorRole: 'admin' | 'user';
   content: string;
   createdAt: Date;
 };
@@ -10,6 +13,9 @@ export type Comment = {
 export type CommentData = {
   id: string;
   author: string;
+  authorId: string;
+  authorPhotoURL?: string | null;
+  authorRole: 'admin' | 'user';
   content: string;
   createdAt: Timestamp;
 }

@@ -18,7 +18,7 @@ import {
   getDocs,
   arrayUnion,
 } from 'firebase/firestore';
-import type { Issue, IssueData, Comment, CommentData } from '@/lib/types';
+import type { Issue, IssueData, CommentData, AppUser } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -127,15 +127,23 @@ export const deleteIssue = async (issueId: string) => {
   await deleteDoc(issueRef);
 };
 
-export const addCommentToIssue = async (issueId: string, comment: { author: string, content: string }) => {
+export const addCommentToIssue = async (
+    issueId: string, 
+    comment: { content: string },
+    user: AppUser
+) => {
     if (!comment.content?.trim()) throw new Error("O comentário não pode estar vazio.");
-    
+    if (!user) throw new Error("Usuário não autenticado.");
+
     const issueRef = doc(db, 'issues', issueId);
     
     const newComment: CommentData = {
         id: uuidv4(),
-        author: comment.author,
         content: comment.content.trim(),
+        author: user.name || 'Usuário Anônimo',
+        authorId: user.uid,
+        authorPhotoURL: user.photoURL || null,
+        authorRole: user.role,
         createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0)
     };
 

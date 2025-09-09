@@ -11,15 +11,23 @@ import { addCommentToIssue } from '@/services/issue-service';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { ScrollArea } from './ui/scroll-area';
-import { Send, User } from 'lucide-react';
+import { Send, ShieldCheck } from 'lucide-react';
 import { Separator } from './ui/separator';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
+import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
+import { Badge } from './ui/badge';
 
 interface CommentSectionProps {
   issueId: string;
   comments: Comment[];
 }
+
+const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+}
+
 
 const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) => {
   const [newComment, setNewComment] = useState('');
@@ -43,10 +51,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
 
     setLoading(true);
     try {
-      await addCommentToIssue(issueId, {
-        author: appUser.name || 'Usuário Anônimo',
-        content: newComment,
-      });
+      await addCommentToIssue(issueId, { content: newComment }, appUser);
       setNewComment('');
       toast({
         title: 'Comentário Adicionado!',
@@ -88,12 +93,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
           {comments && comments.length > 0 ? (
             comments.map((comment) => (
               <div key={comment.id} className="flex gap-3">
-                <div className="bg-muted rounded-full h-8 w-8 flex-shrink-0 flex items-center justify-center">
-                    <User className="h-4 w-4 text-muted-foreground"/>
-                </div>
+                <Avatar className="h-8 w-8 flex-shrink-0">
+                    <AvatarImage src={comment.authorPhotoURL || undefined} alt={comment.author} />
+                    <AvatarFallback>{getInitials(comment.author)}</AvatarFallback>
+                </Avatar>
                 <div className="flex-grow">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-sm">{comment.author}</span>
+                    {comment.authorRole === 'admin' && (
+                        <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">
+                            <ShieldCheck className="h-3 w-3 mr-1" />
+                            Moderador
+                        </Badge>
+                    )}
                     <span className="text-xs text-muted-foreground">
                       • {formatDistanceToNow(comment.createdAt, { addSuffix: true, locale: ptBR })}
                     </span>
