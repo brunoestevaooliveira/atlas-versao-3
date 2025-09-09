@@ -195,7 +195,7 @@ export default function MapPage() {
           </Card>
         </div>
 
-        <div className="absolute bottom-4 left-4 z-10">
+        <div className="absolute bottom-14 left-4 z-10">
           <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
             <CardContent className="p-3">
               <div className="flex items-center gap-3 text-sm">
