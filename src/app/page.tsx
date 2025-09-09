@@ -63,7 +63,8 @@ export default function MapPage() {
       const searchMatch = searchQuery.trim() === '' ||
         issue.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         issue.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        issue.category.toLowerCase().includes(searchQuery.toLowerCase());
+        issue.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        issue.address.toLowerCase().includes(searchQuery.toLowerCase());
       
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(issue.category);
 
@@ -138,7 +139,7 @@ export default function MapPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por ocorrência..."
+                  placeholder="Buscar ocorrência ou endereço..."
                   className="pl-10 bg-background/80 focus:border-primary"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
