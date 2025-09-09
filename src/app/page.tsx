@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp, MapPin, Filter, ChevronDown } from 'lucide-react';
+import { Layers, Search, ThumbsUp, MapPin, Filter, ChevronDown, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -190,6 +190,21 @@ export default function MapPage() {
                     </div>
                   </PopoverContent>
                 </Popover>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="absolute bottom-4 left-4 z-10">
+          <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-3 text-sm">
+                <div className="bg-primary/20 text-primary p-2 rounded-full">
+                  <MapPin className="h-5 w-5" />
+                </div>
+                <p className="text-muted-foreground">
+                  Clique no mapa para selecionar um local e criar uma ocorrência.
+                </p>
               </div>
             </CardContent>
           </Card>
