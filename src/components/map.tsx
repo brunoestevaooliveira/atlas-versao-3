@@ -58,6 +58,23 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
   const [geocodingResult, setGeocodingResult] = useState<GeocodingResult | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
+  const handleSelectLocation = async (lat: number, lng: number) => {
+    setIsGeocoding(true);
+    setDialogOpen(true);
+
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const data = await response.json();
+        const address = formatAddress(data.address) || 'Endereço não encontrado';
+        setGeocodingResult({ address, lat, lng });
+    } catch (error) {
+        console.error("Erro na geocodificação reversa:", error);
+        setGeocodingResult({ address: 'Erro ao buscar endereço', lat, lng });
+    } finally {
+        setIsGeocoding(false);
+    }
+  };
+
   // Initialize map
   useEffect(() => {
     if (mapContainerRef.current && !mapRef.current) {
@@ -71,16 +88,13 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        // Single click for address preview
         map.on('click', async (e) => {
             const { lat, lng } = e.latlng;
             
-            // Remove previous temporary marker
             if (tempMarkerRef.current) {
                 tempMarkerRef.current.remove();
             }
 
-            // Add new temporary marker
             const tempMarker = L.marker([lat, lng], { icon: defaultIcon }).addTo(map);
             tempMarker.bindPopup('Buscando endereço...').openPopup();
             tempMarkerRef.current = tempMarker;
@@ -90,39 +104,30 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
                 const data = await response.json();
                 const address = formatAddress(data.address);
                 const popupContent = `
-                    <div class="text-sm">
+                    <div class="text-sm space-y-2">
+                        <p class="font-medium">Endereço selecionado:</p>
                         <p>${address}</p>
                         <hr class="my-2">
-                        <p class="font-bold text-center">Clique duplo para confirmar este local</p>
+                        <button id="select-location-btn" class="w-full text-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-white" style="background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border: none; cursor: pointer;">
+                            Selecionar Local
+                        </button>
                     </div>
                 `;
                 tempMarker.getPopup()?.setContent(popupContent);
+                
+                // Add event listener to the button inside the popup
+                const selectBtn = document.getElementById('select-location-btn');
+                if (selectBtn) {
+                    selectBtn.onclick = () => handleSelectLocation(lat, lng);
+                }
+
             } catch (error) {
                 console.error("Erro na geocodificação reversa:", error);
                 tempMarker.getPopup()?.setContent('Erro ao buscar endereço.');
             }
         });
-
-        // Double click for confirmation dialog
-        map.on('dblclick', async (e) => {
-          const { lat, lng } = e.latlng;
-          setIsGeocoding(true);
-          setDialogOpen(true);
-
-          try {
-            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-            const data = await response.json();
-            const address = formatAddress(data.address) || 'Endereço não encontrado';
-            setGeocodingResult({ address, lat, lng });
-          } catch (error) {
-            console.error("Erro na geocodificação reversa:", error);
-            setGeocodingResult({ address: 'Erro ao buscar endereço', lat, lng });
-          } finally {
-            setIsGeocoding(false);
-          }
-        });
     }
-  }, [center]);
+  }, []);
 
   // Update issue markers when issues change
   useEffect(() => {
