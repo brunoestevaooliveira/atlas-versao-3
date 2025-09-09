@@ -17,8 +17,9 @@ import {
   serverTimestamp,
   getDocs,
   arrayUnion,
+  getDoc,
 } from 'firebase/firestore';
-import type { Issue, IssueData, CommentData, AppUser } from '@/lib/types';
+import type { Issue, IssueData, CommentData, AppUser, Comment } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
 
 
@@ -150,4 +151,19 @@ export const addCommentToIssue = async (
     await updateDoc(issueRef, {
         comments: arrayUnion(newComment)
     });
+};
+
+export const deleteCommentFromIssue = async (issueId: string, commentId: string) => {
+  const issueRef = doc(db, 'issues', issueId);
+  const issueSnap = await getDoc(issueRef);
+  if (!issueSnap.exists()) {
+    throw new Error('Ocorrência não encontrada.');
+  }
+  
+  const issueData = issueSnap.data() as IssueData;
+  const updatedComments = issueData.comments.filter((c: CommentData) => c.id !== commentId);
+
+  await updateDoc(issueRef, {
+    comments: updatedComments
+  });
 };
