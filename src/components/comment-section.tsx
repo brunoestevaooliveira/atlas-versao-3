@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { useState } from 'react';
@@ -62,6 +61,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
 
     setLoading(true);
     try {
+      // Passa o objeto `appUser` completo, que contém o `role`
       await addCommentToIssue(issueId, { content: newComment }, appUser);
       setNewComment('');
       toast({

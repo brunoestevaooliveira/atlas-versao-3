@@ -1,4 +1,3 @@
-
 // src/services/issue-service.ts
 "use client";
 
@@ -144,7 +143,7 @@ export const addCommentToIssue = async (
         author: user.name || 'Usuário Anônimo',
         authorId: user.uid,
         authorPhotoURL: user.photoURL || null,
-        authorRole: user.role,
+        authorRole: user.role, // Salva o papel do usuário no momento do comentário
         createdAt: Timestamp.now()
     };
 
