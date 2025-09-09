@@ -39,6 +39,14 @@ interface GeocodingResult {
   lng: number;
 }
 
+const formatAddress = (addressData: any): string => {
+    if (!addressData) return 'Endereço não encontrado';
+    const { road, suburb, city_district, city, postcode } = addressData;
+    const parts = [road, suburb, city_district, city].filter(Boolean); // Filtra partes nulas ou vazias
+    const address = parts.join(', ');
+    return postcode ? `${address} - CEP: ${postcode}` : address;
+}
+
 const Map: React.FC<MapProps> = ({ issues, center }) => {
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
@@ -80,8 +88,15 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
             try {
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
                 const data = await response.json();
-                const address = data.display_name || 'Endereço não encontrado';
-                tempMarker.getPopup()?.setContent(address);
+                const address = formatAddress(data.address);
+                const popupContent = `
+                    <div class="text-sm">
+                        <p>${address}</p>
+                        <hr class="my-2">
+                        <p class="font-bold text-center">Clique duplo para confirmar este local</p>
+                    </div>
+                `;
+                tempMarker.getPopup()?.setContent(popupContent);
             } catch (error) {
                 console.error("Erro na geocodificação reversa:", error);
                 tempMarker.getPopup()?.setContent('Erro ao buscar endereço.');
@@ -97,7 +112,7 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
           try {
             const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
             const data = await response.json();
-            const address = data.display_name || 'Endereço não encontrado';
+            const address = formatAddress(data.address) || 'Endereço não encontrado';
             setGeocodingResult({ address, lat, lng });
           } catch (error) {
             console.error("Erro na geocodificação reversa:", error);
