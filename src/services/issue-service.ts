@@ -145,7 +145,7 @@ export const addCommentToIssue = async (
         authorId: user.uid,
         authorPhotoURL: user.photoURL || null,
         authorRole: user.role,
-        createdAt: new Timestamp(Math.floor(Date.now() / 1000), 0)
+        createdAt: Timestamp.now()
     };
 
     await updateDoc(issueRef, {
