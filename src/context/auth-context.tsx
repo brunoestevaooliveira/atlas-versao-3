@@ -31,14 +31,20 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const fetchAppUser = async (uid: string): Promise<AppUser | null> => {
+const fetchAppUser = async (uid: string, isAdminFromToken: boolean): Promise<AppUser | null> => {
     const userRef = doc(db, 'users', uid);
     const docSnap = await getDoc(userRef);
     if (docSnap.exists()) {
         const data = docSnap.data() as AppUserData;
+        
+        // Ensure the role from the token takes precedence
+        const finalRole = isAdminFromToken ? 'admin' : data.role;
+
         return {
             ...data,
-            createdAt: (data.createdAt as Timestamp).toDate()
+            role: finalRole,
+            // Safely handle createdAt, defaulting to now if it's not a timestamp
+            createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
         };
     }
     return null;
@@ -59,9 +65,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       if (user) {
         setAuthUser(user);
         const token = await user.getIdTokenResult(true);
-        setIsAdmin(token.claims.admin === true);
+        const isAdminStatus = token.claims.admin === true;
+        setIsAdmin(isAdminStatus);
 
-        const appProfile = await fetchAppUser(user.uid);
+        const appProfile = await fetchAppUser(user.uid, isAdminStatus);
         if (appProfile) {
             setAppUser(appProfile);
         } else {
@@ -86,9 +93,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // If user document already exists, just update the state
     if (docSnap.exists()) { 
         const data = docSnap.data() as AppUserData;
-        const existingAppUser = {
+        const existingAppUser: AppUser = {
             ...data,
-            createdAt: (data.createdAt as Timestamp).toDate()
+             // Role sync is handled by the onAuthStateChanged listener
+            role: isAdmin ? 'admin' : data.role,
+            // Add a defensive check here as well to prevent crashes
+            createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
         };
         setAppUser(existingAppUser);
         return;
@@ -102,7 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: user.email,
         name: newName,
         photoURL: user.photoURL,
-        role: 'user', // Set default role
+        role: 'user', // Set default role, custom claims will override in the app state
         createdAt: serverTimestamp() as Timestamp,
     };
     
@@ -114,7 +124,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: newUserDocData.email,
         name: newUserDocData.name,
         photoURL: newUserDocData.photoURL,
-        role: newUserDocData.role,
+        role: newUserDocData.role, // Will be 'user' initially
         createdAt: new Date(), // Approximate, actual value is on server
     };
     setAppUser(newAppUser);
@@ -132,13 +142,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-        const result = await signInWithPopup(auth, provider);
+        await signInWithPopup(auth, provider);
         // The onAuthStateChanged listener will handle user creation/update.
-        // We no longer need to call handleNewUser here explicitly.
-        toast({
-            title: 'Login com Google bem-sucedido!',
-            description: 'Bem-vindo(a).',
-        });
     } catch (error: any) {
         let description = error.message || 'Não foi possível autenticar com o Google.';
         if (error.code === 'auth/unauthorized-domain') {
@@ -153,6 +158,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             title: 'Falha no Login com Google',
             description: description,
         });
+        throw error; // Re-throw to indicate failure
     }
   };
 
