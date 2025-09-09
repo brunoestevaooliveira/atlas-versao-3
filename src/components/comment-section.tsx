@@ -107,7 +107,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
           rows={3}
           disabled={loading || !appUser}
         />
-        <Button type="submit" disabled={loading || !appUser}>
+        <Button type="submit" disabled={loading || !newComment.trim() || !appUser}>
           <Send className="mr-2 h-4 w-4" />
           {loading ? 'Enviando...' : 'Enviar Comentário'}
         </Button>
@@ -119,14 +119,14 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
         <div className="space-y-6">
           <h4 className="text-lg font-semibold">Comentários</h4>
           {comments && comments.length > 0 ? (
-            comments.map((comment) => (
+            comments.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime()).map((comment) => (
               <div key={comment.id} className="flex gap-3 group">
                 <Avatar className="h-8 w-8 flex-shrink-0">
                     <AvatarImage src={comment.authorPhotoURL || undefined} alt={comment.author} />
                     <AvatarFallback>{getInitials(comment.author)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-grow">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold text-sm">{comment.author}</span>
                     {comment.authorRole === 'admin' && (
                         <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">
