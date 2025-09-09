@@ -1,3 +1,4 @@
+
 // src/services/issue-service.ts
 "use client";
 
@@ -129,17 +130,17 @@ export const deleteIssue = async (issueId: string) => {
 
 export const addCommentToIssue = async (
     issueId: string, 
-    comment: { content: string },
+    content: string,
     user: AppUser
 ) => {
-    if (!comment.content?.trim()) throw new Error("O comentário não pode estar vazio.");
+    if (!content?.trim()) throw new Error("O comentário não pode estar vazio.");
     if (!user) throw new Error("Usuário não autenticado.");
 
     const issueRef = doc(db, 'issues', issueId);
     
     const newComment: CommentData = {
         id: uuidv4(),
-        content: comment.content.trim(),
+        content: content.trim(),
         author: user.name || 'Usuário Anônimo',
         authorId: user.uid,
         authorPhotoURL: user.photoURL || null,

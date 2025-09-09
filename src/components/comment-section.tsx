@@ -61,8 +61,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
 
     setLoading(true);
     try {
-      // Passa o objeto `appUser` completo, que contém o `role`
-      await addCommentToIssue(issueId, { content: newComment }, appUser);
+      await addCommentToIssue(issueId, newComment, appUser);
       setNewComment('');
       toast({
         title: 'Comentário Adicionado!',
