@@ -86,6 +86,10 @@ export default function MapPage() {
     }
   };
 
+  const getStatusText = (status: Issue['status']) => {
+    return status === 'Em análise' ? 'Análise' : status;
+  };
+
   const handleUpvote = async (issueId: string, currentUpvotes: number) => {
     if (!appUser) {
         toast({
@@ -203,7 +207,7 @@ export default function MapPage() {
                     <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
                       <div className="flex justify-between items-start">
                         <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
-                        <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
+                        <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
                       </div>
                       <p className="text-sm text-primary font-semibold">{issue.category}</p>
                       {issue.address && (

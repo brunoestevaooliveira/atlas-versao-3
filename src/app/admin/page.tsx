@@ -135,6 +135,10 @@ export default function AdminPage() {
     }
   };
 
+  const getStatusText = (status: Issue['status']) => {
+    return status === 'Em análise' ? 'Análise' : status;
+  };
+
 
   return (
     <div className="container mx-auto py-8 mt-20 space-y-8">
@@ -228,7 +232,7 @@ export default function AdminPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
+                        <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
                       </TableCell>
                       <TableCell>
                         <Select

@@ -1,3 +1,4 @@
+
 import type { Issue } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -30,6 +31,10 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
     }
   };
 
+  const getStatusText = (status: Issue['status']) => {
+    return status === 'Em análise' ? 'Análise' : status;
+  };
+
   return (
      <Dialog>
       <Card className={cn(
@@ -39,7 +44,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
         <CardHeader>
           <div className="flex items-start justify-between gap-4">
               <CardTitle className="text-lg text-foreground">{issue.title}</CardTitle>
-              <Badge variant={getStatusVariant(issue.status)} className="flex-shrink-0">{issue.status}</Badge>
+              <Badge variant={getStatusVariant(issue.status)} className="flex-shrink-0">{getStatusText(issue.status)}</Badge>
           </div>
           <CardDescription className="text-sm !mt-1 text-primary font-semibold">{issue.category}</CardDescription>
         </CardHeader>
