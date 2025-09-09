@@ -17,7 +17,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Loader2 } from 'lucide-react';
-import { Button } from './ui/button';
 
 const defaultIcon = new L.Icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -121,7 +120,7 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
 
   return (
     <>
-      <div ref={mapContainerRef} className="h-full w-full"></div>
+      <div ref={mapContainerRef} className="h-full w-full cursor-crosshair"></div>
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
