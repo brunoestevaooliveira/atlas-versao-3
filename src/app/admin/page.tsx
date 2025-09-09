@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import type { Issue } from '@/lib/types';
 import { listenToIssues, updateIssueStatus, deleteIssue } from '@/services/issue-service';
 import {
@@ -32,16 +32,21 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogOut, Shield, Trash2 } from 'lucide-react';
+import { LogOut, Shield, Trash2, Search, ThumbsUp } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
+import { Input } from '@/components/ui/input';
 
 export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { logout, appUser } = useAuth();
+  
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [addressFilter, setAddressFilter] = useState('');
+  const [sortOrder, setSortOrder] = useState('recent');
 
   useEffect(() => {
       if (appUser) { // Only listen to issues if user is authenticated
@@ -52,6 +57,36 @@ export default function AdminPage() {
         return () => unsubscribe();
       }
   }, [appUser]);
+
+  const uniqueCategories = useMemo(() => {
+    return ['all', ...new Set(issues.map(issue => issue.category))];
+  }, [issues]);
+
+  const filteredAndSortedIssues = useMemo(() => {
+    let filtered = issues;
+
+    // 1. Filter by category
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(issue => issue.category === categoryFilter);
+    }
+
+    // 2. Filter by address
+    if (addressFilter.trim() !== '') {
+      filtered = filtered.filter(issue => 
+        issue.address.toLowerCase().includes(addressFilter.toLowerCase())
+      );
+    }
+
+    // 3. Sort
+    if (sortOrder === 'upvotes') {
+      filtered.sort((a, b) => b.upvotes - a.upvotes);
+    } else {
+      filtered.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime());
+    }
+
+    return filtered;
+  }, [issues, categoryFilter, addressFilter, sortOrder]);
+
 
   const handleStatusChange = async (issueId: string, newStatus: Issue['status']) => {
     try {
@@ -105,7 +140,7 @@ export default function AdminPage() {
     <div className="container mx-auto py-8 mt-20 space-y-8">
       <header className="space-y-2 text-center">
         <div className="flex justify-center items-center gap-4">
-            <div className="inline-block bg-brand text-primary-foreground p-3 rounded-full">
+            <div className="inline-block bg-primary text-primary-foreground p-3 rounded-full">
                 <Shield className="w-8 h-8" />
             </div>
             <h1 className="text-4xl font-bold font-headline">Painel do Administrador</h1>
@@ -119,11 +154,46 @@ export default function AdminPage() {
         </p>
       </header>
 
+      <Card className="p-4 bg-muted/30">
+        <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
+           <div className="relative flex-1 w-full sm:w-auto">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+                placeholder="Buscar por endereço..." 
+                className="pl-10"
+                value={addressFilter}
+                onChange={(e) => setAddressFilter(e.target.value)}
+            />
+          </div>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="flex-1 w-full sm:w-auto">
+              <SelectValue placeholder="Filtrar por Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              {uniqueCategories.map(category => (
+                <SelectItem key={category} value={category}>
+                    {category === 'all' ? 'Todas as Categorias' : category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+           <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="flex-1 w-full sm:w-auto">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Mais Recentes</SelectItem>
+              <SelectItem value="upvotes">Prioridade (Apoios)</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Lista de Ocorrências</CardTitle>
           <CardDescription>
-            Altere o status ou exclua as ocorrências para manter os dados atualizados.
+            Encontrado {filteredAndSortedIssues.length} de {issues.length} ocorrências.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -133,6 +203,7 @@ export default function AdminPage() {
                 <TableRow>
                   <TableHead>Título</TableHead>
                   <TableHead>Categoria</TableHead>
+                  <TableHead>Apoios</TableHead>
                   <TableHead>Status Atual</TableHead>
                   <TableHead>Alterar Status</TableHead>
                   <TableHead>Ações</TableHead>
@@ -141,15 +212,21 @@ export default function AdminPage() {
               <TableBody>
                 {loading ? (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center">
+                    <TableCell colSpan={6} className="text-center">
                       Carregando ocorrências...
                     </TableCell>
                   </TableRow>
-                ) : issues.length > 0 ? (
-                  issues.map((issue) => (
+                ) : filteredAndSortedIssues.length > 0 ? (
+                  filteredAndSortedIssues.map((issue) => (
                     <TableRow key={issue.id}>
                       <TableCell className="font-medium">{issue.title}</TableCell>
                       <TableCell>{issue.category}</TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1">
+                          <ThumbsUp className="h-4 w-4 text-primary" />
+                          {issue.upvotes}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         <Badge variant={getStatusVariant(issue.status)}>{issue.status}</Badge>
                       </TableCell>
@@ -198,8 +275,8 @@ export default function AdminPage() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center py-10">
-                      Nenhuma ocorrência reportada ainda.
+                    <TableCell colSpan={6} className="text-center py-10">
+                      Nenhuma ocorrência encontrada com os filtros aplicados.
                     </TableCell>
                   </TableRow>
                 )}
