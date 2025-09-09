@@ -2,7 +2,7 @@
 
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { addIssueClient } from "@/services/issue-service";
 import { useSearchParams, useRouter } from "next/navigation";
 import { Button } from '@/components/ui/button';
@@ -56,15 +56,34 @@ export default function ReportForm() {
     return "";
   }, [params]);
 
+  const initialAddress = useMemo(() => {
+    return params.get("address") || "";
+  }, [params]);
+
   const [form, setForm] = useState<FormState>({
     title: "",
     description: "",
     category: "Limpeza urbana / Acúmulo de lixo",
     locationText: initialLocation,
-    address: ""
+    address: initialAddress
   });
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    // Atualiza o formulário se os parâmetros da URL mudarem
+    const lat = params.get("lat");
+    const lng = params.get("lng");
+    const address = params.get("address");
+
+    setForm(prevForm => ({
+        ...prevForm,
+        locationText: lat && lng ? `${lat}, ${lng}` : "",
+        address: address || ""
+    }));
+
+  }, [params]);
+
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -111,6 +130,9 @@ export default function ReportForm() {
 
       // limpa o formulário após sucesso
       setForm({ ...form, title: "", description: "", address: ""});
+      // Opcional: redirecionar o usuário após o sucesso
+      router.push('/tracking');
+      
     } catch (err: any) {
       console.error("Falha ao enviar ocorrência:", err);
       toast({
@@ -167,7 +189,7 @@ export default function ReportForm() {
                 </Select>
             </div>
              <div className="grid gap-1.5">
-                 <label htmlFor="location">Localização (preenchida ao clicar no mapa)</label>
+                 <label htmlFor="location">Localização (Coordenadas)</label>
                 <Input
                     id="location"
                     value={form.locationText}
@@ -175,13 +197,14 @@ export default function ReportForm() {
                     placeholder="Clique no mapa na página inicial para definir"
                     required
                     readOnly
-                    className="bg-gray-100"
+                    className="bg-muted text-muted-foreground cursor-not-allowed"
                 />
             </div>
             <div className="grid gap-1.5">
                 <label htmlFor="address">Endereço ou Ponto de Referência</label>
-                <Input
+                <Textarea
                     id="address"
+                    rows={3}
                     value={form.address}
                     onChange={(e) => setForm({ ...form, address: e.target.value })}
                     placeholder="Ex: Quadra 15, Conjunto C, em frente ao mercado"

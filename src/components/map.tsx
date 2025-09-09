@@ -3,8 +3,20 @@
 import type { Issue } from '@/lib/types';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Loader2 } from 'lucide-react';
+import { Button } from './ui/button';
 
 const defaultIcon = new L.Icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -21,11 +33,21 @@ interface MapProps {
   center: [number, number];
 }
 
+interface GeocodingResult {
+  address: string;
+  lat: number;
+  lng: number;
+}
+
 const Map: React.FC<MapProps> = ({ issues, center }) => {
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [geocodingResult, setGeocodingResult] = useState<GeocodingResult | null>(null);
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
   // Initialize map
   useEffect(() => {
@@ -40,12 +62,25 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        map.on('click', (e) => {
+        map.on('click', async (e) => {
           const { lat, lng } = e.latlng;
-          router.push(`/report?lat=${lat}&lng=${lng}`);
+          setIsGeocoding(true);
+          setDialogOpen(true);
+
+          try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+            const data = await response.json();
+            const address = data.display_name || 'Endereço não encontrado';
+            setGeocodingResult({ address, lat, lng });
+          } catch (error) {
+            console.error("Erro na geocodificação reversa:", error);
+            setGeocodingResult({ address: 'Erro ao buscar endereço', lat, lng });
+          } finally {
+            setIsGeocoding(false);
+          }
         });
     }
-  }, [center, router]);
+  }, [center]);
 
   // Update markers when issues change
   useEffect(() => {
@@ -70,8 +105,51 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
     
   }, [issues]);
 
+  const handleConfirmLocation = () => {
+    if (geocodingResult) {
+      const { lat, lng, address } = geocodingResult;
+      router.push(`/report?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`);
+    }
+    setDialogOpen(false);
+  };
+
+  const handleCancel = () => {
+    setDialogOpen(false);
+    setGeocodingResult(null);
+  }
+
   return (
-    <div ref={mapContainerRef} className="h-full w-full"></div>
+    <>
+      <div ref={mapContainerRef} className="h-full w-full"></div>
+      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Localização</AlertDialogTitle>
+             <AlertDialogDescription>
+                Você selecionou o seguinte local para reportar uma ocorrência. Deseja continuar?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          
+          <div className="my-4 p-4 border rounded-md bg-muted/50">
+            {isGeocoding ? (
+              <div className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                <span>Buscando endereço...</span>
+              </div>
+            ) : (
+              <p className="text-sm text-foreground">{geocodingResult?.address}</p>
+            )}
+          </div>
+         
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={handleCancel}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmLocation} disabled={isGeocoding}>
+              Confirmar e Reportar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 };
 
