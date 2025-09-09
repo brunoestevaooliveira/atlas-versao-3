@@ -24,7 +24,6 @@ const baseNavLinks = [
   { href: '/', label: 'Mapa' },
   { href: '/report', label: 'Reportar' },
   { href: '/tracking', label: 'Acompanhar' },
-  { href: '/search', label: 'Buscar' },
 ];
 
 const ThemeToggle = () => {

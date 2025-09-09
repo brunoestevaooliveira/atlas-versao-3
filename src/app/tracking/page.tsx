@@ -2,15 +2,18 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import IssueCard from '@/components/issue-card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
 import type { Issue } from '@/lib/types';
-import { BarChart, CheckCircle, Hourglass, ListFilter, Inbox } from 'lucide-react';
+import { BarChart, CheckCircle, Hourglass, ListFilter, Inbox, Search } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Card, CardContent } from '@/components/ui/card';
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
@@ -19,7 +22,7 @@ const EmptyState = ({ tabName }: { tabName: string }) => (
     <Inbox className="mx-auto h-12 w-12 text-muted-foreground/50" />
     <h3 className="mt-4 text-lg font-semibold">Nenhuma ocorrência encontrada</h3>
     <p className="mt-2 text-sm text-muted-foreground">
-      Não há ocorrências com o status "{tabName}" no momento.
+      Não há ocorrências com o status "{tabName}" que correspondam aos seus filtros.
     </p>
   </div>
 );
@@ -27,6 +30,10 @@ const EmptyState = ({ tabName }: { tabName: string }) => (
 export default function TrackingPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
+  const [activeTab, setActiveTab] = useState('all');
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [addressFilter, setAddressFilter] = useState('');
+  const [sortOrder, setSortOrder] = useState('recent');
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
@@ -35,7 +42,7 @@ export default function TrackingPage() {
     const unsubscribe = listenToIssues(setIssues);
     return () => unsubscribe();
   }, []);
-
+  
   useEffect(() => {
     if (!appUser) return;
     try {
@@ -47,6 +54,47 @@ export default function TrackingPage() {
       console.error('Failed to parse upvoted issues from localStorage', error);
     }
   }, [appUser]);
+
+  const uniqueCategories = useMemo(() => {
+    return ['all', ...new Set(issues.map(issue => issue.category))];
+  }, [issues]);
+
+  const filteredAndSortedIssues = useMemo(() => {
+    let filtered = issues;
+
+    // 1. Filter by status (from tabs)
+    if (activeTab !== 'all') {
+      const statusMap = {
+        received: 'Recebido',
+        inProgress: 'Em análise',
+        resolved: 'Resolvido',
+      };
+      // @ts-ignore
+      filtered = filtered.filter(issue => issue.status === statusMap[activeTab]);
+    }
+    
+    // 2. Filter by category
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(issue => issue.category === categoryFilter);
+    }
+
+    // 3. Filter by address
+    if (addressFilter.trim() !== '') {
+      filtered = filtered.filter(issue => 
+        issue.address.toLowerCase().includes(addressFilter.toLowerCase())
+      );
+    }
+
+    // 4. Sort
+    if (sortOrder === 'upvotes') {
+      filtered.sort((a, b) => b.upvotes - a.upvotes);
+    } else {
+      filtered.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime());
+    }
+
+    return filtered;
+  }, [issues, activeTab, categoryFilter, addressFilter, sortOrder]);
+
 
   const handleUpvote = async (issueId: string, currentUpvotes: number) => {
     if (!appUser) {
@@ -81,39 +129,81 @@ export default function TrackingPage() {
     }
   };
 
-  const receivedIssues = issues.filter(issue => issue.status === 'Recebido');
-  const inProgressIssues = issues.filter(issue => issue.status === 'Em análise');
-  const resolvedIssues = issues.filter(issue => issue.status === 'Resolvido');
+  const getIssuesForTab = (status?: 'Recebido' | 'Em análise' | 'Resolvido') => {
+      if (!status) return filteredAndSortedIssues;
+      return filteredAndSortedIssues.filter(issue => issue.status === status);
+  }
+
+  const allTabIssues = getIssuesForTab();
+  const receivedTabIssues = getIssuesForTab('Recebido');
+  const inProgressTabIssues = getIssuesForTab('Em análise');
+  const resolvedTabIssues = getIssuesForTab('Resolvido');
+  
 
   return (
     <div className="container mx-auto py-8 pt-24 bg-background">
-      <header className="space-y-2 text-center mb-12">
-        <h1 className="text-4xl font-bold font-headline">Acompanhar Solicitações</h1>
+      <header className="space-y-2 text-center mb-8">
+        <h1 className="text-4xl font-bold font-headline">Acompanhar Ocorrências</h1>
         <p className="text-muted-foreground max-w-2xl mx-auto">
-          Veja o andamento das ocorrências que você e outros cidadãos reportaram em tempo real.
+          Explore, filtre e veja o andamento das ocorrências reportadas em tempo real.
         </p>
       </header>
 
-      <Tabs defaultValue="all" className="w-full">
+      <Card className="mb-8 p-4 bg-muted/30">
+        <CardContent className="flex flex-col sm:flex-row gap-4 p-2">
+           <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+                placeholder="Buscar por endereço..." 
+                className="pl-10"
+                value={addressFilter}
+                onChange={(e) => setAddressFilter(e.target.value)}
+            />
+          </div>
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Filtrar por Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              {uniqueCategories.map(category => (
+                <SelectItem key={category} value={category}>
+                    {category === 'all' ? 'Todas as Categorias' : category}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+           <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Ordenar por" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="recent">Mais Recentes</SelectItem>
+              <SelectItem value="upvotes">Mais Apoiados (Prioridade)</SelectItem>
+            </SelectContent>
+          </Select>
+        </CardContent>
+      </Card>
+
+      <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-2xl">
           <TabsTrigger value="all">
-            <ListFilter className="mr-2 h-4 w-4" /> Todas ({issues.length})
+            <ListFilter className="mr-2 h-4 w-4" /> Todas ({allTabIssues.length})
           </TabsTrigger>
           <TabsTrigger value="received">
-            <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedIssues.length})
+            <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedTabIssues.length})
           </TabsTrigger>
           <TabsTrigger value="inProgress">
-             <BarChart className="mr-2 h-4 w-4" /> Em Análise ({inProgressIssues.length})
+             <BarChart className="mr-2 h-4 w-4" /> Em Análise ({inProgressTabIssues.length})
           </TabsTrigger>
           <TabsTrigger value="resolved">
-            <CheckCircle className="mr-2 h-4 w-4" /> Resolvidas ({resolvedIssues.length})
+            <CheckCircle className="mr-2 h-4 w-4" /> Resolvidas ({resolvedTabIssues.length})
           </TabsTrigger>
         </TabsList>
         
         <div className="mt-8">
           <TabsContent value="all">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {issues.length > 0 ? issues.map((issue) => (
+              {allTabIssues.length > 0 ? allTabIssues.map((issue) => (
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
@@ -125,7 +215,7 @@ export default function TrackingPage() {
           </TabsContent>
           <TabsContent value="received">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {receivedIssues.length > 0 ? receivedIssues.map((issue) => (
+              {receivedTabIssues.length > 0 ? receivedTabIssues.map((issue) => (
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
@@ -137,7 +227,7 @@ export default function TrackingPage() {
           </TabsContent>
           <TabsContent value="inProgress">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {inProgressIssues.length > 0 ? inProgressIssues.map((issue) => (
+              {inProgressTabIssues.length > 0 ? inProgressTabIssues.map((issue) => (
                 <IssueCard 
                   key={issue.id} 
                   issue={issue} 
@@ -149,7 +239,7 @@ export default function TrackingPage() {
           </TabsContent>
           <TabsContent value="resolved">
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {resolvedIssues.length > 0 ? resolvedIssues.map((issue) => (
+              {resolvedTabIssues.length > 0 ? resolvedTabIssues.map((issue) => (
                  <IssueCard 
                     key={issue.id} 
                     issue={issue} 
