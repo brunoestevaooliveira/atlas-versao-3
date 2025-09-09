@@ -24,7 +24,6 @@ const baseNavLinks = [
   { href: '/', label: 'Mapa' },
   { href: '/report', label: 'Reportar' },
   { href: '/tracking', label: 'Acompanhar' },
-  { href: '/dashboard', label: 'Dashboard' },
   { href: '/search', label: 'Buscar' },
 ];
 
@@ -46,7 +45,7 @@ const ThemeToggle = () => {
 
 const Header: React.FC = () => {
   const pathname = usePathname();
-  const { appUser, logout } = useAuth();
+  const { appUser, logout, isAdmin } = useAuth();
 
   const getInitials = (name: string | null | undefined) => {
     if (!name) return 'U';
@@ -55,7 +54,8 @@ const Header: React.FC = () => {
 
   const NavContent = () => {
     const navLinks = [...baseNavLinks];
-    if (appUser?.role === 'admin') {
+    if (isAdmin) {
+      navLinks.splice(3, 0, { href: '/dashboard', label: 'Dashboard' });
       navLinks.push({ href: '/admin', label: 'Admin' });
     }
 
@@ -109,7 +109,7 @@ const Header: React.FC = () => {
                     <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
                     </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  {appUser.role === 'admin' && (
+                  {isAdmin && (
                     <DropdownMenuItem asChild>
                        <Link href="/admin"><Shield className="mr-2 h-4 w-4" />Admin</Link>
                     </DropdownMenuItem>
@@ -142,7 +142,7 @@ const Header: React.FC = () => {
                   <p className="text-xs text-muted-foreground font-normal">{appUser?.email}</p>
                   </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                {appUser.role === 'admin' && (
+                {isAdmin && (
                     <DropdownMenuItem asChild>
                        <Link href="/admin"><Shield className="mr-2 h-4 w-4" />Admin</Link>
                     </DropdownMenuItem>

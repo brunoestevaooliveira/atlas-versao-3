@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 
-export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const { isLoading, isAdmin } = useAuth();
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { appUser, isLoading, isAdmin } = useAuth();
 
   if (isLoading) {
     return (

@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Issue } from '@/lib/types';
@@ -62,7 +63,7 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
-        map.on('click', async (e) => {
+        map.on('dblclick', async (e) => {
           const { lat, lng } = e.latlng;
           setIsGeocoding(true);
           setDialogOpen(true);

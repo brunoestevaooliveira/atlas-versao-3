@@ -22,6 +22,7 @@ interface AuthContextType {
   authUser: User | null;
   appUser: AppUser | null;
   isLoading: boolean;
+  isAdmin: boolean;
   register: (email: string, pass: string, name: string) => Promise<void>;
   login: (email: string, pass: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
@@ -48,6 +49,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [appUser, setAppUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -56,18 +58,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setIsLoading(true);
       if (user) {
         setAuthUser(user);
+        const token = await user.getIdTokenResult(true);
+        setIsAdmin(token.claims.admin === true);
+
         const appProfile = await fetchAppUser(user.uid);
-        // This case handles a user who is authenticated with Firebase Auth
-        // but doesn't have a document in Firestore yet (e.g., first Google login).
         if (appProfile) {
             setAppUser(appProfile);
         } else {
-            // This is a critical fallback for first-time sign-ins.
             await handleNewUser(user);
         }
       } else {
         setAuthUser(null);
         setAppUser(null);
+        setIsAdmin(false);
       }
       setIsLoading(false);
     });
@@ -85,7 +88,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             ...data,
             createdAt: (data.createdAt as Timestamp).toDate()
         };
-        setAppUser(existingAppUser); // Ensure state is updated for existing users too
+        setAppUser(existingAppUser);
         return;
     }
     
@@ -96,7 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: user.email,
         name: newName,
         photoURL: user.photoURL,
-        role: 'user', // Default role
+        role: 'user', 
         createdAt: serverTimestamp() as Timestamp,
     };
     
@@ -108,11 +111,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         name: newUserDocData.name,
         photoURL: newUserDocData.photoURL,
         role: newUserDocData.role,
-        createdAt: new Date(), // Use current date as a good approximation
+        createdAt: new Date(),
     };
-
-    // Explicitly set the appUser state immediately after creation.
-    // This is the key fix.
     setAppUser(newAppUser);
   }
 
@@ -128,11 +128,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const loginWithGoogle = async () => {
     const provider = new GoogleAuthProvider();
     try {
-        const userCredential = await signInWithPopup(auth, provider);
-        // `onAuthStateChanged` will eventually fire, but we can speed up the UI
-        // by handling the new user data immediately.
-        await handleNewUser(userCredential.user);
-        
+        await signInWithPopup(auth, provider);
+        // onAuthStateChanged will handle the user creation and state update.
         toast({
             title: 'Login com Google bem-sucedido!',
             description: 'Bem-vindo(a).',
@@ -142,7 +139,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (error.code === 'auth/unauthorized-domain') {
             description = 'Este domínio não está autorizado para login. Por favor, adicione-o no Console do Firebase > Authentication > Settings > Authorized domains.';
         } else if (error.code === 'auth/popup-closed-by-user') {
-            return; // Don't show a toast for this case
+            return; 
         }
         
         console.error("Google Sign-In Error:", error);
@@ -160,7 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authUser, appUser, isLoading, register, login, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ authUser, appUser, isLoading, isAdmin, register, login, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
