@@ -42,6 +42,7 @@ interface GeocodingResult {
 const Map: React.FC<MapProps> = ({ issues, center }) => {
   const mapRef = useRef<L.Map | null>(null);
   const markersRef = useRef<L.Marker[]>([]);
+  const tempMarkerRef = useRef<L.Marker | null>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
@@ -62,6 +63,32 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
 
+        // Single click for address preview
+        map.on('click', async (e) => {
+            const { lat, lng } = e.latlng;
+            
+            // Remove previous temporary marker
+            if (tempMarkerRef.current) {
+                tempMarkerRef.current.remove();
+            }
+
+            // Add new temporary marker
+            const tempMarker = L.marker([lat, lng], { icon: defaultIcon }).addTo(map);
+            tempMarker.bindPopup('Buscando endereço...').openPopup();
+            tempMarkerRef.current = tempMarker;
+
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                const data = await response.json();
+                const address = data.display_name || 'Endereço não encontrado';
+                tempMarker.getPopup()?.setContent(address);
+            } catch (error) {
+                console.error("Erro na geocodificação reversa:", error);
+                tempMarker.getPopup()?.setContent('Erro ao buscar endereço.');
+            }
+        });
+
+        // Double click for confirmation dialog
         map.on('dblclick', async (e) => {
           const { lat, lng } = e.latlng;
           setIsGeocoding(true);
@@ -82,16 +109,16 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
     }
   }, [center]);
 
-  // Update markers when issues change
+  // Update issue markers when issues change
   useEffect(() => {
     const map = mapRef.current;
     if (!map) return;
 
-    // Clear existing markers
+    // Clear existing issue markers
     markersRef.current.forEach(marker => marker.remove());
     markersRef.current = [];
 
-    // Add new markers
+    // Add new issue markers
     issues.forEach(issue => {
         const marker = L.marker([issue.location.lat, issue.location.lng], { icon: defaultIcon })
             .addTo(map)
