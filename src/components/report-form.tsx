@@ -103,7 +103,7 @@ export default function ReportForm() {
       toast({
         variant: 'destructive',
         title: 'Endereço Obrigatório',
-        description: 'Por favor, preencha o campo de endereço.',
+        description: 'Por favor, selecione um endereço clicando no mapa na página inicial.',
       });
       return;
     }
@@ -188,27 +188,22 @@ export default function ReportForm() {
                     </SelectContent>
                 </Select>
             </div>
-             <div className="grid gap-1.5">
-                 <label htmlFor="location">Localização (Coordenadas)</label>
+             <div className="hidden">
+                <label htmlFor="location">Localização (Coordenadas)</label>
                 <Input
                     id="location"
                     value={form.locationText}
-                    onChange={(e) => setForm({ ...form, locationText: e.target.value })}
-                    placeholder="Clique no mapa na página inicial para definir"
-                    required
                     readOnly
-                    className="bg-muted text-muted-foreground cursor-not-allowed"
                 />
             </div>
             <div className="grid gap-1.5">
-                <label htmlFor="address">Endereço ou Ponto de Referência</label>
-                <Textarea
+                <label htmlFor="address">Endereço Selecionado</label>
+                <Input
                     id="address"
-                    rows={3}
                     value={form.address}
-                    onChange={(e) => setForm({ ...form, address: e.target.value })}
-                    placeholder="Ex: Quadra 15, Conjunto C, em frente ao mercado"
-                    required
+                    placeholder="Selecione um local no mapa na página inicial"
+                    readOnly
+                    className="bg-muted text-muted-foreground cursor-not-allowed"
                 />
             </div>
         </div>
