@@ -104,24 +104,20 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
                 const data = await response.json();
                 const address = formatAddress(data.address);
                 
-                // Aplicando Tailwind CSS ao conteúdo do popup
                 const popupContent = `
-                    <div class="font-sans space-y-2 p-1">
-                        <p class="font-semibold text-sm text-[hsl(var(--foreground))]">Endereço selecionado:</p>
-                        <p class="text-xs text-[hsl(var(--muted-foreground))]">${address}</p>
-                        <hr class="my-2 border-[hsl(var(--border))]">
+                    <div style="font-family: 'PT Sans', sans-serif; background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); padding: 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <p style="font-weight: 600; font-size: 14px; margin: 0 0 4px 0;">Endereço selecionado:</p>
+                        <p style="font-size: 12px; color: hsl(var(--muted-foreground)); margin: 0;">${address}</p>
+                        <hr style="margin: 8px 0; border: 0; border-top: 1px solid hsl(var(--border));">
                         <button id="select-location-btn" 
-                                class="w-full text-center px-4 py-2 text-sm font-medium rounded-md transition-colors
-                                       bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] 
-                                       hover:bg-[hsl(var(--primary)/0.9)]" 
-                                style="border: none; cursor: pointer;">
+                                style="width: 100%; text-align: center; padding: 8px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; cursor: pointer; transition: background-color 0.2s;
+                                       background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border: none;">
                             Selecionar Local
                         </button>
                     </div>
                 `;
                 tempMarker.getPopup()?.setContent(popupContent);
                 
-                // Add event listener to the button inside the popup
                 const selectBtn = document.getElementById('select-location-btn');
                 if (selectBtn) {
                     selectBtn.onclick = () => handleSelectLocation(lat, lng);
