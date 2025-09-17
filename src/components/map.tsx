@@ -6,30 +6,22 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseEvent } from 'react-map-gl';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { MapPin } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { Card, CardContent } from '@/components/ui/card';
+
+interface NewReportInfo {
+  lat: number;
+  lng: number;
+  address: string;
+  isLoading: boolean;
+}
 
 interface MapProps {
   issues: Issue[];
   center: { lat: number; lng: number };
-}
-
-interface GeocodingResult {
-  address: string;
-  lat: number;
-  lng: number;
 }
 
 const formatAddress = (addressData: any): string => {
@@ -46,39 +38,38 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
   const { theme } = useTheme();
   
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [geocodingResult, setGeocodingResult] = useState<GeocodingResult | null>(null);
-  const [isGeocoding, setIsGeocoding] = useState(false);
+  const [newReportInfo, setNewReportInfo] = useState<NewReportInfo | null>(null);
+
 
   const handleMapClick = async (e: MapLayerMouseEvent) => {
+    // Prevent click when clicking on an existing marker
+    if (e.originalEvent.target.closest('.mapboxgl-marker')) return;
+    
     const { lng, lat } = e.lngLat;
-    setIsGeocoding(true);
-    setDialogOpen(true);
+    
+    // Clear any selected issue to hide its popup
+    setSelectedIssue(null);
+    
+    // Set initial state for the new report pin
+    setNewReportInfo({ lat, lng, address: '', isLoading: true });
 
     try {
         const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
         const data = await response.json();
         const address = formatAddress(data.address) || 'Endereço não encontrado';
-        setGeocodingResult({ address, lat, lng });
+        setNewReportInfo({ lat, lng, address, isLoading: false });
     } catch (error) {
         console.error("Erro na geocodificação reversa:", error);
-        setGeocodingResult({ address: 'Erro ao buscar endereço', lat, lng });
-    } finally {
-        setIsGeocoding(false);
+        setNewReportInfo({ lat, lng, address: 'Erro ao buscar endereço', isLoading: false });
     }
   };
 
   const handleConfirmLocation = () => {
-    if (geocodingResult) {
-      const { lat, lng, address } = geocodingResult;
+    if (newReportInfo) {
+      const { lat, lng, address } = newReportInfo;
       router.push(`/report?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`);
     }
-    setDialogOpen(false);
-  };
-
-  const handleCancel = () => {
-    setDialogOpen(false);
-    setGeocodingResult(null);
+    setNewReportInfo(null);
   };
 
   const issueMarkers = useMemo(() => issues.map(issue => (
@@ -89,6 +80,7 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
         anchor="bottom"
         onClick={e => {
             e.originalEvent.stopPropagation();
+            setNewReportInfo(null); // Close new report popup if open
             setSelectedIssue(issue);
         }}
     >
@@ -109,6 +101,7 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
         style={{ width: '100%', height: '100%' }}
         mapStyle={theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v11"}
         onClick={handleMapClick}
+        interactiveLayerIds={['clusters']}
       >
         <GeolocateControl position="top-left" />
         <NavigationControl position="top-left" />
@@ -122,7 +115,7 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
                 latitude={selectedIssue.location.lat}
                 onClose={() => setSelectedIssue(null)}
                 closeOnClick={false}
-                className="font-sans"
+                className="font-sans z-10"
             >
                 <div className="space-y-2 p-1">
                     <h3 className="font-bold text-base">{selectedIssue.title}</h3>
@@ -131,36 +124,50 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
                 </div>
             </Popup>
         )}
-      </Map>
 
-      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Localização</AlertDialogTitle>
-            <AlertDialogDescription>
-                Você selecionou o seguinte local para reportar uma ocorrência. Deseja continuar?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          
-          <div className="my-4 p-4 border rounded-md bg-muted/50">
-            {isGeocoding ? (
-            <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Buscando endereço...</span>
-            </div>
-            ) : (
-            <p className="text-sm text-foreground">{geocodingResult?.address}</p>
-            )}
-          </div>
-          
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancel}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmLocation} disabled={isGeocoding}>
-            Confirmar e Reportar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        {newReportInfo && (
+          <>
+            <Marker
+              longitude={newReportInfo.lng}
+              latitude={newReportInfo.lat}
+              anchor="bottom"
+            >
+              <MapPin className="text-green-500 h-8 w-8" fill="currentColor"/>
+            </Marker>
+             <Popup
+                anchor="bottom"
+                longitude={newReportInfo.lng}
+                latitude={newReportInfo.lat}
+                onClose={() => setNewReportInfo(null)}
+                closeOnClick={false}
+                offset={-15}
+                className="font-sans z-20"
+            >
+               <div className="space-y-3 p-1 max-w-xs">
+                    <h3 className="font-bold text-base">Confirmar Localização</h3>
+                     <div className="p-2 border rounded-md bg-muted/50">
+                        {newReportInfo.isLoading ? (
+                            <div className="flex items-center gap-2 text-sm">
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                                <span>Buscando endereço...</span>
+                            </div>
+                        ) : (
+                            <p className="text-sm text-foreground">{newReportInfo.address}</p>
+                        )}
+                    </div>
+                    <Button 
+                        onClick={handleConfirmLocation} 
+                        disabled={newReportInfo.isLoading}
+                        className="w-full"
+                    >
+                        Confirmar e Reportar
+                    </Button>
+                </div>
+            </Popup>
+          </>
+        )}
+
+      </Map>
     </>
   );
 };
