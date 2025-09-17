@@ -105,12 +105,12 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
                 const address = formatAddress(data.address);
                 
                 const popupContent = `
-                    <div style="font-family: 'PT Sans', sans-serif; background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); padding: 8px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <div style="font-family: 'PT Sans', sans-serif; background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid hsl(var(--border) / 0.5);">
                         <p style="font-weight: 600; font-size: 14px; margin: 0 0 4px 0;">Endereço selecionado:</p>
-                        <p style="font-size: 12px; color: hsl(var(--muted-foreground)); margin: 0;">${address}</p>
-                        <hr style="margin: 8px 0; border: 0; border-top: 1px solid hsl(var(--border));">
+                        <p style="font-size: 13px; color: hsl(var(--muted-foreground)); margin: 0;">${address}</p>
+                        <hr style="margin: 12px 0; border: 0; border-top: 1px solid hsl(var(--border));">
                         <button id="select-location-btn" 
-                                style="width: 100%; text-align: center; padding: 8px 16px; font-size: 14px; font-weight: 500; border-radius: 6px; cursor: pointer; transition: background-color 0.2s;
+                                style="width: 100%; text-align: center; padding: 10px 16px; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; transition: background-color 0.2s;
                                        background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border: none;">
                             Selecionar Local
                         </button>

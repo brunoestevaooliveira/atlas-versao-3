@@ -97,4 +97,17 @@
   ::-webkit-scrollbar-thumb:hover {
     background: hsla(var(--primary), 0.5);
   }
+  
+  .leaflet-popup-content-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+  .leaflet-popup-tip-container {
+    display: none !important;
+  }
+  .leaflet-popup-content {
+    margin: 0 !important;
+  }
 }
