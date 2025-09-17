@@ -18,7 +18,6 @@ import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
-import InteractiveMap from '@/components/interactive-map';
 
 export default function DashboardPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -65,12 +64,8 @@ export default function DashboardPage() {
   }, [filteredIssues]);
 
   return (
-    <div className="relative min-h-screen w-full">
-      <div className="absolute inset-0 pointer-events-none">
-        <InteractiveMap issues={[]} />
-      </div>
-      <div className="absolute inset-0 bg-black/80" />
-      <div className="relative container mx-auto py-8 pt-24 space-y-8">
+    <div className="min-h-screen w-full bg-background">
+      <div className="container mx-auto py-8 pt-24 space-y-8">
         <header className="space-y-2 text-center">
           <h1 className="text-4xl font-bold font-headline">Dashboard de Análise</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -78,7 +73,7 @@ export default function DashboardPage() {
           </p>
         </header>
 
-        <Card className="p-4 bg-muted/30 backdrop-blur-sm">
+        <Card className="p-4 bg-card/80">
           <CardHeader className="p-2 pt-0">
               <CardTitle className="text-base flex items-center gap-2">
                   <Filter className="w-4 h-4 text-muted-foreground"/>
@@ -157,7 +152,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="bg-card/80 backdrop-blur-sm">
+              <Card className="bg-card/80">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Total de Ocorrências</CardTitle>
                   <AlertCircle className="h-4 w-4 text-muted-foreground" />
@@ -167,7 +162,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-muted-foreground">Total de relatos no período.</p>
               </CardContent>
               </Card>
-              <Card className="bg-card/80 backdrop-blur-sm">
+              <Card className="bg-card/80">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Resolvidas</CardTitle>
                   <CheckCircle className="h-4 w-4 text-green-500" />
@@ -177,7 +172,7 @@ export default function DashboardPage() {
                   <p className="text-xs text-muted-foreground">Ocorrências marcadas como resolvidas.</p>
               </CardContent>
               </Card>
-              <Card className="bg-card/80 backdrop-blur-sm">
+              <Card className="bg-card/80">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Em Análise</CardTitle>
                   <Hourglass className="h-4 w-4 text-blue-500" />
@@ -191,7 +186,7 @@ export default function DashboardPage() {
         )}
 
         <div className="grid gap-8 lg:grid-cols-5">
-          <Card className="lg:col-span-2 bg-card/80 backdrop-blur-sm">
+          <Card className="lg:col-span-2 bg-card/80">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <PieChart className="h-5 w-5 text-muted-foreground"/>
@@ -203,7 +198,7 @@ export default function DashboardPage() {
               <CategoryChart issues={filteredIssues} loading={loading} />
             </CardContent>
           </Card>
-          <Card className="lg:col-span-3 bg-card/80 backdrop-blur-sm">
+          <Card className="lg:col-span-3 bg-card/80">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <BarChart className="h-5 w-5 text-muted-foreground"/>
@@ -217,7 +212,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        <Card className="bg-card/80 backdrop-blur-sm">
+        <Card className="bg-card/80">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <LucideLineChart className="h-5 w-5 text-muted-foreground"/>
@@ -233,5 +228,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-
-    

@@ -15,7 +15,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import InteractiveMap from '@/components/interactive-map';
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
@@ -149,12 +148,8 @@ export default function TrackingPage() {
   
 
   return (
-    <div className="relative min-h-screen w-full">
-      <div className="absolute inset-0 pointer-events-none">
-        <InteractiveMap issues={[]} />
-      </div>
-      <div className="absolute inset-0 bg-black/80" />
-      <div className="relative container mx-auto py-8 pt-24">
+    <div className="min-h-screen w-full bg-background">
+      <div className="container mx-auto py-8 pt-24">
         <header className="space-y-2 text-center mb-8">
           <h1 className="text-4xl font-bold font-headline">Acompanhar Ocorrências</h1>
           <p className="text-muted-foreground max-w-2xl mx-auto">
@@ -162,7 +157,7 @@ export default function TrackingPage() {
           </p>
         </header>
 
-        <Card className="mb-8 p-4 bg-muted/30 backdrop-blur-sm">
+        <Card className="mb-8 p-4 bg-card/80">
           <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
             <div className="relative flex-1 w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -277,5 +272,3 @@ export default function TrackingPage() {
     </div>
   );
 }
-
-    

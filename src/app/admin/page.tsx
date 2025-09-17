@@ -37,7 +37,6 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { Input } from '@/components/ui/input';
-import InteractiveMap from '@/components/interactive-map';
 
 export default function AdminPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -142,12 +141,8 @@ export default function AdminPage() {
 
 
   return (
-    <div className="relative min-h-screen w-full">
-      <div className="absolute inset-0 pointer-events-none">
-        <InteractiveMap issues={[]} />
-      </div>
-      <div className="absolute inset-0 bg-black/80" />
-      <div className="relative container mx-auto py-8 pt-24 space-y-8">
+    <div className="min-h-screen w-full bg-background">
+      <div className="container mx-auto py-8 pt-24 space-y-8">
         <header className="space-y-2 text-center">
           <div className="flex justify-center items-center gap-4">
               <div className="inline-block bg-primary text-primary-foreground p-3 rounded-full">
@@ -164,7 +159,7 @@ export default function AdminPage() {
           </p>
         </header>
 
-        <Card className="p-4 bg-muted/30 backdrop-blur-sm">
+        <Card className="p-4 bg-card/80">
           <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
             <div className="relative flex-1 w-full sm:w-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -199,7 +194,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card/80 backdrop-blur-sm">
+        <Card className="bg-card/80">
           <CardHeader>
             <CardTitle>Lista de Ocorrências</CardTitle>
             <CardDescription>
@@ -299,5 +294,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
-    
