@@ -59,7 +59,7 @@ const Header: React.FC = () => {
     }
 
     return (
-      <nav className="hidden md:flex flex-row items-start md:items-center gap-1 md:gap-2 text-sm font-medium">
+      <nav className="hidden md:flex flex-row items-center gap-1 text-sm font-medium">
         {navLinks.map(({ href, label }) => (
           <Link
             key={href}
@@ -153,21 +153,22 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
-            <span className='hidden md:inline text-primary-foreground'>Atlas Cívico</span>
+            <span className='hidden md:inline text-foreground dark:text-primary-foreground'>Atlas Cívico</span>
           </Link>
         </div>
 
-        <div className="hidden md:flex items-center gap-6">
+        <div className="flex-1 justify-center hidden md:flex">
           <NavContent />
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            {appUser && (
-              <>
-                <div className="w-px h-6 bg-border" />
-                <UserMenu />
-              </>
-            )}
-          </div>
+        </div>
+        
+        <div className="hidden md:flex items-center gap-2 justify-end">
+          <ThemeToggle />
+          {appUser && (
+            <>
+              <div className="w-px h-6 bg-border" />
+              <UserMenu />
+            </>
+          )}
         </div>
         
         <div className="md:hidden flex items-center gap-1">
@@ -185,7 +186,7 @@ const Header: React.FC = () => {
                     <SheetTitle className='sr-only'>Navegação Principal</SheetTitle>
                     <Link href="/" className="flex items-center gap-2 font-bold text-xl">
                         <Compass className="h-7 w-7 text-primary" />
-                        <span className='text-primary-foreground'>Atlas Cívico</span>
+                        <span className='text-foreground dark:text-primary-foreground'>Atlas Cívico</span>
                     </Link>
                 </SheetHeader>
                 <MobileNavContent />
