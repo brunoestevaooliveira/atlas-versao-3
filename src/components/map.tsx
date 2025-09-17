@@ -3,7 +3,7 @@
 
 import type { Issue } from '@/lib/types';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseEvent } from 'react-map-gl';
 import {
@@ -19,6 +19,7 @@ import {
 import { Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { MapPin } from 'lucide-react';
+import { useTheme } from 'next-themes';
 
 interface MapProps {
   issues: Issue[];
@@ -42,6 +43,7 @@ const formatAddress = (addressData: any): string => {
 const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
   const router = useRouter();
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  const { theme } = useTheme();
   
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -105,7 +107,7 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
           pitch: 45 // Initial 3D tilt
         }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="mapbox://styles/mapbox/streets-v11"
+        mapStyle={theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v11"}
         onClick={handleMapClick}
       >
         <GeolocateControl position="top-left" />
@@ -152,7 +154,7 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
           </div>
          
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancel}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={handleCancel}>Cancelar</Cancel>
             <AlertDialogAction onClick={handleConfirmLocation} disabled={isGeocoding}>
               Confirmar e Reportar
             </AlertDialogAction>
