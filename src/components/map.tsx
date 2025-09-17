@@ -10,7 +10,6 @@ import { Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { MapPin } from 'lucide-react';
 import { useTheme } from 'next-themes';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface NewReportInfo {
   lat: number;
