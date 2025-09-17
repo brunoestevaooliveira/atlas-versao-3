@@ -12,16 +12,28 @@ import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
 import TutorialModal from '@/components/tutorial-modal';
+import { useTheme } from 'next-themes';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const { appUser, isLoading, showTutorial, setShowTutorial } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const { setTheme } = useTheme();
 
   const isPublicPage = ['/login', '/register'].includes(pathname);
   const isSplashPage = pathname === '/';
   const [isSplashLoading, setIsSplashLoading] = useState(isSplashPage);
   const [isSplashFinishing, setIsSplashFinishing] = useState(false);
+
+  useEffect(() => {
+    const currentHour = new Date().getHours();
+    // Set dark theme from 6 PM (18:00) to 6 AM (06:00)
+    if (currentHour >= 18 || currentHour < 6) {
+      setTheme('dark');
+    } else {
+      setTheme('light');
+    }
+  }, [setTheme]);
 
   useEffect(() => {
     if (!isSplashPage) {
@@ -102,7 +114,7 @@ export default function RootLayout({
       </head>
       <body className={cn('min-h-screen font-sans antialiased')}>
         <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <LayoutContent>{children}</LayoutContent>
           </ThemeProvider>
         </AuthProvider>
