@@ -68,9 +68,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setIsLoading(true);
       if (user) {
+        setAuthUser(user);
+        
+        // Determine if it's a new user before any async operations
         const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
 
-        setAuthUser(user);
+        // Check if tutorial has been completed from localStorage
+        const tutorialCompleted = localStorage.getItem(TUTORIAL_COMPLETED_KEY);
+
+        // Show tutorial only if it's a new user AND they haven't seen it before
+        if (isNewUser && tutorialCompleted !== 'true') {
+            setShowTutorial(true);
+        }
+
         const token = await user.getIdTokenResult(true);
         const isAdminStatus = token.claims.admin === true;
         setIsAdmin(isAdminStatus);
@@ -79,20 +89,15 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (appProfile) {
             setAppUser(appProfile);
         } else {
+            // This will be called for new users (email/pass or first time Google)
             await handleNewUser(user);
-        }
-        
-        // Show tutorial for new users who haven't completed it
-        const tutorialCompleted = localStorage.getItem(TUTORIAL_COMPLETED_KEY);
-        if (isNewUser && tutorialCompleted !== 'true') {
-            setShowTutorial(true);
         }
 
       } else {
         setAuthUser(null);
         setAppUser(null);
         setIsAdmin(false);
-        setShowTutorial(false);
+        setShowTutorial(false); // Reset on logout
       }
       setIsLoading(false);
     });
@@ -140,8 +145,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }
 
   const register = async (email: string, pass: string, name: string) => {
-    await createUserWithEmailAndPassword(auth, email, pass);
-    // onAuthStateChanged will handle the rest, including showing the tutorial
+    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
+    await handleNewUser(userCredential.user, name);
+    // onAuthStateChanged will then handle showing the tutorial
   };
 
   const login = async (email: string, pass: string) => {
