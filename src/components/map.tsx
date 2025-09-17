@@ -93,15 +93,15 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
             popupPane.innerHTML = '';
         }
         
-        const stadiaApiKey = process.env.NEXT_PUBLIC_STADIA_API_KEY;
+        const hereApiKey = process.env.NEXT_PUBLIC_HERE_API_KEY;
 
-        if (stadiaApiKey) {
-            L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key={apiKey}', {
-                attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
-                apiKey: stadiaApiKey
+        if (hereApiKey) {
+            L.tileLayer('https://2.base.maps.ls.hereapi.com/maptile/2.1/maptile/newest/normal.day/{z}/{x}/{y}/512/png8?apiKey={apiKey}', {
+                attribution: '&copy; <a href="https://legal.here.com/en-gb/privacy" target="_blank">HERE</a>',
+                apiKey: hereApiKey
             }).addTo(map);
         } else {
-            console.warn("Stadia Maps API key not found. Using default OpenStreetMap tiles.");
+            console.warn("HERE Maps API key not found. Using default OpenStreetMap tiles.");
             L.tileLayer('https://c.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             }).addTo(map);

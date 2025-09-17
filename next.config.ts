@@ -39,6 +39,12 @@ const nextConfig: NextConfig = {
         hostname: 'tiles.stadiamaps.com',
         port: '',
         pathname: '/**',
+      },
+       {
+        protocol: 'https',
+        hostname: '2.base.maps.ls.hereapi.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
