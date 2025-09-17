@@ -4,12 +4,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Calendar, User, ThumbsUp, MapPin, MessageCircle } from 'lucide-react';
+import { Calendar, User, ThumbsUp, MapPin, MessageCircle, ExternalLink } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import CommentSection from './comment-section';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface IssueCardProps {
   issue: Issue;
@@ -34,6 +35,8 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
   const getStatusText = (status: Issue['status']) => {
     return status === 'Em análise' ? 'Análise' : status;
   };
+  
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${issue.location.lat},${issue.location.lng}`;
 
   return (
      <Dialog>
@@ -53,9 +56,17 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
               {issue.description}
             </p>
             {issue.address && (
-              <div className="flex items-center gap-2 text-xs text-slate-400 pt-2">
+              <div className="flex items-center justify-between gap-2 text-xs text-slate-400 pt-2">
+                <div className="flex items-center gap-2 min-w-0">
                   <MapPin className="h-4 w-4 flex-shrink-0 text-primary"/>
-                  <span className="text-muted-foreground">{issue.address}</span>
+                  <span className="text-muted-foreground truncate">{issue.address}</span>
+                </div>
+                <Button asChild variant="outline" size="icon" className="h-7 w-7 flex-shrink-0">
+                   <Link href={googleMapsUrl} target="_blank" rel="noopener noreferrer" title="Ver no Google Maps">
+                    <ExternalLink className="h-4 w-4" />
+                    <span className="sr-only">Ver no Google Maps</span>
+                   </Link>
+                </Button>
               </div>
             )}
         </CardContent>

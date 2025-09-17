@@ -81,6 +81,8 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
         const map = L.map(mapContainerRef.current, {
             center: center,
             zoom: 14,
+            // Remove default popup styling
+            popupPane: L.DomUtil.create('div', 'leaflet-popup-pane', map.getPane('popupPane')),
         });
         mapRef.current = map;
 
@@ -105,14 +107,14 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
                 const address = formatAddress(data.address);
                 
                 const popupContent = `
-                    <div style="font-family: 'PT Sans', sans-serif; background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid hsl(var(--border) / 0.5);">
-                        <p style="font-weight: 600; font-size: 14px; margin: 0 0 4px 0;">Endereço selecionado:</p>
-                        <p style="font-size: 13px; color: hsl(var(--muted-foreground)); margin: 0;">${address}</p>
+                    <div style="font-family: 'PT Sans', sans-serif; background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid hsl(var(--border) / 0.5); width: 250px;">
+                        <p style="font-weight: 600; font-size: 14px; margin: 0 0 4px 0;">Local selecionado</p>
+                        <p style="font-size: 13px; color: hsl(var(--muted-foreground)); margin: 0 0 12px 0; line-height: 1.4;">${address}</p>
                         <hr style="margin: 12px 0; border: 0; border-top: 1px solid hsl(var(--border));">
                         <button id="select-location-btn" 
                                 style="width: 100%; text-align: center; padding: 10px 16px; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; transition: background-color 0.2s;
                                        background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border: none;">
-                            Selecionar Local
+                            Reportar neste Local
                         </button>
                     </div>
                 `;
@@ -142,12 +144,20 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
 
     // Add new issue markers
     issues.forEach(issue => {
+        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${issue.location.lat},${issue.location.lng}`;
         const marker = L.marker([issue.location.lat, issue.location.lng], { icon: defaultIcon })
             .addTo(map)
             .bindPopup(`
-                <div class="font-bold">${issue.title}</div>
-                <div>${issue.category}</div>
-                <div class="text-sm text-muted-foreground">${issue.status}</div>
+                <div style="font-family: 'PT Sans', sans-serif; background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid hsl(var(--border) / 0.5); width: 250px;">
+                    <p style="font-weight: 700; font-size: 16px; margin: 0 0 4px 0;">${issue.title}</p>
+                    <p style="font-size: 13px; color: hsl(var(--primary)); margin: 0 0 8px 0; font-weight: 500;">${issue.category}</p>
+                    <p style="font-size: 13px; color: hsl(var(--muted-foreground)); margin: 0 0 12px 0;">${issue.status}</p>
+                     <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer"
+                        style="display: inline-block; text-decoration: none; width: 100%; text-align: center; padding: 8px 14px; font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer; transition: background-color 0.2s;
+                               background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); border: 1px solid hsl(var(--border));">
+                        Ver no Google Maps
+                     </a>
+                </div>
             `);
         markersRef.current.push(marker);
     });
