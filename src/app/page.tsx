@@ -304,7 +304,7 @@ export default function MapPage() {
               isDesktopPanelOpen ? "w-96 opacity-100" : "w-0 opacity-0",
               "overflow-hidden"
             )}>
-            <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
+            <Card className="h-full flex flex-col shadow-lg bg-card/50 backdrop-blur-lg border-l border-border/10">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div className="space-y-1">
                   <CardTitle className="text-xl text-foreground dark:text-foreground font-headline">Ocorrências Recentes</CardTitle>
@@ -351,6 +351,8 @@ export default function MapPage() {
 
     
 
+
+    
 
     
 
