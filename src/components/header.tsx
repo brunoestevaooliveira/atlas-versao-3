@@ -137,16 +137,6 @@ const Header: React.FC = () => {
             {appUser && (
                 <div className="mt-auto">
                     <Separator className="my-4"/>
-                    <div className="flex items-center gap-3 mb-4">
-                         <Avatar className="h-12 w-12 border-2 border-primary/50">
-                            <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
-                            <AvatarFallback className="bg-primary/20 text-primary font-bold">{getInitials(appUser?.name)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                             <p className="font-semibold">{appUser.name}</p>
-                             <p className="text-sm text-muted-foreground">{appUser.email}</p>
-                        </div>
-                    </div>
                     <Button onClick={logout} className="w-full">
                         <LogOut className="mr-2 h-4 w-4" />
                         <span>Sair</span>
@@ -182,6 +172,7 @@ const Header: React.FC = () => {
         
         <div className="md:hidden flex items-center gap-1">
           <ThemeToggle />
+           {appUser && <UserMenu />}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
