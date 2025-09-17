@@ -86,8 +86,10 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
         });
 
         // This removes default popup styling by replacing the pane
-        map.getPane('popupPane')!.innerHTML = '';
-
+        if (map.getPane('popupPane')) {
+            map.getPane('popupPane')!.innerHTML = '';
+        }
+        
         mapRef.current = map;
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {

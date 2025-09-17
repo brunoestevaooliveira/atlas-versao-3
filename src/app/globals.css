@@ -99,12 +99,15 @@
   }
   
   /* Reset Leaflet Popup Styles */
-  .leaflet-popup-content-wrapper,
-  .leaflet-popup-tip {
+  .leaflet-popup-content-wrapper {
     background: transparent !important;
     color: inherit !important;
     box-shadow: none !important;
     border-radius: 0 !important;
+    padding: 0 !important;
+  }
+  .leaflet-popup-tip-container {
+    display: none !important; /* Hides the default arrow tip container */
   }
   .leaflet-popup-content {
     margin: 0 !important;
@@ -112,7 +115,7 @@
     line-height: inherit;
   }
   .leaflet-popup-close-button {
-    display: none !important; /* Hide default close button */
+    display: none !important;
   }
   .leaflet-container a.leaflet-popup-close-button {
      display: none !important;
