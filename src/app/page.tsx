@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp, MapPin, Filter, List } from 'lucide-react';
+import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -28,6 +28,7 @@ export default function MapPage() {
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
   const [searchQuery, setSearchQuery] = useState('');
   const [showIssues, setShowIssues] = useState(true);
+  const [isDesktopPanelOpen, setIsDesktopPanelOpen] = useState(true);
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
@@ -247,17 +248,35 @@ export default function MapPage() {
           </Card>
         </div>
 
-        {/* Desktop Panel */}
-        <div className="absolute top-24 right-4 z-10 w-96 max-h-[calc(100vh-8rem)] hidden md:block">
-           <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
-            <CardHeader>
-              <CardTitle className="text-xl text-foreground dark:text-foreground">Ocorrências Recentes</CardTitle>
-              <CardDescription className="text-muted-foreground">Veja os problemas reportados pela comunidade.</CardDescription>
-            </CardHeader>
-            <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
-              <RecentIssuesPanelContent />
-            </CardContent>
-          </Card>
+        {/* Desktop Panel Logic */}
+        <div className="absolute top-24 right-4 z-10 max-h-[calc(100vh-8rem)] hidden md:block">
+          {!isDesktopPanelOpen && (
+            <Button size="icon" className="rounded-full shadow-lg" onClick={() => setIsDesktopPanelOpen(true)}>
+              <PanelRightClose />
+              <span className="sr-only">Abrir painel de ocorrências</span>
+            </Button>
+          )}
+          <div className={cn(
+              "transition-all duration-300 ease-in-out",
+              isDesktopPanelOpen ? "w-96 opacity-100" : "w-0 opacity-0",
+              "overflow-hidden"
+            )}>
+            <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div className="space-y-1">
+                  <CardTitle className="text-xl text-foreground dark:text-foreground">Ocorrências Recentes</CardTitle>
+                  <CardDescription className="text-muted-foreground">Veja os problemas reportados.</CardDescription>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setIsDesktopPanelOpen(false)}>
+                  <PanelRightOpen />
+                  <span className="sr-only">Fechar painel</span>
+                </Button>
+              </CardHeader>
+              <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
+                <RecentIssuesPanelContent />
+              </CardContent>
+            </Card>
+          </div>
         </div>
         
         {/* Mobile Sheet Trigger */}
