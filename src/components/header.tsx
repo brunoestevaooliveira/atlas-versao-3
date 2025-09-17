@@ -6,7 +6,7 @@ import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut, Menu, S
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle, SheetClose } from './ui/sheet';
 import { useAuth } from '@/context/auth-context';
 import {
   DropdownMenu,
@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
 import { useTheme } from 'next-themes';
+import { Separator } from './ui/separator';
 
 
 const baseNavLinks = [
@@ -41,29 +42,24 @@ const ThemeToggle = () => {
   );
 }
 
+const getInitials = (name: string | null | undefined) => {
+    if (!name) return 'U';
+    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+}
 
 const Header: React.FC = () => {
   const pathname = usePathname();
   const { appUser, logout, isAdmin } = useAuth();
 
-  const getInitials = (name: string | null | undefined) => {
-    if (!name) return 'U';
-    return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-  }
-
-  const NavContent = ({ isMobile = false }: { isMobile?: boolean }) => {
+  const NavContent = () => {
     const navLinks = [...baseNavLinks];
     if (isAdmin) {
       navLinks.splice(3, 0, { href: '/dashboard', label: 'Dashboard' });
       navLinks.push({ href: '/admin', label: 'Admin' });
     }
 
-    const navClass = isMobile
-      ? 'flex flex-col gap-4 text-lg'
-      : 'hidden md:flex flex-row items-start md:items-center gap-1 md:gap-2 text-sm font-medium';
-
     return (
-      <nav className={navClass}>
+      <nav className="hidden md:flex flex-row items-start md:items-center gap-1 md:gap-2 text-sm font-medium">
         {navLinks.map(({ href, label }) => (
           <Link
             key={href}
@@ -113,6 +109,54 @@ const Header: React.FC = () => {
     );
   }
 
+  const MobileNavContent = () => {
+    const navLinks = [...baseNavLinks];
+    if (isAdmin) {
+      navLinks.push({ href: '/dashboard', label: 'Dashboard' });
+      navLinks.push({ href: '/admin', label: 'Admin' });
+    }
+
+    return (
+        <div className="flex flex-col justify-between h-full">
+            <div className="flex flex-col gap-2 text-lg">
+                {navLinks.map(({ href, label }) => (
+                    <SheetClose asChild key={href}>
+                        <Link
+                            href={href}
+                            className={cn(
+                                'px-3 py-2 rounded-md transition-colors text-foreground dark:text-white font-semibold',
+                                pathname === href ? 'bg-black/10 dark:bg-white/20' : 'hover:bg-black/5 dark:hover:bg-white/10',
+                            )}
+                        >
+                            {label}
+                        </Link>
+                    </SheetClose>
+                ))}
+            </div>
+
+            {appUser && (
+                <div className="mt-auto">
+                    <Separator className="my-4"/>
+                    <div className="flex items-center gap-3 mb-4">
+                         <Avatar className="h-12 w-12 border-2 border-primary/50">
+                            <AvatarImage src={appUser?.photoURL || undefined} alt={appUser?.name || 'User'} />
+                            <AvatarFallback className="bg-primary/20 text-primary font-bold">{getInitials(appUser?.name)}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                             <p className="font-semibold">{appUser.name}</p>
+                             <p className="text-sm text-muted-foreground">{appUser.email}</p>
+                        </div>
+                    </div>
+                    <Button onClick={logout} className="w-full">
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Sair</span>
+                    </Button>
+                </div>
+            )}
+        </div>
+    )
+  }
+
   return (
     <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-full max-w-md md:max-w-7xl px-4">
       <div className="container flex h-16 items-center justify-between rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 px-4 md:px-6 shadow-lg backdrop-blur-xl">
@@ -138,7 +182,6 @@ const Header: React.FC = () => {
         
         <div className="md:hidden flex items-center gap-1">
           <ThemeToggle />
-          {appUser && <UserMenu />}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
@@ -146,34 +189,15 @@ const Header: React.FC = () => {
                 <span className="sr-only">Toggle Menu</span>
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[280px]">
-             <SheetHeader className='text-left mb-4'>
-                <SheetTitle className='sr-only'>Navegação Principal</SheetTitle>
-                 <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-                    <Compass className="h-7 w-7 text-primary" />
-                    <span className='text-primary-foreground'>Atlas Cívico</span>
-                 </Link>
-             </SheetHeader>
-              <div className="flex flex-col gap-4 text-lg">
-                 {baseNavLinks.map(({ href, label }) => (
-                    <Link
-                        key={href}
-                        href={href}
-                        className={cn(
-                        'px-3 py-1.5 rounded-md transition-colors text-foreground dark:text-white font-semibold hover:bg-black/10 dark:hover:bg-white/20',
-                        pathname === href ? 'bg-black/10 dark:bg-white/30' : 'hover:bg-black/5 dark:hover:bg-white/10',
-                        )}
-                    >
-                        {label}
+            <SheetContent side="right" className="w-[280px] flex flex-col">
+                <SheetHeader className='text-left mb-4'>
+                    <SheetTitle className='sr-only'>Navegação Principal</SheetTitle>
+                    <Link href="/" className="flex items-center gap-2 font-bold text-xl">
+                        <Compass className="h-7 w-7 text-primary" />
+                        <span className='text-primary-foreground'>Atlas Cívico</span>
                     </Link>
-                 ))}
-                 {isAdmin && (
-                    <>
-                        <Link href="/dashboard" className={cn('px-3 py-1.5 rounded-md transition-colors text-foreground dark:text-white font-semibold hover:bg-black/10 dark:hover:bg-white/20', pathname === '/dashboard' ? 'bg-black/10 dark:bg-white/30' : 'hover:bg-black/5 dark:hover:bg-white/10')}>Dashboard</Link>
-                        <Link href="/admin" className={cn('px-3 py-1.5 rounded-md transition-colors text-foreground dark:text-white font-semibold hover:bg-black/10 dark:hover:bg-white/20', pathname === '/admin' ? 'bg-black/10 dark:bg-white/30' : 'hover:bg-black/5 dark:hover:bg-white/10')}>Admin</Link>
-                    </>
-                 )}
-              </div>
+                </SheetHeader>
+                <MobileNavContent />
             </SheetContent>
           </Sheet>
         </div>
