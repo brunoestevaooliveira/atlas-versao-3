@@ -165,7 +165,7 @@ export default function MapPage() {
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
                   <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
-                  <p className="text-sm text-primary font-semibold">{issue.category}</p>
+                  <p className="text-sm text-primary font-semibold italic">{issue.category}</p>
                 </div>
                 <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
               </div>
@@ -174,7 +174,7 @@ export default function MapPage() {
                 <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
                     <div className="flex items-center gap-2 min-w-0">
                       <MapPin className="h-4 w-4 flex-shrink-0 text-primary"/>
-                      <span className="text-slate-400 truncate">{issue.address}</span>
+                      <span className="text-slate-400 truncate italic">{issue.address}</span>
                     </div>
                     <Button asChild variant="outline" size="sm" className="h-8 flex-shrink-0">
                        <Link href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
@@ -351,5 +351,7 @@ export default function MapPage() {
 
     
 
+
+    
 
     
