@@ -2,10 +2,10 @@
 'use client';
 
 import type { Issue } from '@/lib/types';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { useEffect, useRef, useState } from 'react';
+import 'mapbox-gl/dist/mapbox-gl.css';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseEvent } from 'react-map-gl';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,23 +16,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2, ExternalLink } from 'lucide-react';
-import Link from 'next/link';
-
-
-const defaultIcon = new L.Icon({
-    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-    iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
-});
+import { Loader2 } from 'lucide-react';
+import { Button } from './ui/button';
+import { MapPin } from 'lucide-react';
 
 interface MapProps {
   issues: Issue[];
-  center: [number, number];
+  center: { lat: number; lng: number };
 }
 
 interface GeocodingResult {
@@ -49,18 +39,17 @@ const formatAddress = (addressData: any): string => {
     return postcode ? `${address} - CEP: ${postcode}` : address;
 }
 
-const Map: React.FC<MapProps> = ({ issues, center }) => {
-  const mapRef = useRef<L.Map | null>(null);
-  const markersRef = useRef<L.Marker[]>([]);
-  const tempMarkerRef = useRef<L.Marker | null>(null);
-  const mapContainerRef = useRef<HTMLDivElement>(null);
+const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
   const router = useRouter();
-
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+  
+  const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [geocodingResult, setGeocodingResult] = useState<GeocodingResult | null>(null);
   const [isGeocoding, setIsGeocoding] = useState(false);
 
-  const handleSelectLocation = async (lat: number, lng: number) => {
+  const handleMapClick = async (e: MapLayerMouseEvent) => {
+    const { lng, lat } = e.lngLat;
     setIsGeocoding(true);
     setDialogOpen(true);
 
@@ -77,112 +66,6 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
     }
   };
 
-  // Initialize map
-  useEffect(() => {
-    if (mapContainerRef.current && !mapRef.current) {
-        const map = L.map(mapContainerRef.current, {
-            center: center,
-            zoom: 14,
-        });
-
-        mapRef.current = map;
-
-        const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
-
-        // This removes default popup styling by replacing the pane content
-        const popupPane = map.getPane('popupPane');
-        if (popupPane) {
-            popupPane.innerHTML = '';
-        }
-        
-        if (mapboxAccessToken) {
-            L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
-                attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
-                tileSize: 512,
-                zoomOffset: -1,
-                accessToken: mapboxAccessToken
-            }).addTo(map);
-        } else {
-             L.tileLayer('https://c.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
-        }
-
-
-        map.on('click', async (e) => {
-            const { lat, lng } = e.latlng;
-            
-            if (tempMarkerRef.current) {
-                tempMarkerRef.current.remove();
-            }
-
-            const tempMarker = L.marker([lat, lng], { icon: defaultIcon }).addTo(map);
-            tempMarker.bindPopup('Buscando endereço...').openPopup();
-            tempMarkerRef.current = tempMarker;
-
-            try {
-                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
-                const data = await response.json();
-                const address = formatAddress(data.address);
-                
-                const popupContent = `
-                    <div style="font-family: 'PT Sans', sans-serif; background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid hsl(var(--border) / 0.5); width: 250px;">
-                        <p style="font-weight: 600; font-size: 14px; margin: 0 0 4px 0;">Local selecionado</p>
-                        <p style="font-size: 13px; color: hsl(var(--muted-foreground)); margin: 0 0 12px 0; line-height: 1.4;">${address}</p>
-                        <hr style="margin: 12px 0; border: 0; border-top: 1px solid hsl(var(--border));">
-                        <button id="select-location-btn" 
-                                style="width: 100%; text-align: center; padding: 10px 16px; font-size: 14px; font-weight: 500; border-radius: 8px; cursor: pointer; transition: background-color 0.2s;
-                                       background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border: none;">
-                            Reportar neste Local
-                        </button>
-                    </div>
-                `;
-                tempMarker.getPopup()?.setContent(popupContent);
-                
-                const selectBtn = document.getElementById('select-location-btn');
-                if (selectBtn) {
-                    selectBtn.onclick = () => handleSelectLocation(lat, lng);
-                }
-
-            } catch (error) {
-                console.error("Erro na geocodificação reversa:", error);
-                tempMarker.getPopup()?.setContent('Erro ao buscar endereço.');
-            }
-        });
-    }
-  }, []);
-
-  // Update issue markers when issues change
-  useEffect(() => {
-    const map = mapRef.current;
-    if (!map) return;
-
-    // Clear existing issue markers
-    markersRef.current.forEach(marker => marker.remove());
-    markersRef.current = [];
-
-    // Add new issue markers
-    issues.forEach(issue => {
-        const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${issue.location.lat},${issue.location.lng}`;
-        const marker = L.marker([issue.location.lat, issue.location.lng], { icon: defaultIcon })
-            .addTo(map)
-            .bindPopup(`
-                <div style="font-family: 'PT Sans', sans-serif; background-color: hsl(var(--card)); color: hsl(var(--card-foreground)); padding: 12px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: 1px solid hsl(var(--border) / 0.5); width: 250px;">
-                    <p style="font-weight: 700; font-size: 16px; margin: 0 0 4px 0;">${issue.title}</p>
-                    <p style="font-size: 13px; color: hsl(var(--primary)); margin: 0 0 8px 0; font-weight: 500;">${issue.category}</p>
-                    <p style="font-size: 13px; color: hsl(var(--muted-foreground)); margin: 0 0 12px 0;">${issue.status}</p>
-                     <a href="${googleMapsUrl}" target="_blank" rel="noopener noreferrer"
-                        style="display: inline-block; text-decoration: none; width: 100%; text-align: center; padding: 8px 14px; font-size: 13px; font-weight: 500; border-radius: 8px; cursor: pointer; transition: background-color 0.2s;
-                               background-color: hsl(var(--secondary)); color: hsl(var(--secondary-foreground)); border: 1px solid hsl(var(--border));">
-                        Ver no Google Maps
-                     </a>
-                </div>
-            `);
-        markersRef.current.push(marker);
-    });
-    
-  }, [issues]);
-
   const handleConfirmLocation = () => {
     if (geocodingResult) {
       const { lat, lng, address } = geocodingResult;
@@ -194,11 +77,60 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
   const handleCancel = () => {
     setDialogOpen(false);
     setGeocodingResult(null);
-  }
+  };
+
+  const issueMarkers = useMemo(() => issues.map(issue => (
+    <Marker 
+        key={issue.id}
+        longitude={issue.location.lng} 
+        latitude={issue.location.lat}
+        anchor="bottom"
+        onClick={e => {
+            e.originalEvent.stopPropagation();
+            setSelectedIssue(issue);
+        }}
+    >
+        <MapPin className="text-primary h-8 w-8 cursor-pointer" fill="currentColor"/>
+    </Marker>
+  )), [issues]);
 
   return (
     <>
-      <div ref={mapContainerRef} className="h-full w-full cursor-crosshair"></div>
+      <Map
+        mapboxAccessToken={mapboxToken}
+        initialViewState={{
+          longitude: center.lng,
+          latitude: center.lat,
+          zoom: 13,
+          pitch: 45 // Initial 3D tilt
+        }}
+        style={{ width: '100%', height: '100%' }}
+        mapStyle="mapbox://styles/mapbox/streets-v11"
+        onClick={handleMapClick}
+      >
+        <GeolocateControl position="top-left" />
+        <NavigationControl position="top-left" />
+
+        {issueMarkers}
+
+        {selectedIssue && (
+            <Popup
+                anchor="top"
+                longitude={selectedIssue.location.lng}
+                latitude={selectedIssue.location.lat}
+                onClose={() => setSelectedIssue(null)}
+                closeOnClick={false}
+                className="font-sans"
+            >
+                <div className="space-y-2 p-1">
+                    <h3 className="font-bold text-base">{selectedIssue.title}</h3>
+                    <p className="text-sm text-primary">{selectedIssue.category}</p>
+                    <p className="text-xs text-muted-foreground">{selectedIssue.status}</p>
+                </div>
+            </Popup>
+        )}
+      </Map>
+
       <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -231,4 +163,4 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
   );
 };
 
-export default Map;
+export default MapComponent;

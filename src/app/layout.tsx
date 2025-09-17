@@ -3,10 +3,10 @@
 
 import { useState, useEffect } from 'react';
 import './globals.css';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
 import { cn } from '@/lib/utils';
-import 'leaflet/dist/leaflet.css';
 import SplashScreen from '@/components/splash-screen';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
