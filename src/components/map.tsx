@@ -103,12 +103,18 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
                 const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
                 const data = await response.json();
                 const address = formatAddress(data.address);
+                
+                // Aplicando Tailwind CSS ao conteúdo do popup
                 const popupContent = `
-                    <div class="text-sm space-y-2">
-                        <p class="font-medium">Endereço selecionado:</p>
-                        <p>${address}</p>
-                        <hr class="my-2">
-                        <button id="select-location-btn" class="w-full text-center px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors text-white" style="background-color: hsl(var(--primary)); color: hsl(var(--primary-foreground)); border: none; cursor: pointer;">
+                    <div class="font-sans space-y-2 p-1">
+                        <p class="font-semibold text-sm text-[hsl(var(--foreground))]">Endereço selecionado:</p>
+                        <p class="text-xs text-[hsl(var(--muted-foreground))]">${address}</p>
+                        <hr class="my-2 border-[hsl(var(--border))]">
+                        <button id="select-location-btn" 
+                                class="w-full text-center px-4 py-2 text-sm font-medium rounded-md transition-colors
+                                       bg-[hsl(var(--primary))] text-[hsl(var(--primary-foreground))] 
+                                       hover:bg-[hsl(var(--primary)/0.9)]" 
+                                style="border: none; cursor: pointer;">
                             Selecionar Local
                         </button>
                     </div>
