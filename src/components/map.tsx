@@ -16,7 +16,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Loader2 } from 'lucide-react';
+import { Loader2, ExternalLink } from 'lucide-react';
+import Link from 'next/link';
+
 
 const defaultIcon = new L.Icon({
     iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
@@ -81,9 +83,11 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
         const map = L.map(mapContainerRef.current, {
             center: center,
             zoom: 14,
-            // Remove default popup styling
-            popupPane: L.DomUtil.create('div', 'leaflet-popup-pane', map.getPane('popupPane')),
         });
+
+        // This removes default popup styling by replacing the pane
+        map.getPane('popupPane')!.innerHTML = '';
+
         mapRef.current = map;
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
