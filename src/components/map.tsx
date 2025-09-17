@@ -97,7 +97,6 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
   )), [issues]);
 
   return (
-    <>
       <Map
         mapboxAccessToken={mapboxToken}
         initialViewState={{
@@ -131,37 +130,36 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
                 </div>
             </Popup>
         )}
-      </Map>
 
-      <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Localização</AlertDialogTitle>
-             <AlertDialogDescription>
-                Você selecionou o seguinte local para reportar uma ocorrência. Deseja continuar?
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          
-          <div className="my-4 p-4 border rounded-md bg-muted/50">
-            {isGeocoding ? (
-              <div className="flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>Buscando endereço...</span>
-              </div>
-            ) : (
-              <p className="text-sm text-foreground">{geocodingResult?.address}</p>
-            )}
-          </div>
-         
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={handleCancel}>Cancelar</Cancel>
-            <AlertDialogAction onClick={handleConfirmLocation} disabled={isGeocoding}>
-              Confirmar e Reportar
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </>
+        <AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>Confirmar Localização</AlertDialogTitle>
+                <AlertDialogDescription>
+                    Você selecionou o seguinte local para reportar uma ocorrência. Deseja continuar?
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            
+            <div className="my-4 p-4 border rounded-md bg-muted/50">
+                {isGeocoding ? (
+                <div className="flex items-center gap-2">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>Buscando endereço...</span>
+                </div>
+                ) : (
+                <p className="text-sm text-foreground">{geocodingResult?.address}</p>
+                )}
+            </div>
+            
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={handleCancel}>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={handleConfirmLocation} disabled={isGeocoding}>
+                Confirmar e Reportar
+                </AlertDialogAction>
+            </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
+      </Map>
   );
 };
 
