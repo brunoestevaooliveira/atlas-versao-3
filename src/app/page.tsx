@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose } from 'lucide-react';
+import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -19,6 +19,7 @@ import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+import Link from 'next/link';
 
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
@@ -157,34 +158,49 @@ export default function MapPage() {
 
   const RecentIssuesPanelContent = () => (
       <div className="space-y-4">
-        {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
-          <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
-            <div className="flex justify-between items-start">
-              <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
-              <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
-            </div>
-            <p className="text-sm text-primary font-semibold">{issue.category}</p>
-            {issue.address && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="h-3 w-3"/>
-                  <span className="text-slate-400">{issue.address}</span>
+        {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => {
+          const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${issue.location.lat},${issue.location.lng}`;
+          return (
+            <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-3 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
+                  <p className="text-sm text-primary font-semibold">{issue.category}</p>
+                </div>
+                <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
               </div>
-            )}
-            <Button
-              size="sm"
-              variant="ghost"
-              className={cn(
-                  "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-border/20 text-black dark:text-white",
-                  upvotedIssues.has(issue.id) && "opacity-50 cursor-not-allowed"
+              
+              {issue.address && (
+                <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <MapPin className="h-4 w-4 flex-shrink-0 text-primary"/>
+                      <span className="text-slate-400 truncate">{issue.address}</span>
+                    </div>
+                    <Button asChild variant="outline" size="sm" className="h-8 flex-shrink-0">
+                       <Link href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
+                        <ExternalLink className="h-4 w-4 mr-2" />
+                        Ver no Google Maps
+                       </Link>
+                    </Button>
+                </div>
               )}
-              onClick={() => handleUpvote(issue.id, issue.upvotes)}
-              disabled={upvotedIssues.has(issue.id)}
-            >
-              <ThumbsUp className="mr-2 h-4 w-4" />
-              Apoiar ({issue.upvotes})
-            </Button>
-          </div>
-        )) : (
+
+              <Button
+                size="sm"
+                variant="ghost"
+                className={cn(
+                    "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-border/20 text-black dark:text-white",
+                    upvotedIssues.has(issue.id) && "opacity-50 cursor-not-allowed"
+                )}
+                onClick={() => handleUpvote(issue.id, issue.upvotes)}
+                disabled={upvotedIssues.has(issue.id)}
+              >
+                <ThumbsUp className="mr-2 h-4 w-4" />
+                Apoiar ({issue.upvotes})
+              </Button>
+            </div>
+          );
+        }) : (
           <p className="text-sm text-center text-muted-foreground py-8">Nenhuma ocorrência encontrada.</p>
         )}
       </div>
@@ -331,6 +347,9 @@ export default function MapPage() {
 
     
 
+
+
+    
 
 
     
