@@ -212,14 +212,14 @@ export default function ReportForm() {
                     value={form.address}
                     placeholder="Selecione um local no mapa na página inicial"
                     readOnly
-                    className="bg-muted text-muted-foreground cursor-not-allowed"
+                    className="bg-muted/80 text-muted-foreground cursor-not-allowed"
                 />
             </div>
         </div>
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading}>
+             <Button type="submit" size="lg" disabled={loading} variant="outline" className="bg-white text-black hover:bg-gray-200">
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -231,3 +231,5 @@ export default function ReportForm() {
     </form>
   );
 }
+
+    

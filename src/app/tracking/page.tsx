@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import InteractiveMap from '@/components/interactive-map';
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
@@ -148,125 +149,133 @@ export default function TrackingPage() {
   
 
   return (
-    <div className="container mx-auto py-8 pt-24 bg-background">
-      <header className="space-y-2 text-center mb-8">
-        <h1 className="text-4xl font-bold font-headline">Acompanhar Ocorrências</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Explore, filtre e veja o andamento das ocorrências reportadas em tempo real.
-        </p>
-      </header>
+    <div className="relative min-h-screen w-full">
+      <div className="absolute inset-0 pointer-events-none">
+        <InteractiveMap issues={[]} />
+      </div>
+      <div className="absolute inset-0 bg-black/80" />
+      <div className="relative container mx-auto py-8 pt-24">
+        <header className="space-y-2 text-center mb-8">
+          <h1 className="text-4xl font-bold font-headline">Acompanhar Ocorrências</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Explore, filtre e veja o andamento das ocorrências reportadas em tempo real.
+          </p>
+        </header>
 
-      <Card className="mb-8 p-4 bg-muted/30">
-        <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
-           <div className="relative flex-1 w-full sm:w-auto">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-                placeholder="Buscar por endereço..." 
-                className="pl-10"
-                value={addressFilter}
-                onChange={(e) => setAddressFilter(e.target.value)}
-            />
-          </div>
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="flex-1 w-full sm:w-auto">
-              <SelectValue placeholder="Filtrar por Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              {uniqueCategories.map(category => (
-                <SelectItem key={category} value={category}>
-                    {category === 'all' ? 'Todas as Categorias' : category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-           <Select value={sortOrder} onValueChange={setSortOrder}>
-            <SelectTrigger className="flex-1 w-full sm:w-auto">
-              <SelectValue placeholder="Ordenar por" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="recent">Mais Recentes</SelectItem>
-              <SelectItem value="upvotes">Mais Apoiados (Prioridade)</SelectItem>
-            </SelectContent>
-          </Select>
-          <div className="flex items-center space-x-2">
-            <Switch 
-                id="my-issues-only" 
-                checked={myIssuesOnly}
-                onCheckedChange={setMyIssuesOnly}
-                disabled={!appUser}
-            />
-            <Label htmlFor="my-issues-only" className="whitespace-nowrap">Minhas Ocorrências</Label>
-          </div>
-        </CardContent>
-      </Card>
+        <Card className="mb-8 p-4 bg-muted/30 backdrop-blur-sm">
+          <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
+            <div className="relative flex-1 w-full sm:w-auto">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input 
+                  placeholder="Buscar por endereço..." 
+                  className="pl-10"
+                  value={addressFilter}
+                  onChange={(e) => setAddressFilter(e.target.value)}
+              />
+            </div>
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="flex-1 w-full sm:w-auto">
+                <SelectValue placeholder="Filtrar por Categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueCategories.map(category => (
+                  <SelectItem key={category} value={category}>
+                      {category === 'all' ? 'Todas as Categorias' : category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={sortOrder} onValueChange={setSortOrder}>
+              <SelectTrigger className="flex-1 w-full sm:w-auto">
+                <SelectValue placeholder="Ordenar por" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="recent">Mais Recentes</SelectItem>
+                <SelectItem value="upvotes">Mais Apoiados (Prioridade)</SelectItem>
+              </SelectContent>
+            </Select>
+            <div className="flex items-center space-x-2">
+              <Switch 
+                  id="my-issues-only" 
+                  checked={myIssuesOnly}
+                  onCheckedChange={setMyIssuesOnly}
+                  disabled={!appUser}
+              />
+              <Label htmlFor="my-issues-only" className="whitespace-nowrap">Minhas Ocorrências</Label>
+            </div>
+          </CardContent>
+        </Card>
 
-      <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-        <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-2xl">
-          <TabsTrigger value="all">
-            <ListFilter className="mr-2 h-4 w-4" /> Todas ({allTabIssues.length})
-          </TabsTrigger>
-          <TabsTrigger value="received">
-            <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedTabIssues.length})
-          </TabsTrigger>
-          <TabsTrigger value="inProgress">
-             <BarChart className="mr-2 h-4 w-4" /> Em Análise ({inProgressTabIssues.length})
-          </TabsTrigger>
-          <TabsTrigger value="resolved">
-            <CheckCircle className="mr-2 h-4 w-4" /> Resolvidas ({resolvedTabIssues.length})
-          </TabsTrigger>
-        </TabsList>
-        
-        <div className="mt-8">
-          <TabsContent value="all">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {allTabIssues.length > 0 ? allTabIssues.map((issue) => (
-                <IssueCard 
-                  key={issue.id} 
-                  issue={issue} 
-                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
-                  isUpvoted={upvotedIssues.has(issue.id)}
-                />
-              )) : <EmptyState tabName="Todas" />}
-            </div>
-          </TabsContent>
-          <TabsContent value="received">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {receivedTabIssues.length > 0 ? receivedTabIssues.map((issue) => (
-                <IssueCard 
-                  key={issue.id} 
-                  issue={issue} 
-                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
-                  isUpvoted={upvotedIssues.has(issue.id)}
-                />
-              )) : <EmptyState tabName="Recebidas" />}
-            </div>
-          </TabsContent>
-          <TabsContent value="inProgress">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {inProgressTabIssues.length > 0 ? inProgressTabIssues.map((issue) => (
-                <IssueCard 
-                  key={issue.id} 
-                  issue={issue} 
-                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
-                  isUpvoted={upvotedIssues.has(issue.id)}
-                />
-              )) : <EmptyState tabName="Em Análise" />}
-            </div>
-          </TabsContent>
-          <TabsContent value="resolved">
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {resolvedTabIssues.length > 0 ? resolvedTabIssues.map((issue) => (
-                 <IssueCard 
+        <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-2xl">
+            <TabsTrigger value="all">
+              <ListFilter className="mr-2 h-4 w-4" /> Todas ({allTabIssues.length})
+            </TabsTrigger>
+            <TabsTrigger value="received">
+              <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedTabIssues.length})
+            </TabsTrigger>
+            <TabsTrigger value="inProgress">
+              <BarChart className="mr-2 h-4 w-4" /> Em Análise ({inProgressTabIssues.length})
+            </TabsTrigger>
+            <TabsTrigger value="resolved">
+              <CheckCircle className="mr-2 h-4 w-4" /> Resolvidas ({resolvedTabIssues.length})
+            </TabsTrigger>
+          </TabsList>
+          
+          <div className="mt-8">
+            <TabsContent value="all">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {allTabIssues.length > 0 ? allTabIssues.map((issue) => (
+                  <IssueCard 
                     key={issue.id} 
                     issue={issue} 
                     onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
                     isUpvoted={upvotedIssues.has(issue.id)}
                   />
-              )) : <EmptyState tabName="Resolvidas" />}
-            </div>
-          </TabsContent>
-        </div>
-      </Tabs>
+                )) : <EmptyState tabName="Todas" />}
+              </div>
+            </TabsContent>
+            <TabsContent value="received">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {receivedTabIssues.length > 0 ? receivedTabIssues.map((issue) => (
+                  <IssueCard 
+                    key={issue.id} 
+                    issue={issue} 
+                    onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
+                    isUpvoted={upvotedIssues.has(issue.id)}
+                  />
+                )) : <EmptyState tabName="Recebidas" />}
+              </div>
+            </TabsContent>
+            <TabsContent value="inProgress">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {inProgressTabIssues.length > 0 ? inProgressTabIssues.map((issue) => (
+                  <IssueCard 
+                    key={issue.id} 
+                    issue={issue} 
+                    onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
+                    isUpvoted={upvotedIssues.has(issue.id)}
+                  />
+                )) : <EmptyState tabName="Em Análise" />}
+              </div>
+            </TabsContent>
+            <TabsContent value="resolved">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {resolvedTabIssues.length > 0 ? resolvedTabIssues.map((issue) => (
+                  <IssueCard 
+                      key={issue.id} 
+                      issue={issue} 
+                      onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
+                      isUpvoted={upvotedIssues.has(issue.id)}
+                    />
+                )) : <EmptyState tabName="Resolvidas" />}
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
     </div>
   );
 }
+
+    

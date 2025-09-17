@@ -18,6 +18,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import InteractiveMap from '@/components/interactive-map';
 
 export default function DashboardPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -64,165 +65,173 @@ export default function DashboardPage() {
   }, [filteredIssues]);
 
   return (
-    <div className="container mx-auto py-8 pt-24 space-y-8 bg-background">
-      <header className="space-y-2 text-center">
-        <h1 className="text-4xl font-bold font-headline">Dashboard de Análise</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Visualize os dados sobre as ocorrências reportadas em tempo real.
-        </p>
-      </header>
-
-      <Card className="p-4 bg-muted/30">
-         <CardHeader className="p-2 pt-0">
-            <CardTitle className="text-base flex items-center gap-2">
-                <Filter className="w-4 h-4 text-muted-foreground"/>
-                Filtros de Análise
-            </CardTitle>
-         </CardHeader>
-        <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
-          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-            <SelectTrigger className="flex-1 w-full sm:w-auto">
-              <SelectValue placeholder="Filtrar por Categoria" />
-            </SelectTrigger>
-            <SelectContent>
-              {uniqueCategories.map(category => (
-                <SelectItem key={category} value={category}>
-                    {category === 'all' ? 'Todas as Categorias' : category}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-           <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
-            <SelectTrigger className="flex-1 w-full sm:w-auto">
-              <SelectValue placeholder="Filtrar por Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos os Status</SelectItem>
-              <SelectItem value="Recebido">Recebido</SelectItem>
-              <SelectItem value="Em análise">Em análise</SelectItem>
-              <SelectItem value="Resolvido">Resolvido</SelectItem>
-            </SelectContent>
-          </Select>
-           <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                id="date"
-                variant={"outline"}
-                className={cn(
-                  "w-full sm:w-[300px] justify-start text-left font-normal",
-                  !dateRange && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRange?.from ? (
-                  dateRange.to ? (
-                    <>
-                      {format(dateRange.from, "LLL dd, y")} -{" "}
-                      {format(dateRange.to, "LLL dd, y")}
-                    </>
-                  ) : (
-                    format(dateRange.from, "LLL dd, y")
-                  )
-                ) : (
-                  <span>Selecione um período</span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={dateRange?.from}
-                selected={dateRange}
-                onSelect={setDateRange}
-                numberOfMonths={2}
-              />
-            </PopoverContent>
-          </Popover>
-        </CardContent>
-      </Card>
-
-
-      {loading ? (
-         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-            <Skeleton className="h-28" />
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total de Ocorrências</CardTitle>
-                <AlertCircle className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{stats.total}</div>
-                <p className="text-xs text-muted-foreground">Total de relatos no período.</p>
-            </CardContent>
-            </Card>
-            <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Resolvidas</CardTitle>
-                <CheckCircle className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{stats.resolved}</div>
-                 <p className="text-xs text-muted-foreground">Ocorrências marcadas como resolvidas.</p>
-            </CardContent>
-            </Card>
-             <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Em Análise</CardTitle>
-                <Hourglass className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-                <div className="text-2xl font-bold">{stats.inProgress}</div>
-                 <p className="text-xs text-muted-foreground">Ocorrências em andamento.</p>
-            </CardContent>
-            </Card>
-        </div>
-      )}
-
-      <div className="grid gap-8 lg:grid-cols-5">
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <div className="flex items-center gap-2">
-              <PieChart className="h-5 w-5 text-muted-foreground"/>
-              <CardTitle>Ocorrências por Categoria</CardTitle>
-            </div>
-            <CardDescription>Distribuição dos tipos de problemas mais comuns.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <CategoryChart issues={filteredIssues} loading={loading} />
-          </CardContent>
-        </Card>
-        <Card className="lg:col-span-3">
-          <CardHeader>
-             <div className="flex items-center gap-2">
-              <BarChart className="h-5 w-5 text-muted-foreground"/>
-              <CardTitle>Status das Ocorrências</CardTitle>
-            </div>
-            <CardDescription>Contagem de ocorrências por status atual.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <StatusChart issues={filteredIssues} loading={loading} />
-          </CardContent>
-        </Card>
+    <div className="relative min-h-screen w-full">
+      <div className="absolute inset-0 pointer-events-none">
+        <InteractiveMap issues={[]} />
       </div>
+      <div className="absolute inset-0 bg-black/80" />
+      <div className="relative container mx-auto py-8 pt-24 space-y-8">
+        <header className="space-y-2 text-center">
+          <h1 className="text-4xl font-bold font-headline">Dashboard de Análise</h1>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
+            Visualize os dados sobre as ocorrências reportadas em tempo real.
+          </p>
+        </header>
 
-       <Card>
-          <CardHeader>
-             <div className="flex items-center gap-2">
-              <LucideLineChart className="h-5 w-5 text-muted-foreground"/>
-              <CardTitle>Linha do Tempo das Ocorrências</CardTitle>
-            </div>
-            <CardDescription>Volume de novas ocorrências reportadas ao longo do tempo.</CardDescription>
+        <Card className="p-4 bg-muted/30 backdrop-blur-sm">
+          <CardHeader className="p-2 pt-0">
+              <CardTitle className="text-base flex items-center gap-2">
+                  <Filter className="w-4 h-4 text-muted-foreground"/>
+                  Filtros de Análise
+              </CardTitle>
           </CardHeader>
-          <CardContent>
-            <TimelineChart issues={filteredIssues} loading={loading} />
+          <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
+            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+              <SelectTrigger className="flex-1 w-full sm:w-auto">
+                <SelectValue placeholder="Filtrar por Categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueCategories.map(category => (
+                  <SelectItem key={category} value={category}>
+                      {category === 'all' ? 'Todas as Categorias' : category}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
+              <SelectTrigger className="flex-1 w-full sm:w-auto">
+                <SelectValue placeholder="Filtrar por Status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos os Status</SelectItem>
+                <SelectItem value="Recebido">Recebido</SelectItem>
+                <SelectItem value="Em análise">Em análise</SelectItem>
+                <SelectItem value="Resolvido">Resolvido</SelectItem>
+              </SelectContent>
+            </Select>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  id="date"
+                  variant={"outline"}
+                  className={cn(
+                    "w-full sm:w-[300px] justify-start text-left font-normal",
+                    !dateRange && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {dateRange?.from ? (
+                    dateRange.to ? (
+                      <>
+                        {format(dateRange.from, "LLL dd, y")} -{" "}
+                        {format(dateRange.to, "LLL dd, y")}
+                      </>
+                    ) : (
+                      format(dateRange.from, "LLL dd, y")
+                    )
+                  ) : (
+                    <span>Selecione um período</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  initialFocus
+                  mode="range"
+                  defaultMonth={dateRange?.from}
+                  selected={dateRange}
+                  onSelect={setDateRange}
+                  numberOfMonths={2}
+                />
+              </PopoverContent>
+            </Popover>
           </CardContent>
         </Card>
+
+
+        {loading ? (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Card className="bg-card/80 backdrop-blur-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total de Ocorrências</CardTitle>
+                  <AlertCircle className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                  <div className="text-2xl font-bold">{stats.total}</div>
+                  <p className="text-xs text-muted-foreground">Total de relatos no período.</p>
+              </CardContent>
+              </Card>
+              <Card className="bg-card/80 backdrop-blur-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Resolvidas</CardTitle>
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+              </CardHeader>
+              <CardContent>
+                  <div className="text-2xl font-bold">{stats.resolved}</div>
+                  <p className="text-xs text-muted-foreground">Ocorrências marcadas como resolvidas.</p>
+              </CardContent>
+              </Card>
+              <Card className="bg-card/80 backdrop-blur-sm">
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Em Análise</CardTitle>
+                  <Hourglass className="h-4 w-4 text-blue-500" />
+              </CardHeader>
+              <CardContent>
+                  <div className="text-2xl font-bold">{stats.inProgress}</div>
+                  <p className="text-xs text-muted-foreground">Ocorrências em andamento.</p>
+              </CardContent>
+              </Card>
+          </div>
+        )}
+
+        <div className="grid gap-8 lg:grid-cols-5">
+          <Card className="lg:col-span-2 bg-card/80 backdrop-blur-sm">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <PieChart className="h-5 w-5 text-muted-foreground"/>
+                <CardTitle>Ocorrências por Categoria</CardTitle>
+              </div>
+              <CardDescription>Distribuição dos tipos de problemas mais comuns.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <CategoryChart issues={filteredIssues} loading={loading} />
+            </CardContent>
+          </Card>
+          <Card className="lg:col-span-3 bg-card/80 backdrop-blur-sm">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <BarChart className="h-5 w-5 text-muted-foreground"/>
+                <CardTitle>Status das Ocorrências</CardTitle>
+              </div>
+              <CardDescription>Contagem de ocorrências por status atual.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <StatusChart issues={filteredIssues} loading={loading} />
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="bg-card/80 backdrop-blur-sm">
+            <CardHeader>
+              <div className="flex items-center gap-2">
+                <LucideLineChart className="h-5 w-5 text-muted-foreground"/>
+                <CardTitle>Linha do Tempo das Ocorrências</CardTitle>
+              </div>
+              <CardDescription>Volume de novas ocorrências reportadas ao longo do tempo.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TimelineChart issues={filteredIssues} loading={loading} />
+            </CardContent>
+          </Card>
+      </div>
     </div>
   );
 }
+
+    
