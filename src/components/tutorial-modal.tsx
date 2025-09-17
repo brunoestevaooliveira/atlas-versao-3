@@ -57,13 +57,23 @@ interface TutorialModalProps {
 
 export default function TutorialModal({ isOpen, onOpenChange }: TutorialModalProps) {
   const handleClose = () => {
-    localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+    try {
+      localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
+    } catch (error) {
+      console.error('Failed to access localStorage:', error);
+    }
     onOpenChange(false);
   };
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm md:max-w-md w-full p-0">
+        <DialogHeader className="p-6 pb-0 sr-only">
+          <DialogTitle>Tutorial Interativo</DialogTitle>
+          <DialogDescription>
+            Um guia rápido pelas funcionalidades da plataforma.
+          </DialogDescription>
+        </DialogHeader>
         <Carousel className="w-full">
           <CarouselContent>
             {tutorialSteps.map((step, index) => (
