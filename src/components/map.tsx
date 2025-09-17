@@ -87,15 +87,27 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
 
         mapRef.current = map;
 
+        const mapboxAccessToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
+
         // This removes default popup styling by replacing the pane content
         const popupPane = map.getPane('popupPane');
         if (popupPane) {
             popupPane.innerHTML = '';
         }
         
-        L.tileLayer('https://c.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        if (mapboxAccessToken) {
+            L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+                attribution: '© <a href="https://www.mapbox.com/about/maps/">Mapbox</a> © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> <strong><a href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a></strong>',
+                tileSize: 512,
+                zoomOffset: -1,
+                accessToken: mapboxAccessToken
+            }).addTo(map);
+        } else {
+             L.tileLayer('https://c.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
+
 
         map.on('click', async (e) => {
             const { lat, lng } = e.latlng;
