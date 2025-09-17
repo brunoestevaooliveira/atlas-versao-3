@@ -137,7 +137,7 @@ export default function MapPage() {
       <div className="relative flex-grow">
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
-        <div className="absolute top-24 left-4 z-10 w-80 space-y-4">
+        <div className="absolute top-24 left-4 z-10 hidden md:block w-80 space-y-4">
           <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
             <CardHeader>
               <div className="relative">
@@ -195,7 +195,7 @@ export default function MapPage() {
           </Card>
         </div>
 
-        <div className="absolute bottom-14 left-4 z-10">
+        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 md:left-4 md:translate-x-0 z-10 w-full max-w-sm md:max-w-none md:w-auto px-4 md:px-0">
           <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
             <CardContent className="p-3">
               <div className="flex items-center gap-3 text-sm">
@@ -210,7 +210,7 @@ export default function MapPage() {
           </Card>
         </div>
 
-        <div className="absolute top-24 right-4 z-10 w-96 max-h-[calc(100vh-8rem)]">
+        <div className="absolute top-24 right-4 z-10 w-96 max-h-[calc(100vh-8rem)] hidden md:block">
            <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
             <CardHeader>
               <CardTitle className="text-xl text-foreground dark:text-foreground">Ocorrências Recentes</CardTitle>
