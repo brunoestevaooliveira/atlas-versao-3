@@ -85,13 +85,14 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
             zoom: 14,
         });
 
-        // This removes default popup styling by replacing the pane
-        if (map.getPane('popupPane')) {
-            map.getPane('popupPane')!.innerHTML = '';
-        }
-        
         mapRef.current = map;
 
+        // This removes default popup styling by replacing the pane content
+        const popupPane = map.getPane('popupPane');
+        if (popupPane) {
+            popupPane.innerHTML = '';
+        }
+        
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
