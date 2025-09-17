@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp, MapPin, Filter, ChevronDown, Info } from 'lucide-react';
+import { Layers, Search, ThumbsUp, MapPin, Filter, List } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -18,6 +18,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
+
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
@@ -130,6 +132,41 @@ export default function MapPage() {
         : [...prev, category]
     );
   };
+
+  const RecentIssuesPanelContent = () => (
+      <div className="space-y-4">
+        {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
+          <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
+            <div className="flex justify-between items-start">
+              <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
+              <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
+            </div>
+            <p className="text-sm text-primary font-semibold">{issue.category}</p>
+            {issue.address && (
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <MapPin className="h-3 w-3"/>
+                  <span className="text-slate-400">{issue.address}</span>
+              </div>
+            )}
+            <Button
+              size="sm"
+              variant="ghost"
+              className={cn(
+                  "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-border/20 text-black dark:text-white",
+                  upvotedIssues.has(issue.id) && "opacity-50 cursor-not-allowed"
+              )}
+              onClick={() => handleUpvote(issue.id, issue.upvotes)}
+              disabled={upvotedIssues.has(issue.id)}
+            >
+              <ThumbsUp className="mr-2 h-4 w-4" />
+              Apoiar ({issue.upvotes})
+            </Button>
+          </div>
+        )) : (
+          <p className="text-sm text-center text-muted-foreground py-8">Nenhuma ocorrência encontrada.</p>
+        )}
+      </div>
+  );
   
 
   return (
@@ -210,6 +247,7 @@ export default function MapPage() {
           </Card>
         </div>
 
+        {/* Desktop Panel */}
         <div className="absolute top-24 right-4 z-10 w-96 max-h-[calc(100vh-8rem)] hidden md:block">
            <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
             <CardHeader>
@@ -217,42 +255,32 @@ export default function MapPage() {
               <CardDescription className="text-muted-foreground">Veja os problemas reportados pela comunidade.</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow p-6 pt-0 overflow-y-auto">
-                <div className="space-y-4">
-                  {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
-                    <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-2 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
-                      <div className="flex justify-between items-start">
-                        <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
-                        <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
-                      </div>
-                      <p className="text-sm text-primary font-semibold">{issue.category}</p>
-                      {issue.address && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <MapPin className="h-3 w-3"/>
-                            <span className="text-slate-400">{issue.address}</span>
-                        </div>
-                      )}
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        className={cn(
-                            "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-border/20 text-black dark:text-white",
-                            upvotedIssues.has(issue.id) && "opacity-50 cursor-not-allowed"
-                        )}
-                        onClick={() => handleUpvote(issue.id, issue.upvotes)}
-                        disabled={upvotedIssues.has(issue.id)}
-                      >
-                        <ThumbsUp className="mr-2 h-4 w-4" />
-                        Apoiar ({issue.upvotes})
-                      </Button>
-                    </div>
-                  )) : (
-                    <p className="text-sm text-center text-muted-foreground py-8">Nenhuma ocorrência encontrada.</p>
-                  )}
-                </div>
+              <RecentIssuesPanelContent />
             </CardContent>
           </Card>
+        </div>
+        
+        {/* Mobile Sheet Trigger */}
+         <div className="absolute top-24 right-4 z-10 md:hidden">
+           <Sheet>
+            <SheetTrigger asChild>
+                <Button size="icon" className="rounded-full shadow-lg">
+                    <List className="h-5 w-5"/>
+                    <span className="sr-only">Ver ocorrências</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-[75vh] flex flex-col">
+                <SheetHeader>
+                    <SheetTitle>Ocorrências Recentes</SheetTitle>
+                </SheetHeader>
+                <div className="flex-grow overflow-y-auto pr-6">
+                  <RecentIssuesPanelContent />
+                </div>
+            </SheetContent>
+           </Sheet>
         </div>
       </div>
     </div>
   );
-}
+
+    
