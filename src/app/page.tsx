@@ -189,7 +189,7 @@ export default function MapPage() {
                 size="sm"
                 variant="ghost"
                 className={cn(
-                    "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-border/20 text-black dark:text-white",
+                    "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-border/20 text-foreground",
                     upvotedIssues.has(issue.id) && "opacity-50 cursor-not-allowed"
                 )}
                 onClick={() => handleUpvote(issue.id, issue.upvotes)}
@@ -213,7 +213,7 @@ export default function MapPage() {
         <InteractiveMap issues={showIssues ? filteredIssues : []} />
 
         <div className="absolute top-24 left-4 z-10 hidden md:block w-80 space-y-4">
-          <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
+          <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
             <CardHeader>
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -277,7 +277,7 @@ export default function MapPage() {
             isHintVisible ? 'opacity-100' : 'opacity-0'
           )}
         >
-          <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
+          <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
             <CardContent className="p-3">
               <div className="flex items-center gap-3 text-sm">
                 <div className="bg-primary/20 text-primary p-2 rounded-full">
@@ -304,10 +304,10 @@ export default function MapPage() {
               isDesktopPanelOpen ? "w-96 opacity-100" : "w-0 opacity-0",
               "overflow-hidden"
             )}>
-            <Card className="h-full flex flex-col shadow-lg bg-card/50 backdrop-blur-lg border-l border-border/10">
+            <Card className="h-full flex flex-col rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div className="space-y-1">
-                  <CardTitle className="text-xl text-foreground dark:text-foreground font-headline">Ocorrências Recentes</CardTitle>
+                  <CardTitle className="text-xl text-foreground font-headline">Ocorrências Recentes</CardTitle>
                   <CardDescription className="text-muted-foreground">Veja os problemas reportados.</CardDescription>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setIsDesktopPanelOpen(false)}>

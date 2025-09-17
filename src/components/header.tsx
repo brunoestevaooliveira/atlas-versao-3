@@ -35,8 +35,8 @@ const ThemeToggle = () => {
       size="icon"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
     >
-      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground dark:text-white" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-white" />
+      <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0 text-foreground" />
+      <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 text-foreground" />
       <span className="sr-only">Toggle theme</span>
     </Button>
   );
@@ -65,7 +65,7 @@ const Header: React.FC = () => {
             key={href}
             href={href}
             className={cn(
-              'px-3 py-1.5 rounded-md transition-colors text-foreground dark:text-white font-semibold hover:bg-black/10 dark:hover:bg-white/20',
+              'px-3 py-1.5 rounded-md transition-colors text-foreground font-semibold hover:bg-black/10 dark:hover:bg-white/20',
               pathname === href ? 'bg-black/10 dark:bg-white/30' : 'hover:bg-black/5 dark:hover:bg-white/10',
             )}
           >
@@ -124,7 +124,7 @@ const Header: React.FC = () => {
                         <Link
                             href={href}
                             className={cn(
-                                'px-3 py-2 rounded-md transition-colors text-foreground dark:text-white font-semibold',
+                                'px-3 py-2 rounded-md transition-colors text-foreground font-semibold',
                                 pathname === href ? 'bg-black/10 dark:bg-white/20' : 'hover:bg-black/5 dark:hover:bg-white/10',
                             )}
                         >
@@ -153,7 +153,7 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-2">
           <Link href="/" className="flex items-center gap-2 font-bold text-lg">
             <Compass className="h-6 w-6 text-primary" />
-            <span className='hidden md:inline text-foreground dark:text-primary-foreground'>Atlas Cívico</span>
+            <span className='hidden md:inline text-foreground'>Atlas Cívico</span>
           </Link>
         </div>
 
@@ -186,7 +186,7 @@ const Header: React.FC = () => {
                     <SheetTitle className='sr-only'>Navegação Principal</SheetTitle>
                     <Link href="/" className="flex items-center gap-2 font-bold text-xl">
                         <Compass className="h-7 w-7 text-primary" />
-                        <span className='text-foreground dark:text-primary-foreground'>Atlas Cívico</span>
+                        <span className='text-foreground'>Atlas Cívico</span>
                     </Link>
                 </SheetHeader>
                 <MobileNavContent />
