@@ -2,6 +2,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -22,29 +23,39 @@ import { Map, FilePlus, BarChart, Check, Compass } from 'lucide-react';
 
 const tutorialSteps = [
   {
-    icon: <Compass className="w-12 h-12 md:w-16 md:h-16 text-primary" />,
+    icon: <Compass className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     title: 'Bem-vindo ao Atlas Cívico!',
     description: 'Um tour rápido para você conhecer as principais funcionalidades da plataforma e começar a colaborar com a sua cidade.',
+    image: 'https://picsum.photos/seed/welcome/400/200',
+    aiHint: 'community city',
   },
   {
-    icon: <Map className="w-12 h-12 md:w-16 md:h-16 text-primary" />,
+    icon: <Map className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     title: 'Explore o Mapa Interativo',
-    description: 'Na tela principal, você pode visualizar todas as ocorrências reportadas. Clique em um marcador para ver detalhes ou clique em qualquer lugar no mapa para iniciar um novo reporte.',
+    description: 'Na tela principal, visualize as ocorrências. Clique em um marcador para detalhes ou em qualquer lugar no mapa para iniciar um novo reporte.',
+    image: 'https://picsum.photos/seed/map/400/200',
+    aiHint: 'interactive map',
   },
   {
-    icon: <FilePlus className="w-12 h-12 md:w-16 md:h-16 text-primary" />,
+    icon: <FilePlus className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     title: 'Reporte uma Ocorrência',
-    description: 'Encontrou um problema? Vá para a aba "Reportar", descreva a situação, adicione a localização (pelo mapa) e envie para que a administração possa analisar.',
+    description: 'Encontrou um problema? Vá para a aba "Reportar", descreva a situação, adicione a localização e envie para análise.',
+    image: 'https://picsum.photos/seed/form/400/200',
+    aiHint: 'report form',
   },
   {
-    icon: <BarChart className="w-12 h-12 md:w-16 md:h-16 text-primary" />,
+    icon: <BarChart className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     title: 'Acompanhe o Andamento',
-    description: 'Na aba "Acompanhar", você pode filtrar e visualizar o status de todas as ocorrências: as que foram recebidas, as que estão em análise e as que já foram resolvidas.',
+    description: 'Na aba "Acompanhar", filtre e visualize o status de todas as ocorrências: recebidas, em análise e resolvidas.',
+    image: 'https://picsum.photos/seed/tracking/400/200',
+    aiHint: 'dashboard chart',
   },
   {
-    icon: <Check className="w-12 h-12 md:w-16 md:h-16 text-primary" />,
+    icon: <Check className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
     title: 'Pronto para Começar!',
-    description: 'Agora você já sabe o básico. Explore a plataforma e ajude a construir uma cidade melhor para todos. Sua participação faz a diferença!',
+    description: 'Agora você já sabe o básico. Explore a plataforma e ajude a construir uma cidade melhor. Sua participação faz a diferença!',
+    image: 'https://picsum.photos/seed/ready/400/200',
+    aiHint: 'city ready',
   },
 ];
 
@@ -67,7 +78,7 @@ export default function TutorialModal({ isOpen, onOpenChange }: TutorialModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm md:max-w-md w-full p-0 bg-background/80 backdrop-blur-sm">
+      <DialogContent className="max-w-sm md:max-w-md w-full p-0 bg-background/80 backdrop-blur-sm border-border/50 text-foreground">
         <DialogHeader className="p-6 pb-0 sr-only">
           <DialogTitle>Tutorial Interativo</DialogTitle>
           <DialogDescription>
@@ -78,20 +89,29 @@ export default function TutorialModal({ isOpen, onOpenChange }: TutorialModalPro
           <CarouselContent>
             {tutorialSteps.map((step, index) => (
               <CarouselItem key={index}>
-                <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 space-y-4 h-[420px] md:h-[400px]">
-                  <div className="mb-4">{step.icon}</div>
+                <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 space-y-4 h-[450px] md:h-[480px]">
+                  <div className="mb-2">{step.icon}</div>
                   <h3 className="text-xl md:text-2xl font-bold font-headline text-foreground">{step.title}</h3>
+                  <div className="relative w-full aspect-video rounded-lg overflow-hidden my-2 border border-border/20">
+                     <Image
+                        src={step.image}
+                        alt={step.title}
+                        fill
+                        className="object-cover"
+                        data-ai-hint={step.aiHint}
+                      />
+                  </div>
                   <p className="text-sm md:text-base text-muted-foreground">{step.description}</p>
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
-          <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
-             <CarouselPrevious className="static -translate-y-0 text-foreground"/>
-             <CarouselNext className="static -translate-y-0 text-foreground" />
+          <div className="absolute bottom-20 left-1/2 -translate-x-1/2 flex items-center gap-4">
+             <CarouselPrevious className="static -translate-y-0 text-foreground bg-background/50 hover:bg-background/80"/>
+             <CarouselNext className="static -translate-y-0 text-foreground bg-background/50 hover:bg-background/80" />
           </div>
         </Carousel>
-         <DialogFooter className="p-4 border-t items-center flex-row justify-between w-full">
+         <DialogFooter className="p-4 border-t border-border/50 items-center flex-row justify-between w-full">
             <Button variant="ghost" onClick={handleClose}>Pular Tutorial</Button>
             <Button onClick={handleClose}>Concluir</Button>
          </DialogFooter>
