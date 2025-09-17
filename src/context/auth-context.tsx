@@ -18,11 +18,15 @@ import { auth, db } from '@/lib/firebase';
 import type { AppUser, AppUserData } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 
+const TUTORIAL_COMPLETED_KEY = 'tutorialCompleted';
+
 interface AuthContextType {
   authUser: User | null;
   appUser: AppUser | null;
   isLoading: boolean;
   isAdmin: boolean;
+  showTutorial: boolean;
+  setShowTutorial: (show: boolean) => void;
   register: (email: string, pass: string, name: string) => Promise<void>;
   login: (email: string, pass: string) => Promise<void>;
   loginWithGoogle: () => Promise<void>;
@@ -56,6 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [appUser, setAppUser] = useState<AppUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [showTutorial, setShowTutorial] = useState<boolean>(false);
   const router = useRouter();
   const { toast } = useToast();
 
@@ -63,6 +68,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       setIsLoading(true);
       if (user) {
+        const isNewUser = user.metadata.creationTime === user.metadata.lastSignInTime;
+
         setAuthUser(user);
         const token = await user.getIdTokenResult(true);
         const isAdminStatus = token.claims.admin === true;
@@ -72,13 +79,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (appProfile) {
             setAppUser(appProfile);
         } else {
-            // This case handles Google Sign-In for the first time
             await handleNewUser(user);
         }
+        
+        // Show tutorial for new users who haven't completed it
+        const tutorialCompleted = localStorage.getItem(TUTORIAL_COMPLETED_KEY);
+        if (isNewUser && tutorialCompleted !== 'true') {
+            setShowTutorial(true);
+        }
+
       } else {
         setAuthUser(null);
         setAppUser(null);
         setIsAdmin(false);
+        setShowTutorial(false);
       }
       setIsLoading(false);
     });
@@ -90,21 +104,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const userRef = doc(db, 'users', user.uid);
     const docSnap = await getDoc(userRef);
 
-    // If user document already exists, just update the state
     if (docSnap.exists()) { 
         const data = docSnap.data() as AppUserData;
         const existingAppUser: AppUser = {
             ...data,
-             // Role sync is handled by the onAuthStateChanged listener
             role: isAdmin ? 'admin' : data.role,
-            // Add a defensive check here as well to prevent crashes
             createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
         };
         setAppUser(existingAppUser);
         return;
     }
     
-    // Create a new user document
     const newName = name || user.displayName || user.email?.split('@')[0] || 'Usuário';
     
     const newUserDocData: AppUserData = {
@@ -112,27 +122,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         email: user.email,
         name: newName,
         photoURL: user.photoURL,
-        role: 'user', // Set default role, custom claims will override in the app state
+        role: 'user', 
         createdAt: serverTimestamp() as Timestamp,
     };
     
     await setDoc(userRef, newUserDocData);
 
-    // Create AppUser object for local state (without re-fetching)
     const newAppUser: AppUser = {
         uid: newUserDocData.uid,
         email: newUserDocData.email,
         name: newUserDocData.name,
         photoURL: newUserDocData.photoURL,
-        role: newUserDocData.role, // Will be 'user' initially
-        createdAt: new Date(), // Approximate, actual value is on server
+        role: newUserDocData.role,
+        createdAt: new Date(),
     };
     setAppUser(newAppUser);
   }
 
   const register = async (email: string, pass: string, name: string) => {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, pass);
-    await handleNewUser(userCredential.user, name);
+    await createUserWithEmailAndPassword(auth, email, pass);
+    // onAuthStateChanged will handle the rest, including showing the tutorial
   };
 
   const login = async (email: string, pass: string) => {
@@ -143,13 +152,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const provider = new GoogleAuthProvider();
     try {
         await signInWithPopup(auth, provider);
-        // The onAuthStateChanged listener will handle user creation/update.
     } catch (error: any) {
         let description = error.message || 'Não foi possível autenticar com o Google.';
         if (error.code === 'auth/unauthorized-domain') {
             description = 'Este domínio não está autorizado para login. Por favor, adicione-o no Console do Firebase > Authentication > Settings > Authorized domains.';
         } else if (error.code === 'auth/popup-closed-by-user') {
-            return; // Don't show an error if the user closes the popup
+            return; 
         }
         
         console.error("Google Sign-In Error:", error);
@@ -158,7 +166,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             title: 'Falha no Login com Google',
             description: description,
         });
-        throw error; // Re-throw to indicate failure
+        throw error;
     }
   };
 
@@ -168,7 +176,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ authUser, appUser, isLoading, isAdmin, register, login, loginWithGoogle, logout }}>
+    <AuthContext.Provider value={{ authUser, appUser, isLoading, isAdmin, showTutorial, setShowTutorial, register, login, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );

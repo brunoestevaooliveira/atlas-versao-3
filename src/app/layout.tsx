@@ -11,9 +11,10 @@ import SplashScreen from '@/components/splash-screen';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
+import TutorialModal from '@/components/tutorial-modal';
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
-  const { appUser, isLoading } = useAuth();
+  const { appUser, isLoading, showTutorial, setShowTutorial } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
@@ -74,6 +75,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
           {!isPublicPage && <Header />}
           <main>{children}</main>
           <Toaster />
+          <TutorialModal isOpen={showTutorial} onOpenChange={setShowTutorial} />
         </>
     );
   }
