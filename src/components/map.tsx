@@ -125,14 +125,15 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
         )}
 
         {newReportInfo && (
-          <>
-            <Marker
-              longitude={newReportInfo.lng}
-              latitude={newReportInfo.lat}
-              anchor="bottom"
-            >
-              <MapPin className="text-primary h-8 w-8" fill="currentColor"/>
-            </Marker>
+          <Marker
+            longitude={newReportInfo.lng}
+            latitude={newReportInfo.lat}
+            anchor="bottom"
+          >
+            <MapPin className="text-primary h-8 w-8" fill="currentColor"/>
+          </Marker>
+        )}
+        {newReportInfo && (
             <Popup
                 anchor="bottom"
                 longitude={newReportInfo.lng}
@@ -163,7 +164,6 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
                     </Button>
                 </div>
             </Popup>
-          </>
         )}
 
       </Map>
