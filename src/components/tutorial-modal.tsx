@@ -67,7 +67,7 @@ export default function TutorialModal({ isOpen, onOpenChange }: TutorialModalPro
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm md:max-w-md w-full p-0">
+      <DialogContent className="max-w-sm md:max-w-md w-full p-0 bg-background/80 backdrop-blur-sm">
         <DialogHeader className="p-6 pb-0 sr-only">
           <DialogTitle>Tutorial Interativo</DialogTitle>
           <DialogDescription>
@@ -80,15 +80,15 @@ export default function TutorialModal({ isOpen, onOpenChange }: TutorialModalPro
               <CarouselItem key={index}>
                 <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 space-y-4 h-[420px] md:h-[400px]">
                   <div className="mb-4">{step.icon}</div>
-                  <h3 className="text-xl md:text-2xl font-bold font-headline">{step.title}</h3>
+                  <h3 className="text-xl md:text-2xl font-bold font-headline text-foreground">{step.title}</h3>
                   <p className="text-sm md:text-base text-muted-foreground">{step.description}</p>
                 </div>
               </CarouselItem>
             ))}
           </CarouselContent>
           <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4">
-             <CarouselPrevious className="static -translate-y-0"/>
-             <CarouselNext className="static -translate-y-0" />
+             <CarouselPrevious className="static -translate-y-0 text-foreground"/>
+             <CarouselNext className="static -translate-y-0 text-foreground" />
           </div>
         </Carousel>
          <DialogFooter className="p-4 border-t items-center flex-row justify-between w-full">
