@@ -233,7 +233,7 @@ export default function MapPage() {
           </Card>
         </div>
 
-        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 md:left-4 md:translate-x-0 z-10 w-full max-w-sm md:max-w-none md:w-auto px-4 md:px-0">
+        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 md:left-4 md:translate-x-0 z-10 w-full max-w-sm md:max-w-none md:w-auto px-4 md:px-0 animate-pulse-fade">
           <Card className="shadow-lg bg-card/90 dark:bg-card/80 backdrop-blur-lg border-white/5">
             <CardContent className="p-3">
               <div className="flex items-center gap-3 text-sm">
@@ -303,3 +303,4 @@ export default function MapPage() {
   );
 
     
+

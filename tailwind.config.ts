@@ -100,10 +100,15 @@ export default {
             height: '0',
           },
         },
+        'pulse-fade': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.3' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        'pulse-fade': 'pulse-fade 15s cubic-bezier(0.4, 0, 0.6, 1) 5s infinite',
       },
     },
   },
