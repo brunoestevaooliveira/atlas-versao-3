@@ -307,7 +307,7 @@ export default function MapPage() {
             <Card className="h-full flex flex-col shadow-lg bg-card/80 backdrop-blur-lg border-l border-border/10">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div className="space-y-1">
-                  <CardTitle className="text-xl text-foreground dark:text-foreground">Ocorrências Recentes</CardTitle>
+                  <CardTitle className="text-xl text-foreground dark:text-foreground font-headline">Ocorrências Recentes</CardTitle>
                   <CardDescription className="text-muted-foreground">Veja os problemas reportados.</CardDescription>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => setIsDesktopPanelOpen(false)}>
