@@ -102,7 +102,16 @@ export default function ReportForm() {
       toast({
         variant: 'destructive',
         title: 'Endereço Obrigatório',
-        description: 'Por favor, selecione um endereço clicando no mapa na página inicial.',
+        description: 'Por favor, selecione um local no mapa na página inicial.',
+      });
+      return;
+    }
+    
+    if (form.title.trim() && form.title.trim()[0] !== form.title.trim()[0].toUpperCase()) {
+      toast({
+        variant: 'destructive',
+        title: 'Título Inválido',
+        description: 'O título da ocorrência deve começar com uma letra maiúscula.',
       });
       return;
     }
