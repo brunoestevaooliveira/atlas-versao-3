@@ -164,7 +164,7 @@ export default function MapPage() {
             <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-3 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
               <div className="flex justify-between items-start">
                 <div className="space-y-1">
-                  <h4 className="font-bold text-lg text-foreground italic">{issue.title}</h4>
+                  <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
                   <p className="text-sm text-primary font-semibold">{issue.category}</p>
                 </div>
                 <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
