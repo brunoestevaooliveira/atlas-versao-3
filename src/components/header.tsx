@@ -6,7 +6,7 @@ import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut, Menu, S
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
-import { Sheet, SheetTrigger, SheetContent } from './ui/sheet';
+import { Sheet, SheetTrigger, SheetContent, SheetHeader, SheetTitle } from './ui/sheet';
 import { useAuth } from '@/context/auth-context';
 import {
   DropdownMenu,
@@ -60,7 +60,7 @@ const Header: React.FC = () => {
 
     const navClass = isMobile
       ? 'flex flex-col gap-4 text-lg'
-      : 'flex flex-row items-start md:items-center gap-1 md:gap-2 text-sm font-medium';
+      : 'hidden md:flex flex-row items-start md:items-center gap-1 md:gap-2 text-sm font-medium';
 
     return (
       <nav className={navClass}>
@@ -147,12 +147,32 @@ const Header: React.FC = () => {
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-[280px]">
-              <div className="flex flex-col gap-6 pt-8">
-                 <Link href="/" className="flex items-center gap-2 font-bold text-xl self-center mb-4">
+             <SheetHeader className='text-left mb-4'>
+                <SheetTitle className='sr-only'>Navegação Principal</SheetTitle>
+                 <Link href="/" className="flex items-center gap-2 font-bold text-xl">
                     <Compass className="h-7 w-7 text-primary" />
                     <span className='text-primary-foreground'>Atlas Cívico</span>
                  </Link>
-                <NavContent isMobile />
+             </SheetHeader>
+              <div className="flex flex-col gap-4 text-lg">
+                 {baseNavLinks.map(({ href, label }) => (
+                    <Link
+                        key={href}
+                        href={href}
+                        className={cn(
+                        'px-3 py-1.5 rounded-md transition-colors text-foreground dark:text-white font-semibold hover:bg-black/10 dark:hover:bg-white/20',
+                        pathname === href ? 'bg-black/10 dark:bg-white/30' : 'hover:bg-black/5 dark:hover:bg-white/10',
+                        )}
+                    >
+                        {label}
+                    </Link>
+                 ))}
+                 {isAdmin && (
+                    <>
+                        <Link href="/dashboard" className={cn('px-3 py-1.5 rounded-md transition-colors text-foreground dark:text-white font-semibold hover:bg-black/10 dark:hover:bg-white/20', pathname === '/dashboard' ? 'bg-black/10 dark:bg-white/30' : 'hover:bg-black/5 dark:hover:bg-white/10')}>Dashboard</Link>
+                        <Link href="/admin" className={cn('px-3 py-1.5 rounded-md transition-colors text-foreground dark:text-white font-semibold hover:bg-black/10 dark:hover:bg-white/20', pathname === '/admin' ? 'bg-black/10 dark:bg-white/30' : 'hover:bg-black/5 dark:hover:bg-white/10')}>Admin</Link>
+                    </>
+                 )}
               </div>
             </SheetContent>
           </Sheet>
