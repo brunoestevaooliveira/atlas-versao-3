@@ -110,8 +110,9 @@ export default function RootLayout({
         <meta name="description" content="Plataforma cívica para mapeamento e resolução de problemas urbanos em Santa Maria-DF." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400..700;1,400..700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('min-h-screen font-sans antialiased')}>
+      <body className={cn('min-h-screen font-serif antialiased')}>
         <AuthProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               <LayoutContent>{children}</LayoutContent>
