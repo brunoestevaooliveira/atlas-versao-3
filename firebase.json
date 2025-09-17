@@ -1,4 +1,12 @@
 {
+  "hosting": {
+    "source": ".",
+    "appHosting": {
+      "backends": [
+        "atlas-civico-backend"
+      ]
+    }
+  },
   "firestore": {
     "rules": "firestore.rules",
     "indexes": "firestore.indexes.json"
