@@ -95,10 +95,17 @@ const Map: React.FC<MapProps> = ({ issues, center }) => {
         
         const stadiaApiKey = process.env.NEXT_PUBLIC_STADIA_API_KEY;
 
-        L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key={apiKey}', {
-            attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
-            apiKey: stadiaApiKey
-        }).addTo(map);
+        if (stadiaApiKey) {
+            L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png?api_key={apiKey}', {
+                attribution: '&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>',
+                apiKey: stadiaApiKey
+            }).addTo(map);
+        } else {
+            console.warn("Stadia Maps API key not found. Using default OpenStreetMap tiles.");
+            L.tileLayer('https://c.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+        }
 
         map.on('click', async (e) => {
             const { lat, lng } = e.latlng;
