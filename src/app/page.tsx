@@ -436,7 +436,7 @@ export default function MapPage() {
           </div>
         </div>
         
-        {/* Gatilho para abrir a gaveta de ocorrências (Mobile) */}
+        {/* Gatilho para abrir la gaveta de ocorrências (Mobile) */}
          <div className="absolute top-24 right-4 z-10 md:hidden">
            <Sheet>
             <SheetTrigger asChild>
@@ -453,7 +453,7 @@ export default function MapPage() {
                   <RecentIssuesPanelContent />
                 </div>
             </SheetContent>
-           </Sheet>
+          </Sheet>
         </div>
       </div>
     </div>

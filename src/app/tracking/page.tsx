@@ -290,27 +290,3 @@ export default function TrackingPage() {
                   <IssueCard 
                     key={issue.id} 
                     issue={issue} 
-                    onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
-                    isUpvoted={upvotedIssues.has(issue.id)}
-                  />
-                )) : <EmptyState tabName="Em Análise" />}
-              </div>
-            </TabsContent>
-            <TabsContent value="resolved">
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {resolvedTabIssues.length > 0 ? resolvedTabIssues.map((issue) => (
-                  <IssueCard 
-                      key={issue.id} 
-                      issue={issue} 
-                      onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
-                      isUpvoted={upvotedIssues.has(issue.id)}
-                    />
-                )) : <EmptyState tabName="Resolvidas" />}
-              </div>
-            </TabsContent>
-          </div>
-        </Tabs>
-      </div>
-    </div>
-  );
-}
