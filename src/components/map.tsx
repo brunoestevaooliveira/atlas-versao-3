@@ -22,6 +22,7 @@ interface MapProps {
   issues: Issue[];
   center: { lat: number; lng: number };
   mapRef?: React.RefObject<MapRef>;
+  mapStyle: 'streets' | 'satellite';
 }
 
 const formatAddress = (addressData: any): string => {
@@ -38,13 +39,19 @@ const formatAddress = (addressData: any): string => {
     return address || 'Endereço não pode ser determinado';
 }
 
-const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center }, ref) => {
+const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle }, ref) => {
   const router = useRouter();
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
   const { theme } = useTheme();
   
   const [selectedIssue, setSelectedIssue] = useState<Issue | null>(null);
   const [newReportInfo, setNewReportInfo] = useState<NewReportInfo | null>(null);
+
+  const getMapStyle = () => {
+    if (theme === 'dark') return "mapbox://styles/mapbox/dark-v11";
+    if (mapStyle === 'satellite') return "mapbox://styles/mapbox/satellite-v9";
+    return "mapbox://styles/mapbox/streets-v12";
+  }
 
 
   const handleMapClick = async (e: MapLayerMouseEvent) => {
@@ -106,8 +113,8 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center }, ref) => {
           pitch: 0
         }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle={theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v12"}
-        key={theme}
+        mapStyle={getMapStyle()}
+        key={`${theme}-${mapStyle}`}
         onClick={handleMapClick}
         interactiveLayerIds={['clusters']}
       >

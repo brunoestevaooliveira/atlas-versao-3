@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink } from 'lucide-react';
+import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink, Globe, Map as MapIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -31,6 +31,7 @@ export default function MapPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showIssues, setShowIssues] = useState(true);
   const [isDesktopPanelOpen, setIsDesktopPanelOpen] = useState(true);
+  const [mapStyle, setMapStyle] = useState<'streets' | 'satellite'>('streets');
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
@@ -191,7 +192,7 @@ export default function MapPage() {
   return (
     <div className="h-screen w-screen flex flex-col pt-0 overflow-hidden">
       <div className="relative flex-grow">
-        <InteractiveMap issues={showIssues ? filteredIssues : []} mapRef={mapRef}/>
+        <InteractiveMap issues={showIssues ? filteredIssues : []} mapStyle={mapStyle} mapRef={mapRef}/>
 
         <div className="absolute top-24 left-4 z-10 hidden md:block w-80 space-y-4">
           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
@@ -216,36 +217,42 @@ export default function MapPage() {
                     />
                     <Label htmlFor="layers-switch">Mostrar Ocorrências</Label>
                 </div>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                        <Layers className="h-5 w-5 text-primary"/>
-                        <span className="sr-only">Filtrar Camadas</span>
+                <div className="flex items-center">
+                    <Button variant="ghost" size="icon" onClick={() => setMapStyle(style => style === 'streets' ? 'satellite' : 'streets')}>
+                        {mapStyle === 'streets' ? <Globe className="h-5 w-5 text-primary"/> : <MapIcon className="h-5 w-5 text-primary"/>}
+                        <span className="sr-only">Mudar estilo do mapa</span>
                     </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-64">
-                    <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <Filter className="h-4 w-4"/>
-                            <h4 className="font-medium text-sm">Filtrar por Categoria</h4>
-                        </div>
-                        <div className="space-y-2">
-                        {allCategories.map(category => (
-                            <div key={category} className="flex items-center space-x-2">
-                                <Checkbox
-                                    id={category}
-                                    checked={selectedCategories.includes(category)}
-                                    onCheckedChange={() => handleCategoryChange(category)}
-                                />
-                                <Label htmlFor={category} className="text-sm font-normal">
-                                    {category}
-                                </Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button variant="ghost" size="icon">
+                            <Layers className="h-5 w-5 text-primary"/>
+                            <span className="sr-only">Filtrar Camadas</span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-64">
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-2">
+                                <Filter className="h-4 w-4"/>
+                                <h4 className="font-medium text-sm">Filtrar por Categoria</h4>
                             </div>
-                        ))}
+                            <div className="space-y-2">
+                            {allCategories.map(category => (
+                                <div key={category} className="flex items-center space-x-2">
+                                    <Checkbox
+                                        id={category}
+                                        checked={selectedCategories.includes(category)}
+                                        onCheckedChange={() => handleCategoryChange(category)}
+                                    />
+                                    <Label htmlFor={category} className="text-sm font-normal">
+                                        {category}
+                                    </Label>
+                                </div>
+                            ))}
+                            </div>
                         </div>
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                      </PopoverContent>
+                    </Popover>
+                </div>
               </div>
             </CardContent>
           </Card>
