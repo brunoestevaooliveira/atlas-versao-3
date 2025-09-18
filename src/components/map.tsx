@@ -155,8 +155,8 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
         style={{ width: '100%', height: '100%' }}
         mapStyle={mapStyleUrl}
         onClick={handleMapClick}
-        onZoom={(e) => setZoom(e.viewState.zoom)}
-        onMove={(e) => {
+        onMoveEnd={(e) => {
+            setZoom(e.viewState.zoom);
             setBounds(e.target.getBounds().toArray().flat() as [number, number, number, number]);
         }}
         cursor={geocoding ? 'wait' : 'pointer'}
