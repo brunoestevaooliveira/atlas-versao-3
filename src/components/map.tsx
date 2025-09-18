@@ -25,30 +25,39 @@ interface MapProps {
   mapStyle: 'streets' | 'satellite';
 }
 
-const formatAddress = (addressData: any): string => {
-    if (!addressData) return 'Endereço não encontrado';
-
-    const { road, neighbourhood, suburb, city, state, postcode } = addressData;
+// Rewritten to parse Mapbox Geocoding API response
+const formatAddress = (features: any[]): string => {
+    if (!features || features.length === 0) return 'Endereço não encontrado';
     
-    // Prioriza o nome da rua/quadra (road) que é o mais específico
-    let mainAddress = road;
-    
-    // Se não tiver 'road', tenta 'neighbourhood' ou 'suburb'
-    if (!mainAddress) {
-        mainAddress = neighbourhood || suburb;
+    const feature = features[0]; // Use the most relevant result
+    const placeName = feature.place_name; // e.g., "QR 100 Conjunto 1, 2, Santa Maria, Brasília, Distrito Federal 72540-101, Brazil"
+    const address = feature.address; // e.g., "72540-101"
+    const text = feature.text; // e.g., "QR 100 Conjunto 1, 2"
+    const place = feature.place; // e.g., "Santa Maria"
+    const district = feature.context?.find((c: any) => c.id.startsWith('district'))?.text;
+    const postcode = feature.context?.find((c: any) => c.id.startsWith('postcode'))?.text;
+    const city = feature.context?.find((c: any) => c.id.startsWith('place'))?.text;
+    const state = feature.context?.find((c: any) => c.id.startsWith('region'))?.text;
+
+    // A resposta do Mapbox costuma ser bem completa no `place_name`.
+    // Vamos apenas remover a parte do país para ficar mais limpo.
+    if (placeName) {
+        return placeName.replace(', Brazil', '').replace(', Brasil', '');
     }
 
-    // Se encontrou alguma informação de rua/bairro, adiciona a cidade
-    if (mainAddress) {
-        return `${mainAddress} - ${city}, ${state}`;
+    // Fallback se o place_name não for o ideal
+    let constructedAddress = text || '';
+    if (district && constructedAddress !== district) {
+        constructedAddress += `, ${district}`;
+    }
+    if (city && !constructedAddress.includes(city)) {
+        constructedAddress += ` - ${city}`;
+    }
+     if (postcode) {
+        constructedAddress += `, CEP: ${postcode}`;
     }
 
-    // Se não encontrou nem rua nem bairro, retorna cidade e CEP como último recurso
-    if (city && postcode) {
-         return `${city}, CEP: ${postcode}`;
-    }
-
-    return 'Endereço não pode ser determinado';
+    return constructedAddress || 'Endereço não pode ser determinado';
 }
 
 
@@ -62,7 +71,7 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
 
   const getMapStyle = () => {
     if (mapStyle === 'satellite') {
-      return theme === 'dark' ? "mapbox://styles/mapbox/satellite-streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12";
+      return "mapbox://styles/mapbox/satellite-streets-v12";
     }
     return theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v12";
   }
@@ -81,9 +90,9 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
     setNewReportInfo({ lat, lng, address: '', isLoading: true });
 
     try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=pt-BR`);
+        const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxToken}&language=pt-BR&types=address,poi,neighborhood,place`);
         const data = await response.json();
-        const address = formatAddress(data.address) || 'Endereço não encontrado';
+        const address = formatAddress(data.features) || 'Endereço não encontrado';
         setNewReportInfo({ lat, lng, address, isLoading: false });
     } catch (error) {
         console.error("Erro na geocodificação reversa:", error);
