@@ -52,17 +52,17 @@ export default function MapPage() {
   }, []);
 
   useEffect(() => {
-    // Hide hint after 5 seconds
+    // Hide hint after a longer period
     const initialTimeout = setTimeout(() => {
       setIsHintVisible(false);
-    }, 5000);
+    }, 8000); // Increased from 5000ms
 
     // After that, start a pulse cycle
     const pulseInterval = setInterval(() => {
       setIsHintVisible(true); // Show
       setTimeout(() => {
-        setIsHintVisible(false); // Hide after a short duration
-      }, 2000); // Visible for 2 seconds
+        setIsHintVisible(false); // Hide after a longer duration
+      }, 4000); // Increased from 2000ms
     }, 15000); // Pulse every 15 seconds
 
     return () => {
@@ -279,11 +279,11 @@ export default function MapPage() {
         >
           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
             <CardContent className="p-3">
-              <div className="flex items-center gap-3 text-sm">
+              <div className="flex items-center gap-3">
                 <div className="bg-primary/20 text-primary p-2 rounded-full">
                   <MapPin className="h-5 w-5" />
                 </div>
-                <p className="text-muted-foreground">
+                <p className="text-sm md:text-base text-foreground">
                   Clique no mapa para selecionar um local e criar uma ocorrência.
                 </p>
               </div>
@@ -359,3 +359,4 @@ export default function MapPage() {
     
 
     
+
