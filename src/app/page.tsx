@@ -49,6 +49,7 @@ export default function MapPage() {
   const [debouncedAddressSearch] = useDebounce(addressSearch, 500);
   const [isGeocoding, setIsGeocoding] = useState(false);
   const [geocodeResults, setGeocodeResults] = useState<GeocodeResult[]>([]);
+  const [noResults, setNoResults] = useState(false);
   const searchBoxRef = useRef<HTMLDivElement>(null);
 
 
@@ -184,15 +185,22 @@ export default function MapPage() {
   useEffect(() => {
     if (debouncedAddressSearch.trim().length < 3) {
       setGeocodeResults([]);
+      setNoResults(false);
       return;
     }
 
     const search = async () => {
       setIsGeocoding(true);
+      setNoResults(false);
       try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(debouncedAddressSearch)}&viewbox=-48.05,-16.05,-47.95,-15.95&bounded=1`);
+        // Append city/state to make search more specific
+        const query = `${debouncedAddressSearch}, Santa Maria, DF, Brasil`;
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&viewbox=-48.05,-16.05,-47.95,-15.95&bounded=1`);
         const data: GeocodeResult[] = await response.json();
         setGeocodeResults(data);
+        if (data.length === 0) {
+          setNoResults(true);
+        }
       } catch (error) {
         console.error("Geocoding error:", error);
         toast({
@@ -213,6 +221,7 @@ export default function MapPage() {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchBoxRef.current && !searchBoxRef.current.contains(event.target as Node)) {
         setGeocodeResults([]);
+        setNoResults(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -349,19 +358,23 @@ export default function MapPage() {
                   />
                   {isGeocoding && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin" />}
                 </div>
-                {geocodeResults.length > 0 && (
+                {(geocodeResults.length > 0 || noResults) && (
                   <div className="absolute bottom-full left-0 w-full mb-2 bg-background/80 backdrop-blur-xl border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
-                    <ul>
-                      {geocodeResults.map((result) => (
-                        <li 
-                          key={result.place_id}
-                          className="px-4 py-2 text-sm text-foreground hover:bg-accent cursor-pointer border-b border-border/50 last:border-b-0"
-                          onClick={() => handleSelectAddress(result)}
-                        >
-                          {result.display_name}
-                        </li>
-                      ))}
-                    </ul>
+                    {noResults ? (
+                       <p className="px-4 py-3 text-sm text-center text-muted-foreground">Nenhum resultado encontrado.</p>
+                    ) : (
+                      <ul>
+                        {geocodeResults.map((result) => (
+                          <li 
+                            key={result.place_id}
+                            className="px-4 py-2 text-sm text-foreground hover:bg-accent cursor-pointer border-b border-border/50 last:border-b-0"
+                            onClick={() => handleSelectAddress(result)}
+                          >
+                            {result.display_name}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 )}
               </CardContent>
