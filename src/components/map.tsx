@@ -9,7 +9,7 @@
  * - Dar zoom no mapa ao clicar em um marcador de cluster.
  * - Permitir que o usuário clique em qualquer lugar no mapa para criar uma nova ocorrência.
  * - Obter o endereço correspondente às coordenadas clicadas usando a API de geocodificação do Mapbox.
- * - Exibir um diálogo de confirmação com o endereço antes de redirecionar para a página de reporte.
+ * - Exibir um Pop-up contextual no local do clique com um marcador temporário para confirmação.
  */
 
 'use client';
@@ -21,17 +21,13 @@ import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseE
 import { Loader2, MapPin } from 'lucide-react';
 import useSupercluster from 'use-supercluster';
 import type { PointFeature } from 'supercluster';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Button } from './ui/button';
 
+interface NewIssueLocation {
+  lat: number;
+  lng: number;
+  address: string;
+}
 
 interface MapComponentProps {
   /** A lista de ocorrências a serem exibidas no mapa. */
@@ -50,11 +46,9 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, mapStyle }, ref) => {
   const router = useRouter();
   const [popupInfo, setPopupInfo] = useState<Issue | null>(null);
+  const [newIssueLocation, setNewIssueLocation] = useState<NewIssueLocation | null>(null);
   const [geocoding, setGeocoding] = useState(false);
   
-  // Estado para o diálogo de confirmação de endereço
-  const [confirmationData, setConfirmationData] = useState<{ lat: number; lng: number; address: string } | null>(null);
-
   // Estado para armazenar o zoom e os limites (bounds) atuais do mapa.
   const [zoom, setZoom] = useState(13);
   const [bounds, setBounds] = useState<[number, number, number, number] | undefined>();
@@ -88,7 +82,7 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
    */
   const handleMapClick = async (event: MapLayerMouseEvent) => {
     // Impede a criação de um novo ponto se um pop-up já estiver aberto.
-    if (popupInfo) return;
+    if (popupInfo || newIssueLocation) return;
 
     setGeocoding(true);
     const { lng, lat } = event.lngLat;
@@ -103,13 +97,13 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
       // Usa o primeiro resultado retornado pela API.
       const address = data.features[0]?.place_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
       
-      // Define os dados para o modal de confirmação.
-      setConfirmationData({ lat, lng, address });
+      // Define os dados para o pop-up de confirmação.
+      setNewIssueLocation({ lat, lng, address });
 
     } catch (error) {
       console.error("Erro na geocodificação:", error);
-      // Se a geocodificação falhar, redireciona apenas com as coordenadas.
-      router.push(`/report?lat=${lat}&lng=${lng}&address=Endereço não encontrado`);
+      // Se a geocodificação falhar, permite o reporte apenas com as coordenadas.
+      setNewIssueLocation({ lat, lng, address: 'Endereço não encontrado' });
     } finally {
       setGeocoding(false);
     }
@@ -119,10 +113,10 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
    * Redireciona o usuário para a página de relatório após a confirmação.
    */
   const handleConfirmLocation = () => {
-    if (!confirmationData) return;
-    const { lat, lng, address } = confirmationData;
+    if (!newIssueLocation) return;
+    const { lat, lng, address } = newIssueLocation;
     router.push(`/report?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`);
-    setConfirmationData(null);
+    setNewIssueLocation(null);
   };
 
 
@@ -204,6 +198,7 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
                 >
                     <button onClick={(e) => {
                         e.stopPropagation();
+                        setNewIssueLocation(null); // Fecha o pop-up de novo local se estiver aberto
                         setPopupInfo(issue);
                     }} className="transform hover:scale-125 transition-transform duration-200 ease-in-out">
                         <MapPin className="h-8 w-8 text-primary fill-current drop-shadow-lg" />
@@ -211,16 +206,49 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
                 </Marker>
             );
         })}
+        
+        {/* Marcador e Pop-up para um novo local de ocorrência */}
+        {newIssueLocation && (
+          <>
+            <Marker 
+              latitude={newIssueLocation.lat} 
+              longitude={newIssueLocation.lng}
+            >
+               <MapPin className="h-8 w-8 text-green-500 fill-current drop-shadow-lg" />
+            </Marker>
+            <Popup
+              longitude={newIssueLocation.lng}
+              latitude={newIssueLocation.lat}
+              onClose={() => setNewIssueLocation(null)}
+              closeOnClick={false}
+              anchor="bottom"
+              offset={-15}
+            >
+              <div className="p-1 max-w-xs space-y-2">
+                <h3 className="font-bold text-base text-foreground">Confirmar Local</h3>
+                <p className="text-muted-foreground text-sm">{newIssueLocation.address}</p>
+                <div className="flex gap-2 justify-end">
+                    <Button variant="ghost" size="sm" onClick={() => setNewIssueLocation(null)}>
+                        Cancelar
+                    </Button>
+                    <Button size="sm" onClick={handleConfirmLocation}>
+                        Reportar aqui
+                    </Button>
+                </div>
+              </div>
+            </Popup>
+          </>
+        )}
 
-
+        {/* Pop-up para uma ocorrência existente */}
         {popupInfo && (
           <Popup
             longitude={popupInfo.location.lng}
             latitude={popupInfo.location.lat}
             onClose={() => setPopupInfo(null)}
             closeOnClick={false}
-            anchor="left"
-            offset={20}
+            anchor="bottom"
+            offset={-15}
           >
             <div className="p-1 max-w-xs">
               <h3 className="font-bold text-base text-foreground">{popupInfo.title}</h3>
@@ -231,26 +259,6 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
         )}
       </Map>
 
-      {/* Diálogo de Confirmação de Endereço */}
-      <AlertDialog open={confirmationData !== null} onOpenChange={(open) => !open && setConfirmationData(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Localização</AlertDialogTitle>
-            <AlertDialogDescription>
-              Você selecionou o seguinte endereço. Deseja criar uma ocorrência para este local?
-              <p className="font-semibold text-foreground mt-2 bg-muted p-2 rounded-md">
-                {confirmationData?.address}
-              </p>
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setConfirmationData(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirmLocation}>
-              Confirmar Local
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
 
       {geocoding && (
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-20">
