@@ -14,8 +14,6 @@ import { useTheme } from 'next-themes';
 interface NewReportInfo {
   lat: number;
   lng: number;
-  address: string;
-  isLoading: boolean;
 }
 
 interface MapProps {
@@ -23,26 +21,6 @@ interface MapProps {
   center: { lat: number; lng: number };
   mapRef?: React.RefObject<MapRef>;
   mapStyle: 'streets' | 'satellite';
-}
-
-const formatAddress = (features: any[]): string => {
-    if (!features || features.length === 0) return 'Endereço não encontrado';
-    
-    const feature = features[0];
-    let placeName = feature.place_name || '';
-
-    // Remove o país para um formato mais limpo
-    placeName = placeName.replace(', Brazil', '').replace(', Brasil', '');
-
-    // Faz as substituições específicas para melhorar a legibilidade
-    placeName = placeName.replace(/^Edf\s+/i, ''); // Remove "Edf " do início
-    placeName = placeName.replace(/Quadra Residencial/gi, 'Qr'); // Troca "Quadra Residencial" por "Qr"
-    
-    // Remove o CEP duplicado no final, se houver
-    const cepRegex = /,\s\d{5}-\d{3}$/;
-    placeName = placeName.replace(cepRegex, '');
-
-    return placeName || 'Endereço não pôde ser determinado';
 }
 
 
@@ -56,13 +34,15 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
 
   const getMapStyle = () => {
     if (mapStyle === 'satellite') {
+      // Usando um mapa de satélite que inclui ruas e rótulos para melhor contexto
       return "mapbox://styles/mapbox/satellite-streets-v12";
     }
+    // O tema escuro do Mapbox (dark-v11) tem melhor contraste que o light-v11
     return theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v12";
   }
 
 
-  const handleMapClick = async (e: MapLayerMouseEvent) => {
+  const handleMapClick = (e: MapLayerMouseEvent) => {
     // Prevent click when clicking on an existing marker
     if (e.originalEvent?.target && (e.originalEvent.target as HTMLElement).closest('.mapboxgl-marker')) return;
     
@@ -71,24 +51,15 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
     // Clear any selected issue to hide its popup
     setSelectedIssue(null);
     
-    // Set initial state for the new report pin
-    setNewReportInfo({ lat, lng, address: '', isLoading: true });
-
-    try {
-        const response = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxToken}&language=pt-BR&types=address,poi,neighborhood,place`);
-        const data = await response.json();
-        const address = formatAddress(data.features) || 'Endereço não encontrado';
-        setNewReportInfo({ lat, lng, address, isLoading: false });
-    } catch (error) {
-        console.error("Erro na geocodificação reversa:", error);
-        setNewReportInfo({ lat, lng, address: 'Erro ao buscar endereço', isLoading: false });
-    }
+    // Set initial state for the new report pin, without fetching address
+    setNewReportInfo({ lat, lng });
   };
 
   const handleConfirmLocation = () => {
     if (newReportInfo) {
-      const { lat, lng, address } = newReportInfo;
-      router.push(`/report?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`);
+      const { lat, lng } = newReportInfo;
+      // Passa apenas as coordenadas, o usuário preencherá o endereço
+      router.push(`/report?lat=${lat}&lng=${lng}`);
     }
     setNewReportInfo(null);
   };
@@ -122,7 +93,7 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
         }}
         style={{ width: '100%', height: '100%' }}
         mapStyle={getMapStyle()}
-        key={`${theme}-${mapStyle}`}
+        key={`${theme}-${mapStyle}`} // Força a recriação do mapa ao mudar tema ou estilo
         onClick={handleMapClick}
         interactiveLayerIds={['clusters']}
       >
@@ -170,18 +141,13 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
                <div className="space-y-3 p-1 max-w-xs">
                     <h3 className="font-bold text-base">Confirmar Localização</h3>
                      <div className="p-2 border rounded-md bg-muted/50">
-                        {newReportInfo.isLoading ? (
-                            <div className="flex items-center gap-2 text-sm">
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                <span>Buscando endereço...</span>
-                            </div>
-                        ) : (
-                            <p className="text-sm text-foreground">{newReportInfo.address}</p>
-                        )}
+                        <p className="text-sm text-foreground">
+                            Lat: {newReportInfo.lat.toFixed(6)}, Lng: {newReportInfo.lng.toFixed(6)}
+                        </p>
+                        <p className="text-xs text-muted-foreground mt-1">Você preencherá o endereço na próxima etapa.</p>
                     </div>
                     <Button 
                         onClick={handleConfirmLocation} 
-                        disabled={newReportInfo.isLoading}
                         className="w-full"
                     >
                         Confirmar e Reportar
@@ -198,5 +164,3 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
 MapComponent.displayName = 'MapComponent';
 
 export default MapComponent;
-
-    

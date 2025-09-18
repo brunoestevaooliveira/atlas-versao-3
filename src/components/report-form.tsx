@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Send, Loader2 } from 'lucide-react';
+import { Send, Loader2, MapPin } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/auth-context";
 
@@ -55,30 +55,24 @@ export default function ReportForm() {
     return "";
   }, [params]);
 
-  const initialAddress = useMemo(() => {
-    return params.get("address") || "";
-  }, [params]);
-
   const [form, setForm] = useState<FormState>({
     title: "",
     description: "",
     category: "Limpeza urbana / Acúmulo de lixo",
     locationText: initialLocation,
-    address: initialAddress
+    address: "" // Endereço começa em branco para ser preenchido pelo usuário
   });
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Atualiza o formulário se os parâmetros da URL mudarem
+    // Atualiza apenas a localização se os parâmetros da URL mudarem
     const lat = params.get("lat");
     const lng = params.get("lng");
-    const address = params.get("address");
 
     setForm(prevForm => ({
         ...prevForm,
         locationText: lat && lng ? `${lat}, ${lng}` : "",
-        address: address || ""
     }));
 
   }, [params]);
@@ -98,11 +92,20 @@ export default function ReportForm() {
         return router.push('/login');
     }
 
+    if (!form.locationText.trim()) {
+      toast({
+        variant: 'destructive',
+        title: 'Localização Obrigatória',
+        description: 'Por favor, selecione um local no mapa na página inicial antes de continuar.',
+      });
+      return router.push('/');
+    }
+
     if (!form.address.trim()) {
       toast({
         variant: 'destructive',
         title: 'Endereço Obrigatório',
-        description: 'Por favor, selecione um local no mapa na página inicial.',
+        description: 'Por favor, preencha o campo de endereço.',
       });
       return;
     }
@@ -137,9 +140,6 @@ export default function ReportForm() {
         description: `Sua ocorrência (${form.title}) foi registrada com sucesso.`,
       });
 
-      // limpa o formulário após sucesso
-      setForm({ ...form, title: "", description: "", address: ""});
-      // Opcional: redirecionar o usuário após o sucesso
       router.push('/tracking');
       
     } catch (err: any) {
@@ -197,29 +197,25 @@ export default function ReportForm() {
                     </SelectContent>
                 </Select>
             </div>
-             <div className="hidden">
-                <label htmlFor="location">Localização (Coordenadas)</label>
-                <Input
-                    id="location"
-                    value={form.locationText}
-                    readOnly
-                />
-            </div>
             <div className="grid gap-1.5">
-                <label htmlFor="address">Endereço Selecionado</label>
+                <label htmlFor="address">Endereço da Ocorrência</label>
                 <Input
                     id="address"
                     value={form.address}
-                    placeholder="Selecione um local no mapa na página inicial"
-                    readOnly
-                    className="bg-muted/80 text-muted-foreground cursor-not-allowed"
+                    onChange={(e) => setForm({ ...form, address: e.target.value })}
+                    placeholder="Ex: QR 517, Conjunto H, Casa 10"
+                    required
                 />
+                 <p className="text-xs text-muted-foreground flex items-center gap-1.5">
+                    <MapPin className="h-3 w-3" />
+                    As coordenadas ({form.locationText}) foram salvas.
+                </p>
             </div>
         </div>
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading} variant="outline" className="bg-white text-black hover:bg-gray-200">
+             <Button type="submit" size="lg" disabled={loading}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
@@ -231,5 +227,3 @@ export default function ReportForm() {
     </form>
   );
 }
-
-    
