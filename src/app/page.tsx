@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink, Loader2 } from 'lucide-react';
@@ -21,9 +21,17 @@ import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import Link from 'next/link';
 import { MapRef, MapLayerMouseEvent } from 'react-map-gl';
+import { useDebounce } from 'use-debounce';
 
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
+
+interface GeocodeResult {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
+}
 
 export default function MapPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -36,8 +44,12 @@ export default function MapPage() {
   const router = useRouter();
   const mapRef = useRef<MapRef>(null);
 
+  // Address search states
   const [addressSearch, setAddressSearch] = useState('');
+  const [debouncedAddressSearch] = useDebounce(addressSearch, 500);
   const [isGeocoding, setIsGeocoding] = useState(false);
+  const [geocodeResults, setGeocodeResults] = useState<GeocodeResult[]>([]);
+  const searchBoxRef = useRef<HTMLDivElement>(null);
 
 
   const allCategories = useMemo(() => {
@@ -140,61 +152,80 @@ export default function MapPage() {
     );
   };
   
-  const handleGeocodeSearch = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!addressSearch.trim()) return;
+  const handleSelectAddress = (result: GeocodeResult) => {
+    const { lat, lon } = result;
+    const latitude = parseFloat(lat);
+    const longitude = parseFloat(lon);
 
-    setIsGeocoding(true);
-    try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressSearch)}, Santa Maria, Federal District, Brazil&limit=1`);
-        const data = await response.json();
-        
-        if (data && data.length > 0) {
-            const { lat, lon } = data[0];
-            const lng = parseFloat(lon);
-            const latitude = parseFloat(lat);
-            
-            mapRef.current?.flyTo({ center: [lng, latitude], zoom: 16 });
+    mapRef.current?.flyTo({ center: [longitude, latitude], zoom: 17 });
+    
+    // Clear results and input
+    setGeocodeResults([]);
+    setAddressSearch(result.display_name);
 
-            // Simulate a map click to trigger the pin and popup
-            // This requires the map component to expose a way to do this
-            // For now, we'll just fly there. The user can then click to confirm.
-            const map = mapRef.current?.getMap();
-            if (map) {
-                // This simulates the event object that handleMapClick expects.
-                const mockEvent: MapLayerMouseEvent = {
-                    lngLat: { lng, lat: latitude },
-                    point: map.project([lng, latitude]),
-                    features: [],
-                    target: map,
-                    originalEvent: new MouseEvent('click') as any, // Cast to avoid full type definition
-                };
-                // We'd call the map's internal click handler here if it was exposed
-                // Since it's not, we'll have to guide the user to click.
-                 toast({
-                    title: "Localização Encontrada!",
-                    description: "O mapa foi centralizado no endereço. Clique no local exato para criar sua ocorrência.",
-                });
+    // Simulate map click after a short delay to allow the map to fly
+    setTimeout(() => {
+        const map = mapRef.current?.getMap();
+        if (map) {
+            // This is a bit of a hack to get the map to show the report popup
+            // It relies on internal methods of mapbox which is not ideal
+            // but is the simplest way to integrate with the existing `handleMapClick`
+            const mockEvent: MapLayerMouseEvent = {
+                lngLat: { lng: longitude, lat: latitude },
+                point: map.project([longitude, latitude]),
+                features: [],
+                target: map,
+                originalEvent: new MouseEvent('click') as any,
+            };
+            // Directly calling the map's click handler, if it's exposed or accessible
+             if (mapRef.current) {
+                // @ts-ignore - We are calling the internal click handler
+                mapRef.current.getMap().fire('click', mockEvent);
             }
-
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Endereço não encontrado',
-                description: 'Não foi possível encontrar o endereço ou CEP informado. Tente novamente.',
-            });
         }
-    } catch (error) {
+    }, 1000); // 1-second delay
+  };
+
+  // Effect for handling geocode search with debounce
+  useEffect(() => {
+    if (debouncedAddressSearch.trim().length < 3) {
+      setGeocodeResults([]);
+      return;
+    }
+
+    const search = async () => {
+      setIsGeocoding(true);
+      try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(debouncedAddressSearch)}&viewbox=-48.05,-16.05,-47.95,-15.95&bounded=1`);
+        const data: GeocodeResult[] = await response.json();
+        setGeocodeResults(data);
+      } catch (error) {
         console.error("Geocoding error:", error);
         toast({
-            variant: 'destructive',
-            title: 'Erro ao Buscar Endereço',
-            description: 'Ocorreu um problema ao se comunicar com o serviço de mapas.',
+          variant: 'destructive',
+          title: 'Erro ao Buscar Endereço',
+          description: 'Ocorreu um problema na comunicação com o serviço de mapas.',
         });
-    } finally {
+      } finally {
         setIsGeocoding(false);
-    }
-  };
+      }
+    };
+
+    search();
+  }, [debouncedAddressSearch, toast]);
+
+  // Effect to close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (searchBoxRef.current && !searchBoxRef.current.contains(event.target as Node)) {
+        setGeocodeResults([]);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
 
   const RecentIssuesPanelContent = () => (
@@ -311,21 +342,34 @@ export default function MapPage() {
           </Card>
         </div>
         
-        <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-10 w-full max-w-sm md:max-w-md px-4">
-           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
-              <CardContent className="p-3">
-                <form onSubmit={handleGeocodeSearch} className="flex items-center gap-2">
-                    <Input
-                      placeholder="Buscar por CEP ou endereço..."
-                      className="bg-background/80 focus:border-primary border-0 h-9"
-                      value={addressSearch}
-                      onChange={(e) => setAddressSearch(e.target.value)}
-                    />
-                    <Button type="submit" size="icon" className="h-9 w-10 flex-shrink-0" disabled={isGeocoding}>
-                      {isGeocoding ? <Loader2 className="animate-spin" /> : <Search className="h-4 w-4" />}
-                      <span className="sr-only">Buscar endereço</span>
-                    </Button>
-                </form>
+        <div ref={searchBoxRef} className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20 w-full max-w-sm md:max-w-md px-4">
+           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl overflow-visible">
+              <CardContent className="p-2 relative">
+                <div className="flex items-center gap-2">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                  <Input
+                    placeholder="Buscar por CEP ou endereço para reportar..."
+                    className="bg-background/80 focus:border-primary border-0 h-10 pl-10"
+                    value={addressSearch}
+                    onChange={(e) => setAddressSearch(e.target.value)}
+                  />
+                  {isGeocoding && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin" />}
+                </div>
+                {geocodeResults.length > 0 && (
+                  <div className="absolute bottom-full left-0 w-full mb-2 bg-background/80 backdrop-blur-xl border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">
+                    <ul>
+                      {geocodeResults.map((result) => (
+                        <li 
+                          key={result.place_id}
+                          className="px-4 py-2 text-sm text-foreground hover:bg-accent cursor-pointer border-b border-border/50 last:border-b-0"
+                          onClick={() => handleSelectAddress(result)}
+                        >
+                          {result.display_name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </CardContent>
            </Card>
         </div>
@@ -400,7 +444,5 @@ export default function MapPage() {
     </div>
   );
 }
-
-    
 
     
