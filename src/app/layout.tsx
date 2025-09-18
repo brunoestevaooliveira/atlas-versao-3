@@ -100,7 +100,7 @@ export default function RootLayout({
       </head>
       <body className={cn('min-h-screen font-sans antialiased')}>
         <AuthProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+          <ThemeProvider attribute="class" defaultTheme="light">
               <LayoutContent>{children}</LayoutContent>
           </ThemeProvider>
         </AuthProvider>
