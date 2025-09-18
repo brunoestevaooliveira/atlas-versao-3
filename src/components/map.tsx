@@ -41,7 +41,11 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
   }
 
   const formatAddress = (feature: any) => {
-    const placeName = feature.place_name || '';
+    let placeName = feature.place_name || '';
+    
+    // Remove "Edf " do começo e substitui "Quadra Residencial" por "Qr"
+    placeName = placeName.replace(/^Edf\s+/i, '').replace(/Quadra Residencial/gi, 'Qr');
+
     // Remove o CEP e o país do final para uma exibição mais limpa.
     return placeName.replace(/, \d{5}-\d{3}, Brazil$/, '').replace(/, Brazil$/, '');
   };
@@ -67,11 +71,12 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
   };
 
   const handleMapClick = async (e: MapLayerMouseEvent) => {
+    // Ignora cliques nos marcadores existentes
     if (e.originalEvent?.target && (e.originalEvent.target as HTMLElement).closest('.mapboxgl-marker')) return;
     
     const { lng, lat } = e.lngLat;
     
-    setSelectedIssue(null);
+    setSelectedIssue(null); // Fecha popup de ocorrência existente
     setNewReportInfo({ lat, lng, address: '', isLoading: true });
 
     const fetchedAddress = await fetchAddress(lat, lng);
@@ -81,9 +86,10 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
   const handleConfirmLocation = () => {
     if (newReportInfo) {
       const { lat, lng, address } = newReportInfo;
+      // Passa os dados para a página de report
       router.push(`/report?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`);
     }
-    setNewReportInfo(null);
+    setNewReportInfo(null); // Fecha o popup
   };
 
   const issueMarkers = useMemo(() => issues.map(issue => (
@@ -115,7 +121,7 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
         }}
         style={{ width: '100%', height: '100%' }}
         mapStyle={getMapStyle()}
-        key={`${theme}-${mapStyle}`}
+        key={`${theme}-${mapStyle}`} // Força a recriação do mapa ao mudar tema ou estilo
         onClick={handleMapClick}
         interactiveLayerIds={['clusters']}
       >
@@ -141,6 +147,7 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
             </Popup>
         )}
 
+        {/* Marcador para a nova ocorrência */}
         {newReportInfo && (
           <Marker
             longitude={newReportInfo.lng}
@@ -150,6 +157,7 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
             <MapPin className="text-primary h-8 w-8" fill="currentColor"/>
           </Marker>
         )}
+        {/* Popup para confirmar a nova ocorrência */}
         {newReportInfo && (
             <Popup
                 anchor="bottom"
