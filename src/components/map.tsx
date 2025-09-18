@@ -3,8 +3,10 @@
  * @fileoverview Componente principal que renderiza o mapa interativo usando Mapbox e react-map-gl.
  * Este componente é responsável por:
  * - Renderizar o mapa centrado em uma localização específica.
- * - Exibir marcadores (Markers) para cada ocorrência recebida.
- * - Mostrar um Pop-up com detalhes da ocorrência ao clicar em um marcador.
+ * - Agrupar (cluster) ocorrências próximas em um único marcador para evitar poluição visual.
+ * - Exibir marcadores (Markers) para cada ocorrência ou cluster.
+ * - Mostrar um Pop-up com detalhes da ocorrência ao clicar em um marcador individual.
+ * - Dar zoom no mapa ao clicar em um marcador de cluster.
  * - Permitir que o usuário clique em qualquer lugar no mapa para criar uma nova ocorrência.
  * - Obter o endereço correspondente às coordenadas clicadas usando a API de geocodificação do Mapbox.
  * - Redirecionar o usuário para a página de relatório com as coordenadas e o endereço na URL.
@@ -18,9 +20,9 @@ import { useState, useMemo, forwardRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseEvent, MapRef } from 'react-map-gl';
 import { Loader2 } from 'lucide-react';
-import { Button } from './ui/button';
 import { MapPin } from 'lucide-react';
-
+import useSupercluster from 'use-supercluster';
+import type { PointFeature } from 'supercluster';
 
 interface MapComponentProps {
   /** A lista de ocorrências a serem exibidas no mapa. */
@@ -40,6 +42,32 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
   const router = useRouter();
   const [popupInfo, setPopupInfo] = useState<Issue | null>(null);
   const [geocoding, setGeocoding] = useState(false);
+  
+  // Estado para armazenar o zoom e os limites (bounds) atuais do mapa.
+  const [zoom, setZoom] = useState(13);
+  const [bounds, setBounds] = useState<[number, number, number, number] | undefined>();
+
+  // Converte as 'issues' para o formato GeoJSON que o `useSupercluster` pode entender.
+  const points: PointFeature<{ cluster: false; issue: Issue }>[] = useMemo(() => issues.map(issue => ({
+      type: 'Feature',
+      properties: {
+        cluster: false,
+        issue: issue,
+      },
+      geometry: {
+        type: 'Point',
+        coordinates: [issue.location.lng, issue.location.lat],
+      },
+  })), [issues]);
+
+  // Hook `useSupercluster` para calcular os clusters.
+  const { clusters, supercluster } = useSupercluster({
+    points,
+    bounds,
+    zoom,
+    options: { radius: 75, maxZoom: 20 },
+  });
+
 
   /**
    * Manipula o clique em qualquer lugar no mapa.
@@ -75,20 +103,6 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
     }
   };
 
-  /**
-   * Gera a lista de marcadores (Markers) para cada ocorrência.
-   * `useMemo` otimiza a performance, recriando os marcadores apenas se a lista de 'issues' mudar.
-   */
-  const markers = useMemo(() => issues.map(issue => (
-    <Marker key={issue.id} longitude={issue.location.lng} latitude={issue.location.lat}>
-      <button onClick={(e) => {
-        e.stopPropagation();
-        setPopupInfo(issue);
-      }} className="transform hover:scale-125 transition-transform duration-200 ease-in-out">
-        <MapPin className="h-8 w-8 text-primary fill-current drop-shadow-lg" />
-      </button>
-    </Marker>
-  )), [issues]);
 
   const mapStyleUrl = mapStyle === 'satellite' 
     ? 'mapbox://styles/mapbox/satellite-streets-v12' 
@@ -117,12 +131,64 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
         style={{ width: '100%', height: '100%' }}
         mapStyle={mapStyleUrl}
         onClick={handleMapClick}
+        onZoom={(e) => setZoom(e.viewState.zoom)}
+        onMove={(e) => {
+            setZoom(e.viewState.zoom);
+            setBounds(e.target.getBounds().toArray().flat() as [number, number, number, number]);
+        }}
         cursor={geocoding ? 'wait' : 'pointer'}
       >
         <GeolocateControl position="top-left" />
         <NavigationControl position="top-left" />
 
-        {markers}
+        {/* Renderiza os clusters e marcadores individuais */}
+        {clusters.map(cluster => {
+            const [longitude, latitude] = cluster.geometry.coordinates;
+            const { cluster: isCluster, point_count } = cluster.properties;
+
+            // Se for um cluster (agrupamento de pontos)
+            if (isCluster) {
+                return (
+                    <Marker key={`cluster-${cluster.id}`} latitude={latitude} longitude={longitude}>
+                        <div
+                            className="w-8 h-8 bg-primary/80 text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-white/50 shadow-md hover:scale-110 transition-transform"
+                            onClick={() => {
+                                const expansionZoom = Math.min(
+                                    supercluster?.getClusterExpansionZoom(cluster.id as number),
+                                    20
+                                );
+                                const map = (ref as React.RefObject<MapRef>)?.current;
+                                map?.flyTo({
+                                    center: [longitude, latitude],
+                                    zoom: expansionZoom,
+                                    speed: 1.5,
+                                });
+                            }}
+                        >
+                            {point_count}
+                        </div>
+                    </Marker>
+                );
+            }
+
+            // Se for um marcador individual
+            const issue = cluster.properties.issue;
+            return (
+                <Marker
+                    key={`issue-${issue.id}`}
+                    latitude={latitude}
+                    longitude={longitude}
+                >
+                    <button onClick={(e) => {
+                        e.stopPropagation();
+                        setPopupInfo(issue);
+                    }} className="transform hover:scale-125 transition-transform duration-200 ease-in-out">
+                        <MapPin className="h-8 w-8 text-primary fill-current drop-shadow-lg" />
+                    </button>
+                </Marker>
+            );
+        })}
+
 
         {popupInfo && (
           <Popup
