@@ -247,20 +247,22 @@ export default function TrackingPage() {
 
         {/* Sistema de Abas */}
         <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-4xl h-auto">
-            <TabsTrigger value="all">
-              <ListFilter className="mr-2 h-4 w-4" /> Todas ({allTabIssues.length})
-            </TabsTrigger>
-            <TabsTrigger value="received">
-              <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedTabIssues.length})
-            </TabsTrigger>
-            <TabsTrigger value="inProgress">
-              <BarChart className="mr-2 h-4 w-4" /> Em Análise ({inProgressTabIssues.length})
-            </TabsTrigger>
-            <TabsTrigger value="resolved">
-              <CheckCircle className="mr-2 h-4 w-4" /> Resolvidas ({resolvedTabIssues.length})
-            </TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto pb-2">
+            <TabsList className="mx-auto max-w-4xl h-auto">
+              <TabsTrigger value="all">
+                <ListFilter className="mr-2 h-4 w-4" /> Todas ({allTabIssues.length})
+              </TabsTrigger>
+              <TabsTrigger value="received">
+                <Hourglass className="mr-2 h-4 w-4" /> Recebidas ({receivedTabIssues.length})
+              </TabsTrigger>
+              <TabsTrigger value="inProgress">
+                <BarChart className="mr-2 h-4 w-4" /> Em Análise ({inProgressTabIssues.length})
+              </TabsTrigger>
+              <TabsTrigger value="resolved">
+                <CheckCircle className="mr-2 h-4 w-4" /> Resolvidas ({resolvedTabIssues.length})
+              </TabsTrigger>
+            </TabsList>
+          </div>
           
           <div className="mt-8">
             <TabsContent value="all">
