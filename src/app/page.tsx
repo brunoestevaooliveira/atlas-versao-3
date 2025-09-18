@@ -230,6 +230,102 @@ export default function MapPage() {
         )}
       </div>
   );
+
+  /**
+   * Componente que renderiza os controles do mapa (busca, filtros, etc.).
+   * Reutilizado no painel de desktop e na gaveta móvel.
+   */
+  const MapControlsContent = () => (
+    <div className="space-y-4">
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <Input
+          placeholder="Buscar ocorrência..."
+          className="pl-10 bg-background/80 focus:border-primary"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+            <Switch 
+            id="layers-switch-controls" 
+            checked={showIssues}
+            onCheckedChange={setShowIssues}
+            />
+            <Label htmlFor="layers-switch-controls">Mostrar Ocorrências</Label>
+        </div>
+        <div className="flex items-center">
+            <TooltipProvider>
+               <Tooltip>
+                <TooltipTrigger asChild>
+                  {/* Botão para alternar entre mapa de ruas e satélite */}
+                  <Button variant="ghost" size="icon" onClick={() => setMapStyle(style => style === 'streets' ? 'satellite' : 'streets')}>
+                      {mapStyle === 'streets' ? <Globe className="h-5 w-5 text-primary"/> : <MapIcon className="h-5 w-5 text-primary"/>}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                   <p>Mudar para vista {mapStyle === 'streets' ? 'Satélite' : 'Ruas'}</p>
+                </TooltipContent>
+              </Tooltip>
+              {/* Popover para filtrar por categorias */}
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                      <Layers className="h-5 w-5 text-primary"/>
+                      <span className="sr-only">Filtrar Camadas</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-64">
+                  <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                          <Filter className="h-4 w-4"/>
+                          <h4 className="font-medium text-sm">Filtrar por Categoria</h4>
+                      </div>
+                      <div className="space-y-2">
+                      {allCategories.map(category => (
+                          <div key={category} className="flex items-center space-x-2">
+                              <Checkbox
+                                  id={`category-${category}`}
+                                  checked={selectedCategories.includes(category)}
+                                  onCheckedChange={() => handleCategoryChange(category)}
+                              />
+                              <Label htmlFor={`category-${category}`} className="text-sm font-normal">
+                                  {category}
+                              </Label>
+                          </div>
+                      ))}
+                      </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Separator orientation="vertical" className="h-6 mx-1" />
+              {/* Botões de controle da câmera 2D/3D */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={set2DView}>
+                      <Square className="h-5 w-5 text-primary"/>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Visão de Cima (2D)</p>
+                </TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button variant="ghost" size="icon" onClick={set3DView}>
+                      <Cuboid className="h-5 w-5 text-primary"/>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Visão 3D</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+        </div>
+      </div>
+    </div>
+  );
   
 
   // --- RENDERIZAÇÃO DO COMPONENTE ---
@@ -242,96 +338,8 @@ export default function MapPage() {
         {/* Painel de Controle (apenas Desktop) */}
         <div className="absolute top-24 left-4 z-10 hidden md:block w-80 space-y-4">
           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
-            <CardHeader>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Buscar ocorrência..."
-                  className="pl-10 bg-background/80 focus:border-primary"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                    <Switch 
-                    id="layers-switch" 
-                    checked={showIssues}
-                    onCheckedChange={setShowIssues}
-                    />
-                    <Label htmlFor="layers-switch">Mostrar Ocorrências</Label>
-                </div>
-                <div className="flex items-center">
-                    <TooltipProvider>
-                       <Tooltip>
-                        <TooltipTrigger asChild>
-                          {/* Botão para alternar entre mapa de ruas e satélite */}
-                          <Button variant="ghost" size="icon" onClick={() => setMapStyle(style => style === 'streets' ? 'satellite' : 'streets')}>
-                              {mapStyle === 'streets' ? <Globe className="h-5 w-5 text-primary"/> : <MapIcon className="h-5 w-5 text-primary"/>}
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                           <p>Mudar para vista {mapStyle === 'streets' ? 'Satélite' : 'Ruas'}</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      {/* Popover para filtrar por categorias */}
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                              <Layers className="h-5 w-5 text-primary"/>
-                              <span className="sr-only">Filtrar Camadas</span>
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-64">
-                          <div className="space-y-4">
-                              <div className="flex items-center gap-2">
-                                  <Filter className="h-4 w-4"/>
-                                  <h4 className="font-medium text-sm">Filtrar por Categoria</h4>
-                              </div>
-                              <div className="space-y-2">
-                              {allCategories.map(category => (
-                                  <div key={category} className="flex items-center space-x-2">
-                                      <Checkbox
-                                          id={category}
-                                          checked={selectedCategories.includes(category)}
-                                          onCheckedChange={() => handleCategoryChange(category)}
-                                      />
-                                      <Label htmlFor={category} className="text-sm font-normal">
-                                          {category}
-                                      </Label>
-                                  </div>
-                              ))}
-                              </div>
-                          </div>
-                        </PopoverContent>
-                      </Popover>
-                      <Separator orientation="vertical" className="h-6 mx-1" />
-                      {/* Botões de controle da câmera 2D/3D */}
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={set2DView}>
-                              <Square className="h-5 w-5 text-primary"/>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Visão de Cima (2D)</p>
-                        </TooltipContent>
-                      </Tooltip>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Button variant="ghost" size="icon" onClick={set3DView}>
-                              <Cuboid className="h-5 w-5 text-primary"/>
-                          </Button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Visão 3D</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                </div>
-              </div>
+            <CardContent className="p-4">
+              <MapControlsContent />
             </CardContent>
           </Card>
         </div>
@@ -383,8 +391,9 @@ export default function MapPage() {
           </div>
         </div>
         
-        {/* Gatilho para abrir la gaveta de ocorrências (Mobile) */}
-         <div className="absolute top-24 right-4 z-10 md:hidden">
+        {/* Controles Mobile (Gavetas para Ocorrências e Filtros) */}
+        <div className="absolute top-24 right-4 z-10 md:hidden flex flex-col gap-2">
+           {/* Gatilho para abrir a gaveta de ocorrências */}
            <Sheet>
             <SheetTrigger asChild>
                 <Button size="icon" className="rounded-full shadow-lg">
@@ -398,6 +407,23 @@ export default function MapPage() {
                 </SheetHeader>
                 <div className="flex-grow overflow-y-auto pr-6">
                   <RecentIssuesPanelContent />
+                </div>
+            </SheetContent>
+          </Sheet>
+          {/* Gatilho para abrir a gaveta de filtros */}
+          <Sheet>
+            <SheetTrigger asChild>
+                <Button size="icon" className="rounded-full shadow-lg">
+                    <Filter className="h-5 w-5"/>
+                    <span className="sr-only">Abrir filtros</span>
+                </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-auto flex flex-col">
+                <SheetHeader>
+                    <SheetTitle>Filtros e Controles</SheetTitle>
+                </SheetHeader>
+                <div className="p-4">
+                  <MapControlsContent />
                 </div>
             </SheetContent>
           </Sheet>
