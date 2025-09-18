@@ -26,7 +26,6 @@ type FormState = {
   title: string;
   description: string;
   category: string;
-  locationText: string; // Coordenadas em formato de string "lat, lng"
   address: string;
 };
 
@@ -45,15 +44,14 @@ const issueCategories = [
 
 /**
  * Converte uma string de coordenadas "lat, lng" para um objeto de localização.
- * @param {string | null} text A string a ser convertida.
+ * @param {string | null} latStr A string da latitude.
+ * @param {string | null} lngStr A string da longitude.
  * @returns {{ lat: number; lng: number } | null} O objeto de localização ou null se a string for inválida.
  */
-function parseLatLng(text: string | null): { lat: number; lng: number } | null {
-  if (!text) return null;
-  const parts = text.split(",").map((s) => s.trim());
-  if (parts.length !== 2) return null;
-  const lat = Number(parts[0]);
-  const lng = Number(parts[1]);
+function parseLatLng(latStr: string | null, lngStr: string | null): { lat: number; lng: number } | null {
+  if (!latStr || !lngStr) return null;
+  const lat = Number(latStr);
+  const lng = Number(lngStr);
   if (Number.isNaN(lat) || Number.isNaN(lng)) return null;
   return { lat, lng };
 }
@@ -67,14 +65,7 @@ export default function ReportForm() {
   const { appUser } = useAuth();
   const router = useRouter();
 
-  // Memoiza a captura inicial da localização e endereço da URL para evitar recálculos.
-  const initialLocation = useMemo(() => {
-    const lat = params.get("lat");
-    const lng = params.get("lng");
-    if (lat && lng) return `${lat}, ${lng}`;
-    return "";
-  }, [params]);
-  
+  // Memoiza a captura inicial do endereço da URL.
   const initialAddress = useMemo(() => {
     return params.get("address") || "";
   }, [params]);
@@ -84,12 +75,12 @@ export default function ReportForm() {
     title: "",
     description: "",
     category: "Limpeza urbana / Acúmulo de lixo",
-    locationText: initialLocation,
     address: initialAddress
   });
 
   // Estado para controlar o loading durante a submissão.
   const [loading, setLoading] = useState(false);
+  const [location, setLocation] = useState<{lat: number, lng: number} | null>(null);
 
   // Efeito que atualiza o estado do formulário se os parâmetros da URL mudarem.
   // Útil se o usuário navegar de volta para o mapa e selecionar outro ponto.
@@ -98,13 +89,24 @@ export default function ReportForm() {
     const lng = params.get("lng");
     const address = params.get("address");
 
+    const parsedLoc = parseLatLng(lat, lng);
+    setLocation(parsedLoc);
+
     setForm(prevForm => ({
         ...prevForm,
-        locationText: lat && lng ? `${lat}, ${lng}` : "",
         address: address || "",
     }));
 
-  }, [params]);
+    if (!parsedLoc) {
+        toast({
+            variant: 'destructive',
+            title: 'Localização Inválida',
+            description: 'As coordenadas não foram encontradas. Por favor, selecione um local no mapa.',
+        });
+        router.push('/');
+    }
+
+  }, [params, router, toast]);
 
 
   /**
@@ -127,7 +129,7 @@ export default function ReportForm() {
     }
     
     // Valida se a localização foi selecionada no mapa.
-    if (!form.locationText.trim()) {
+    if (!location) {
       toast({
         variant: 'destructive',
         title: 'Localização Obrigatória',
@@ -159,16 +161,12 @@ export default function ReportForm() {
     setLoading(true);
 
     try {
-      // Converte a string de localização para um objeto de coordenadas.
-      const loc = parseLatLng(form.locationText);
-      if (!loc) throw new Error("Localização inválida. Clique no mapa para definir um ponto.");
-
       // Chama a função do serviço para adicionar a ocorrência no Firestore.
       await addIssueClient({
         title: form.title,
         description: form.description,
         category: form.category,
-        location: loc,
+        location: location,
         address: form.address,
         reporter: appUser.name || 'Cidadão Anônimo',
         reporterId: appUser.uid,
@@ -250,14 +248,14 @@ export default function ReportForm() {
                 />
                  <p className="text-xs text-muted-foreground flex items-center gap-1.5">
                     <MapPin className="h-3 w-3" />
-                    As coordenadas ({form.locationText}) foram salvas.
+                    As coordenadas ({location ? `${location.lat.toFixed(5)}, ${location.lng.toFixed(5)}` : 'N/A'}) foram salvas.
                 </p>
             </div>
         </div>
        </div>
 
         <div className="flex justify-end">
-             <Button type="submit" size="lg" disabled={loading}>
+             <Button type="submit" size="lg" disabled={loading || !location}>
                 {loading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 ) : (

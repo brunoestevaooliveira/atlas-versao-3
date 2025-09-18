@@ -9,20 +9,29 @@
  * - Dar zoom no mapa ao clicar em um marcador de cluster.
  * - Permitir que o usuário clique em qualquer lugar no mapa para criar uma nova ocorrência.
  * - Obter o endereço correspondente às coordenadas clicadas usando a API de geocodificação do Mapbox.
- * - Redirecionar o usuário para a página de relatório com as coordenadas e o endereço na URL.
+ * - Exibir um diálogo de confirmação com o endereço antes de redirecionar para a página de reporte.
  */
 
 'use client';
 
 import type { Issue } from '@/lib/types';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { useState, useMemo, forwardRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseEvent, MapRef } from 'react-map-gl';
-import { Loader2 } from 'lucide-react';
-import { MapPin } from 'lucide-react';
+import { Loader2, MapPin } from 'lucide-react';
 import useSupercluster from 'use-supercluster';
 import type { PointFeature } from 'supercluster';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 
 interface MapComponentProps {
   /** A lista de ocorrências a serem exibidas no mapa. */
@@ -43,6 +52,9 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
   const [popupInfo, setPopupInfo] = useState<Issue | null>(null);
   const [geocoding, setGeocoding] = useState(false);
   
+  // Estado para o diálogo de confirmação de endereço
+  const [confirmationData, setConfirmationData] = useState<{ lat: number; lng: number; address: string } | null>(null);
+
   // Estado para armazenar o zoom e os limites (bounds) atuais do mapa.
   const [zoom, setZoom] = useState(13);
   const [bounds, setBounds] = useState<[number, number, number, number] | undefined>();
@@ -91,8 +103,8 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
       // Usa o primeiro resultado retornado pela API.
       const address = data.features[0]?.place_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
       
-      // Redireciona para a página de relatório com os dados na URL.
-      router.push(`/report?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`);
+      // Define os dados para o modal de confirmação.
+      setConfirmationData({ lat, lng, address });
 
     } catch (error) {
       console.error("Erro na geocodificação:", error);
@@ -101,6 +113,16 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
     } finally {
       setGeocoding(false);
     }
+  };
+
+  /**
+   * Redireciona o usuário para a página de relatório após a confirmação.
+   */
+  const handleConfirmLocation = () => {
+    if (!confirmationData) return;
+    const { lat, lng, address } = confirmationData;
+    router.push(`/report?lat=${lat}&lng=${lng}&address=${encodeURIComponent(address)}`);
+    setConfirmationData(null);
   };
 
 
@@ -152,7 +174,8 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
                     <Marker key={`cluster-${cluster.id}`} latitude={latitude} longitude={longitude}>
                         <div
                             className="w-8 h-8 bg-primary/80 text-primary-foreground rounded-full flex items-center justify-center font-bold text-sm cursor-pointer border-2 border-white/50 shadow-md hover:scale-110 transition-transform"
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation();
                                 const expansionZoom = Math.min(
                                     supercluster?.getClusterExpansionZoom(cluster.id as number),
                                     20
@@ -207,6 +230,28 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
           </Popup>
         )}
       </Map>
+
+      {/* Diálogo de Confirmação de Endereço */}
+      <AlertDialog open={confirmationData !== null} onOpenChange={(open) => !open && setConfirmationData(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar Localização</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você selecionou o seguinte endereço. Deseja criar uma ocorrência para este local?
+              <p className="font-semibold text-foreground mt-2 bg-muted p-2 rounded-md">
+                {confirmationData?.address}
+              </p>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setConfirmationData(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmLocation}>
+              Confirmar Local
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {geocoding && (
         <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-20">
           <Loader2 className="h-8 w-8 animate-spin text-white" />
