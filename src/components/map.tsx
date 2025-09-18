@@ -25,39 +25,24 @@ interface MapProps {
   mapStyle: 'streets' | 'satellite';
 }
 
-// Rewritten to parse Mapbox Geocoding API response
 const formatAddress = (features: any[]): string => {
     if (!features || features.length === 0) return 'Endereço não encontrado';
     
-    const feature = features[0]; // Use the most relevant result
-    const placeName = feature.place_name; // e.g., "QR 100 Conjunto 1, 2, Santa Maria, Brasília, Distrito Federal 72540-101, Brazil"
-    const address = feature.address; // e.g., "72540-101"
-    const text = feature.text; // e.g., "QR 100 Conjunto 1, 2"
-    const place = feature.place; // e.g., "Santa Maria"
-    const district = feature.context?.find((c: any) => c.id.startsWith('district'))?.text;
-    const postcode = feature.context?.find((c: any) => c.id.startsWith('postcode'))?.text;
-    const city = feature.context?.find((c: any) => c.id.startsWith('place'))?.text;
-    const state = feature.context?.find((c: any) => c.id.startsWith('region'))?.text;
+    const feature = features[0];
+    let placeName = feature.place_name || '';
 
-    // A resposta do Mapbox costuma ser bem completa no `place_name`.
-    // Vamos apenas remover a parte do país para ficar mais limpo.
-    if (placeName) {
-        return placeName.replace(', Brazil', '').replace(', Brasil', '');
-    }
+    // Remove o país para um formato mais limpo
+    placeName = placeName.replace(', Brazil', '').replace(', Brasil', '');
 
-    // Fallback se o place_name não for o ideal
-    let constructedAddress = text || '';
-    if (district && constructedAddress !== district) {
-        constructedAddress += `, ${district}`;
-    }
-    if (city && !constructedAddress.includes(city)) {
-        constructedAddress += ` - ${city}`;
-    }
-     if (postcode) {
-        constructedAddress += `, CEP: ${postcode}`;
-    }
+    // Faz as substituições específicas para melhorar a legibilidade
+    placeName = placeName.replace(/^Edf\s+/i, ''); // Remove "Edf " do início
+    placeName = placeName.replace(/Quadra Residencial/gi, 'Qr'); // Troca "Quadra Residencial" por "Qr"
+    
+    // Remove o CEP duplicado no final, se houver
+    const cepRegex = /,\s\d{5}-\d{3}$/;
+    placeName = placeName.replace(cepRegex, '');
 
-    return constructedAddress || 'Endereço não pode ser determinado';
+    return placeName || 'Endereço não pôde ser determinado';
 }
 
 
