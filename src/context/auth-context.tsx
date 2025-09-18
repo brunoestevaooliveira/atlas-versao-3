@@ -107,9 +107,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setShowTutorial(true);
         }
 
-        // Força a atualização do token para obter as 'claims' mais recentes (ainda útil para outras funções do Firebase).
-        await user.getIdTokenResult(true);
-        
         // Busca o perfil do usuário no Firestore para obter o 'role'.
         const appProfile = await fetchAppUser(user.uid);
         

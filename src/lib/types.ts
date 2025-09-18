@@ -16,7 +16,7 @@ export type Comment = {
   author: string;
   authorId: string;
   authorPhotoURL?: string | null;
-  authorRole: 'admin' | 'user';
+  authorRole?: 'admin' | 'user';
   content: string;
   createdAt: Date;
 };
@@ -30,7 +30,7 @@ export type CommentData = {
   author: string;
   authorId: string;
   authorPhotoURL?: string | null;
-  authorRole: 'admin' | 'user';
+  authorRole?: 'admin' | 'user';
   content: string;
   createdAt: Timestamp;
 }
@@ -100,15 +100,4 @@ export type AppUserData = {
     createdAt: Timestamp;
     role: 'user' | 'admin';
     issuesReported: number;
-}
-
-/**
- * Representa o resultado de uma busca na API de geocodificação.
- * (Atualmente não utilizada após a troca para Mapbox, mas mantida para referência).
- */
-export interface GeocodeResult {
-  place_id: number;
-  display_name: string;
-  lat: string;
-  lon: string;
 }

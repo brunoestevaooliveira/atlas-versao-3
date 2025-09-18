@@ -24,6 +24,7 @@ import {
   arrayUnion,
   getDoc,
   increment,
+  arrayRemove,
 } from 'firebase/firestore';
 import type { Issue, IssueData, CommentData, AppUser, Comment } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -53,7 +54,7 @@ const fromFirestore = (docData: any, id: string): Issue => {
     reportedAt: data.reportedAt ? (data.reportedAt as Timestamp).toDate() : new Date(),
     reporter: data.reporter,
     reporterId: data.reporterId,
-    upvotes: data.upvotes,
+    upvotes: data.upvotes || 0,
     // Converte os Timestamps dos comentários para Datas e os ordena do mais recente para o mais antigo.
     comments: (data.comments || []).map(comment => ({
       ...comment,
@@ -231,9 +232,13 @@ export const deleteCommentFromIssue = async (issueId: string, commentId: string)
   // Para remover um item de um array no Firestore, precisamos ler o array,
   // remover o item no lado do cliente e, em seguida, reescrever o array inteiro.
   const issueData = issueSnap.data() as IssueData;
-  const updatedComments = issueData.comments.filter((c: CommentData) => c.id !== commentId);
+  const commentToDelete = issueData.comments.find((c: CommentData) => c.id === commentId);
 
-  await updateDoc(issueRef, {
-    comments: updatedComments
-  });
+  if (commentToDelete) {
+    await updateDoc(issueRef, {
+      comments: arrayRemove(commentToDelete)
+    });
+  } else {
+    console.warn(`Comentário com ID ${commentId} não encontrado na ocorrência ${issueId}.`);
+  }
 };

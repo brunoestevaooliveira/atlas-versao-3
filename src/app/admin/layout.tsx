@@ -2,7 +2,7 @@
  * @file src/app/admin/layout.tsx
  * @fileoverview Layout para as rotas da área de administração.
  * Este componente envolve as páginas de administração e é responsável por
- * proteger o acesso, garantindo que apenas usuários com a permissão 'isAdmin'
+ * proteger o acesso, garantindo que apenas usuários com a permissão de 'admin'
  * possam visualizar o conteúdo. Ele exibe uma tela de carregamento enquanto
  * verifica a permissão e uma tela de "Acesso Negado" caso o usuário não seja um administrador.
  */

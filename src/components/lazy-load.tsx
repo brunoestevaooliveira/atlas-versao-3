@@ -55,6 +55,7 @@ const LazyLoad: React.FC<LazyLoadProps> = ({
     // Função de limpeza para desconectar o observador ao desmontar.
     return () => {
       if (placeholderRef.current) {
+        // eslint-disable-next-line react-hooks/exhaustive-deps
         observer.unobserve(placeholderRef.current);
       }
     };
