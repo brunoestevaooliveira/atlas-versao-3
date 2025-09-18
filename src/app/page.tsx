@@ -237,7 +237,7 @@ export default function MapPage() {
     <div className="h-screen w-screen flex flex-col pt-0 overflow-hidden">
       <div className="relative flex-grow">
         {/* O mapa interativo ocupa todo o espaço disponível. */}
-        <InteractiveMap issues={showIssues ? filteredIssues : []} mapStyle={mapStyle} ref={ref} theme={theme}/>
+        <InteractiveMap issues={showIssues ? filteredIssues : []} mapStyle={mapStyle} ref={mapRef} theme={theme}/>
 
         {/* Painel de Controle (apenas Desktop) */}
         <div className="absolute top-24 left-4 z-10 hidden md:block w-80 space-y-4">
