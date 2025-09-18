@@ -3,20 +3,79 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Regras para a coleção 'users'
-    // Permite que usuários leiam perfis, mas só atualizem o seu próprio.
-    match /users/{userId} {
-      allow read: if true;
-      allow create, update: if request.auth.uid == userId;
-    }
-
-    // Regras para a coleção 'issues'
-    // Permite que qualquer pessoa leia as ocorrências.
-    // Permite que qualquer usuário LOGADO crie, atualize e delete ocorrências.
-    // Esta é uma regra simplificada para resolver o problema de permissão.
+    // Regras para a coleção 'issues' (ocorrências)
     match /issues/{issueId} {
+
+      // Leitura: Qualquer pessoa, autenticada ou não, pode ler as ocorrências.
+      // Isso é necessário para que o mapa e as listas sejam públicos.
       allow read: if true;
-      allow create, update, delete: if request.auth != null;
+
+      // Criação: Um usuário deve estar autenticado para criar uma ocorrência.
+      allow create: if request.auth != null
+                    // Valida se os dados enviados correspondem ao esperado para uma nova ocorrência.
+                    && request.resource.data.reporterId == request.auth.uid
+                    && request.resource.data.title is string
+                    && request.resource.data.title.size() > 0
+                    && request.resource.data.description is string
+                    && request.resource.data.description.size() > 0
+                    && request.resource.data.address is string
+                    && request.resource.data.address.size() > 0
+                    && request.resource.data.category is string
+                    && request.resource.data.status == 'Recebido'
+                    && request.resource.data.upvotes == 0
+                    && request.resource.data.comments is list
+                    && request.resource.data.comments.size() == 0
+                    && request.resource.data.location is latlng;
+
+      // Atualização: Permissões mais granulares para diferentes tipos de atualização.
+      allow update: if request.auth != null
+                     // Cenário 1: Usuário comum apoiando (upvoting).
+                     && (
+                       // Permite apenas incrementar 'upvotes' em 1. Nenhum outro campo pode ser alterado.
+                       request.resource.data.upvotes == resource.data.upvotes + 1
+                       && request.resource.data.keys().diff(resource.data.keys()).hasOnly(['upvotes'])
+                     )
+                     // Cenário 2: Usuário comum adicionando um comentário.
+                     || (
+                       // Permite apenas adicionar um novo comentário ao array.
+                       request.resource.data.comments.size() == resource.data.comments.size() + 1
+                       && request.resource.data.keys().diff(resource.data.keys()).hasOnly(['comments'])
+                       // Valida o conteúdo do novo comentário.
+                       && request.resource.data.comments[-1].authorId == request.auth.uid
+                       && request.resource.data.comments[-1].content is string
+                     )
+                     // Cenário 3: Administrador mudando o status da ocorrência.
+                     || (
+                       // Verifica se o usuário tem a claim 'admin'
+                       get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+                       && (
+                         // Admin pode mudar o status.
+                         request.resource.data.keys().diff(resource.data.keys()).hasAny(['status'])
+                         // Admin pode remover comentários.
+                         || request.resource.data.keys().diff(resource.data.keys()).hasAny(['comments'])
+                       )
+                     );
+
+      // Exclusão: Apenas administradores podem excluir uma ocorrência.
+      allow delete: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+    
+    // Regras para a coleção 'users' (perfis de usuário)
+    match /users/{userId} {
+      // Leitura: Qualquer pessoa pode ler os perfis (para o ranking da comunidade).
+      allow read: if true;
+      
+      // Criação: Um usuário só pode criar seu próprio perfil.
+      allow create: if request.auth != null
+                     && request.auth.uid == userId
+                     && request.resource.data.role == 'user' // Não pode se auto-promover admin.
+                     && request.resource.data.issuesReported == 0;
+                     
+      // Atualização: Um usuário só pode atualizar seu próprio perfil, e campos limitados.
+      allow update: if request.auth != null
+                     && request.auth.uid == userId
+                     // Proíbe que o usuário altere seu papel (role) ou sua contagem de reports.
+                     && !request.resource.data.keys().hasAny(['role', 'issuesReported']);
     }
   }
 }
