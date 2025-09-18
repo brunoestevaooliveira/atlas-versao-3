@@ -30,7 +30,6 @@ export default function MapPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showIssues, setShowIssues] = useState(true);
   const [isDesktopPanelOpen, setIsDesktopPanelOpen] = useState(true);
-  const [isHintVisible, setIsHintVisible] = useState(true);
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
@@ -49,26 +48,6 @@ export default function MapPage() {
   useEffect(() => {
     const unsubscribe = listenToIssues(setIssues);
     return () => unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    // Hide hint after a longer period
-    const initialTimeout = setTimeout(() => {
-      setIsHintVisible(false);
-    }, 8000); // Increased from 5000ms
-
-    // After that, start a pulse cycle
-    const pulseInterval = setInterval(() => {
-      setIsHintVisible(true); // Show
-      setTimeout(() => {
-        setIsHintVisible(false); // Hide after a longer duration
-      }, 4000); // Increased from 2000ms
-    }, 15000); // Pulse every 15 seconds
-
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(pulseInterval);
-    };
   }, []);
 
   useEffect(() => {
@@ -270,13 +249,7 @@ export default function MapPage() {
           </Card>
         </div>
 
-        <div
-          className={cn(
-            'absolute bottom-14 left-1/2 -translate-x-1/2 md:left-4 md:translate-x-0 z-10 w-full max-w-sm md:max-w-none md:w-auto px-4 md:px-0',
-            'transition-opacity duration-500 ease-in-out',
-            isHintVisible ? 'opacity-100' : 'opacity-0'
-          )}
-        >
+        <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-10 w-full max-w-sm md:max-w-md px-4">
           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
             <CardContent className="p-3">
               <div className="flex items-center gap-3">
@@ -359,4 +332,5 @@ export default function MapPage() {
     
 
     
+
 
