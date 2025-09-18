@@ -167,20 +167,14 @@ export default function MapPage() {
     setTimeout(() => {
         const map = mapRef.current?.getMap();
         if (map) {
-            // This is a bit of a hack to get the map to show the report popup
-            // It relies on internal methods of mapbox which is not ideal
-            // but is the simplest way to integrate with the existing `handleMapClick`
-            const mockEvent: MapLayerMouseEvent = {
+            const mockEvent = {
                 lngLat: { lng: longitude, lat: latitude },
                 point: map.project([longitude, latitude]),
-                features: [],
-                target: map,
-                originalEvent: new MouseEvent('click') as any,
-            };
-            // Directly calling the map's click handler, if it's exposed or accessible
+            } as MapLayerMouseEvent;
+            
              if (mapRef.current) {
-                // @ts-ignore - We are calling the internal click handler
-                mapRef.current.getMap().fire('click', mockEvent);
+                // @ts-ignore - map.fire is a valid method
+                map.fire('click', mockEvent);
             }
         }
     }, 1000); // 1-second delay
@@ -345,15 +339,15 @@ export default function MapPage() {
         <div ref={searchBoxRef} className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20 w-full max-w-sm md:max-w-md px-4">
            <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl overflow-visible">
               <CardContent className="p-2 relative">
-                <div className="flex items-center gap-2">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                <div className="relative flex items-center gap-2">
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground z-10 pointer-events-none" />
                   <Input
                     placeholder="Buscar por CEP ou endereço para reportar..."
                     className="bg-background/80 focus:border-primary border-0 h-10 pl-10"
                     value={addressSearch}
                     onChange={(e) => setAddressSearch(e.target.value)}
                   />
-                  {isGeocoding && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 animate-spin" />}
+                  {isGeocoding && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin" />}
                 </div>
                 {geocodeResults.length > 0 && (
                   <div className="absolute bottom-full left-0 w-full mb-2 bg-background/80 backdrop-blur-xl border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto">

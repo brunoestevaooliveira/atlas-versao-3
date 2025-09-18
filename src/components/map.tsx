@@ -49,7 +49,7 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center }, ref) => {
 
   const handleMapClick = async (e: MapLayerMouseEvent) => {
     // Prevent click when clicking on an existing marker
-    if (e.originalEvent.target.closest('.mapboxgl-marker')) return;
+    if (e.originalEvent?.target && (e.originalEvent.target as HTMLElement).closest('.mapboxgl-marker')) return;
     
     const { lng, lat } = e.lngLat;
     
