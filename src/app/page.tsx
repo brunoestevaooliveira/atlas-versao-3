@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink, Globe, Map as MapIcon } from 'lucide-react';
+import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink, Globe, Map as MapIcon, Square, Cuboid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -21,6 +21,8 @@ import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import Link from 'next/link';
 import { MapRef } from 'react-map-gl';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Separator } from '@/components/ui/separator';
 
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
@@ -137,6 +139,14 @@ export default function MapPage() {
         : [...prev, category]
     );
   };
+  
+  const set3DView = () => {
+    mapRef.current?.flyTo({ pitch: 60, bearing: -20, duration: 1500 });
+  };
+  
+  const set2DView = () => {
+    mapRef.current?.flyTo({ pitch: 0, bearing: 0, duration: 1500 });
+  };
 
   const RecentIssuesPanelContent = () => (
       <div className="space-y-4">
@@ -218,40 +228,69 @@ export default function MapPage() {
                     <Label htmlFor="layers-switch">Mostrar Ocorrências</Label>
                 </div>
                 <div className="flex items-center">
-                    <Button variant="ghost" size="icon" onClick={() => setMapStyle(style => style === 'streets' ? 'satellite' : 'streets')}>
-                        {mapStyle === 'streets' ? <Globe className="h-5 w-5 text-primary"/> : <MapIcon className="h-5 w-5 text-primary"/>}
-                        <span className="sr-only">Mudar estilo do mapa</span>
-                    </Button>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button variant="ghost" size="icon">
-                            <Layers className="h-5 w-5 text-primary"/>
-                            <span className="sr-only">Filtrar Camadas</span>
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-64">
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2">
-                                <Filter className="h-4 w-4"/>
-                                <h4 className="font-medium text-sm">Filtrar por Categoria</h4>
-                            </div>
-                            <div className="space-y-2">
-                            {allCategories.map(category => (
-                                <div key={category} className="flex items-center space-x-2">
-                                    <Checkbox
-                                        id={category}
-                                        checked={selectedCategories.includes(category)}
-                                        onCheckedChange={() => handleCategoryChange(category)}
-                                    />
-                                    <Label htmlFor={category} className="text-sm font-normal">
-                                        {category}
-                                    </Label>
-                                </div>
-                            ))}
-                            </div>
-                        </div>
-                      </PopoverContent>
-                    </Popover>
+                    <TooltipProvider>
+                       <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" onClick={() => setMapStyle(style => style === 'streets' ? 'satellite' : 'streets')}>
+                              {mapStyle === 'streets' ? <Globe className="h-5 w-5 text-primary"/> : <MapIcon className="h-5 w-5 text-primary"/>}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                           <p>Mudar para vista {mapStyle === 'streets' ? 'Satélite' : 'Ruas'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button variant="ghost" size="icon">
+                              <Layers className="h-5 w-5 text-primary"/>
+                              <span className="sr-only">Filtrar Camadas</span>
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-64">
+                          <div className="space-y-4">
+                              <div className="flex items-center gap-2">
+                                  <Filter className="h-4 w-4"/>
+                                  <h4 className="font-medium text-sm">Filtrar por Categoria</h4>
+                              </div>
+                              <div className="space-y-2">
+                              {allCategories.map(category => (
+                                  <div key={category} className="flex items-center space-x-2">
+                                      <Checkbox
+                                          id={category}
+                                          checked={selectedCategories.includes(category)}
+                                          onCheckedChange={() => handleCategoryChange(category)}
+                                      />
+                                      <Label htmlFor={category} className="text-sm font-normal">
+                                          {category}
+                                      </Label>
+                                  </div>
+                              ))}
+                              </div>
+                          </div>
+                        </PopoverContent>
+                      </Popover>
+                      <Separator orientation="vertical" className="h-6 mx-1" />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" onClick={set2DView}>
+                              <Square className="h-5 w-5 text-primary"/>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Visão de Cima (2D)</p>
+                        </TooltipContent>
+                      </Tooltip>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button variant="ghost" size="icon" onClick={set3DView}>
+                              <Cuboid className="h-5 w-5 text-primary"/>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Visão 3D</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                 </div>
               </div>
             </CardContent>
@@ -327,5 +366,3 @@ export default function MapPage() {
     </div>
   );
 }
-
-    
