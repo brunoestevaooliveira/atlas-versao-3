@@ -75,11 +75,11 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
           <CardDescription className="text-sm !mt-1 text-primary font-semibold">{issue.category}</CardDescription>
         </CardHeader>
         <CardContent className="flex-grow space-y-4">
-            <p className="text-sm text-slate-400 leading-relaxed line-clamp-3">
+            <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
               {issue.description}
             </p>
             {issue.address && (
-              <div className="flex items-center justify-between gap-2 text-xs text-slate-400 pt-2">
+              <div className="flex items-center justify-between gap-2 text-xs pt-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <MapPin className="h-4 w-4 flex-shrink-0 text-primary"/>
                   <span className="text-muted-foreground truncate">{issue.address}</span>
@@ -120,7 +120,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
            </div>
            <Separator className="bg-border/50"/>
            {/* Rodapé com informações do relator e data */}
-           <div className="text-xs text-slate-500 flex justify-between p-3 bg-background/50 rounded-b-lg">
+           <div className="text-xs text-muted-foreground flex justify-between p-3 bg-background/50 rounded-b-lg">
                 <div className="flex items-center gap-1.5">
                     <User className="h-3 w-3" />
                     <span>{issue.reporter}</span>
