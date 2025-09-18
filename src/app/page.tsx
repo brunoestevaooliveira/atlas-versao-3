@@ -336,7 +336,7 @@ export default function MapPage() {
           </Card>
         </div>
         
-        <div ref={searchBoxRef} className="absolute bottom-32 left-1/2 -translate-x-1/2 z-20 w-full max-w-sm md:max-w-md px-4">
+        <div ref={searchBoxRef} className="absolute bottom-40 left-1/2 -translate-x-1/2 z-20 w-full max-w-sm md:max-w-md px-4">
            <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl overflow-visible">
               <CardContent className="p-2 relative">
                 <div className="relative flex items-center gap-2">
