@@ -34,6 +34,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import LazyLoad from '@/components/lazy-load';
 import IssueCard from '@/components/issue-card';
 import { useDebounce } from 'use-debounce';
+import { useTheme } from 'next-themes';
 
 // Chave usada para armazenar no localStorage os IDs das ocorrências que o usuário já apoiou.
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
@@ -72,6 +73,7 @@ export default function MapPage() {
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
+  const { theme } = useTheme();
 
 
   // --- MEMOS (useMemo) ---
@@ -235,7 +237,7 @@ export default function MapPage() {
     <div className="h-screen w-screen flex flex-col pt-0 overflow-hidden">
       <div className="relative flex-grow">
         {/* O mapa interativo ocupa todo o espaço disponível. */}
-        <InteractiveMap issues={showIssues ? filteredIssues : []} mapStyle={mapStyle} ref={mapRef}/>
+        <InteractiveMap issues={showIssues ? filteredIssues : []} mapStyle={mapStyle} ref={ref} theme={theme}/>
 
         {/* Painel de Controle (apenas Desktop) */}
         <div className="absolute top-24 left-4 z-10 hidden md:block w-80 space-y-4">

@@ -18,6 +18,8 @@ interface InteractiveMapProps {
   issues: Issue[];
   /** O estilo visual do mapa (ruas ou satélite). */
   mapStyle: 'streets' | 'satellite';
+  /** O tema atual da aplicação (claro ou escuro). */
+  theme?: string;
 }
 
 /**
@@ -26,14 +28,14 @@ interface InteractiveMapProps {
  * @param {InteractiveMapProps} props As propriedades do componente.
  * @param {React.Ref<MapRef>} ref A referência para o objeto do mapa, permitindo controle externo da câmera.
  */
-const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(({ issues, mapStyle }, ref) => {
+const InteractiveMap = forwardRef<MapRef, InteractiveMapProps>(({ issues, mapStyle, theme }, ref) => {
   // Coordenadas centrais padrão para o mapa (Santa Maria-DF).
   const center = { lat: -16.0036, lng: -47.9872 };
 
   return (
     <div className="absolute inset-0 z-0">
       {/* Repassa as propriedades e a referência para o componente de mapa real. */}
-      <Map issues={issues} center={center} mapStyle={mapStyle} ref={ref} />
+      <Map issues={issues} center={center} mapStyle={mapStyle} ref={ref} theme={theme} />
     </div>
   );
 });

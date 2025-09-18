@@ -36,6 +36,8 @@ interface MapComponentProps {
   center: { lat: number; lng: number };
    /** O estilo visual do mapa (ruas ou satélite). */
   mapStyle: 'streets' | 'satellite';
+  /** O tema atual da aplicação (claro ou escuro). */
+  theme?: string;
 }
 
 const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
@@ -43,7 +45,7 @@ const MAPBOX_TOKEN = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 /**
  * Componente do Mapa. Utiliza `forwardRef` para passar a referência do mapa para o componente pai.
  */
-const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, mapStyle }, ref) => {
+const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, mapStyle, theme }, ref) => {
   const router = useRouter();
   const [popupInfo, setPopupInfo] = useState<Issue | null>(null);
   const [newIssueLocation, setNewIssueLocation] = useState<NewIssueLocation | null>(null);
@@ -120,9 +122,15 @@ const MapComponent = forwardRef<MapRef, MapComponentProps>(({ issues, center, ma
   };
 
 
-  const mapStyleUrl = mapStyle === 'satellite' 
-    ? 'mapbox://styles/mapbox/satellite-streets-v12' 
-    : 'mapbox://styles/mapbox/streets-v12';
+  const mapStyleUrl = useMemo(() => {
+    if (mapStyle === 'satellite') {
+      return 'mapbox://styles/mapbox/satellite-streets-v12';
+    }
+    if (theme === 'dark') {
+      return 'mapbox://styles/mapbox/dark-v11';
+    }
+    return 'mapbox://styles/mapbox/streets-v12';
+  }, [mapStyle, theme]);
 
   // Alerta de segurança se o token do Mapbox não estiver configurado.
   if (!MAPBOX_TOKEN) {
