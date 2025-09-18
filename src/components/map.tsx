@@ -3,7 +3,7 @@
 
 import type { Issue } from '@/lib/types';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useState, useMemo, forwardRef, useEffect } from 'react';
+import { useState, useMemo, forwardRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseEvent, MapRef } from 'react-map-gl';
 import { Loader2 } from 'lucide-react';
@@ -21,7 +21,6 @@ interface NewReportInfo {
 interface MapProps {
   issues: Issue[];
   center: { lat: number; lng: number };
-  mapRef?: React.RefObject<MapRef>;
   mapStyle: 'streets' | 'satellite';
 }
 

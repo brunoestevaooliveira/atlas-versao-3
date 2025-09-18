@@ -202,7 +202,7 @@ export default function MapPage() {
   return (
     <div className="h-screen w-screen flex flex-col pt-0 overflow-hidden">
       <div className="relative flex-grow">
-        <InteractiveMap issues={showIssues ? filteredIssues : []} mapStyle={mapStyle} mapRef={mapRef}/>
+        <InteractiveMap issues={showIssues ? filteredIssues : []} mapStyle={mapStyle} ref={mapRef}/>
 
         <div className="absolute top-24 left-4 z-10 hidden md:block w-80 space-y-4">
           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
