@@ -23,6 +23,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import LazyLoad from '@/components/lazy-load';
 
 // Chave do localStorage para os apoios do usuário.
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
@@ -263,30 +264,58 @@ export default function TrackingPage() {
             <TabsContent value="all">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {allTabIssues.length > 0 ? allTabIssues.map((issue) => (
-                  <IssueCard 
-                    key={issue.id} 
-                    issue={issue} 
-                    onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
-                    isUpvoted={upvotedIssues.has(issue.id)}
-                  />
+                  <LazyLoad key={issue.id} placeholderHeight="290px">
+                    <IssueCard 
+                      issue={issue} 
+                      onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
+                      isUpvoted={upvotedIssues.has(issue.id)}
+                    />
+                  </LazyLoad>
                 )) : <EmptyState tabName="Todas" />}
               </div>
             </TabsContent>
             <TabsContent value="received">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {receivedTabIssues.length > 0 ? receivedTabIssues.map((issue) => (
-                  <IssueCard 
-                    key={issue.id} 
-                    issue={issue} 
-                    onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
-                    isUpvoted={upvotedIssues.has(issue.id)}
-                  />
+                  <LazyLoad key={issue.id} placeholderHeight="290px">
+                    <IssueCard 
+                      issue={issue} 
+                      onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
+                      isUpvoted={upvotedIssues.has(issue.id)}
+                    />
+                  </LazyLoad>
                 )) : <EmptyState tabName="Recebidas" />}
               </div>
             </TabsContent>
             <TabsContent value="inProgress">
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {inProgressTabIssues.length > 0 ? inProgressTabIssues.map((issue) => (
-                  <IssueCard 
-                    key={issue.id} 
-                    issue={issue} 
+                  <LazyLoad key={issue.id} placeholderHeight="290px">
+                    <IssueCard 
+                      issue={issue} 
+                      onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
+                      isUpvoted={upvotedIssues.has(issue.id)}
+                    />
+                  </LazyLoad>
+                )) : <EmptyState tabName="Em análise" />}
+              </div>
+            </TabsContent>
+            <TabsContent value="resolved">
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {resolvedTabIssues.length > 0 ? resolvedTabIssues.map((issue) => (
+                  <LazyLoad key={issue.id} placeholderHeight="290px">
+                    <IssueCard 
+                      issue={issue} 
+                      onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
+                      isUpvoted={upvotedIssues.has(issue.id)}
+                    />
+                  </LazyLoad>
+                )) : <EmptyState tabName="Resolvidas" />}
+              </div>
+            </TabsContent>
+          </div>
+        </Tabs>
+      </div>
+    </div>
+  );
+}

@@ -31,6 +31,8 @@ import { MapRef } from 'react-map-gl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
+import LazyLoad from '@/components/lazy-load';
+import IssueCard from '@/components/issue-card';
 
 // Chave usada para armazenar no localStorage os IDs das ocorrências que o usuário já apoiou.
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
@@ -133,32 +135,6 @@ export default function MapPage() {
   // --- FUNÇÕES AUXILIARES ---
 
   /**
-   * Retorna a variante de cor para o Badge de status.
-   * @param status O status atual da ocorrência.
-   * @returns A variante de cor ('info', 'warning', 'success').
-   */
-  const getStatusVariant = (status: 'Recebido' | 'Em análise' | 'Resolvido'): "info" | "warning" | "success" => {
-    switch (status) {
-      case 'Resolvido':
-        return 'success';
-      case 'Em análise':
-        return 'warning';
-      case 'Recebido':
-        return 'info';
-      default:
-        return 'info';
-    }
-  };
-
-  /**
-   * Retorna o texto formatado para o status (ex: 'Em análise' -> 'Análise').
-   * @param status O status da ocorrência.
-   */
-  const getStatusText = (status: Issue['status']) => {
-    return status === 'Em análise' ? 'Análise' : status;
-  };
-
-  /**
    * Manipula a lógica de apoio (upvote) a uma ocorrência.
    * Verifica se o usuário está logado e se já não apoiou a ocorrência.
    * Atualiza o estado local e o localStorage, e então envia a atualização para o Firestore.
@@ -236,49 +212,15 @@ export default function MapPage() {
    */
   const RecentIssuesPanelContent = () => (
       <div className="space-y-4">
-        {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => {
-          const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${issue.location.lat},${issue.location.lng}`;
-          return (
-            <div key={issue.id} className="p-4 rounded-lg border border-border/50 space-y-3 bg-background/50 hover:border-primary/50 transition-colors shadow-sm">
-              <div className="flex justify-between items-start">
-                <div className="space-y-1">
-                  <h4 className="font-bold text-lg text-foreground">{issue.title}</h4>
-                  <p className="text-sm text-primary font-semibold">{issue.category}</p>
-                </div>
-                <Badge variant={getStatusVariant(issue.status)}>{getStatusText(issue.status)}</Badge>
-              </div>
-              
-              {issue.address && (
-                <div className="flex items-center justify-between gap-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <MapPin className="h-4 w-4 flex-shrink-0 text-primary"/>
-                      <span className="text-slate-400 truncate">{issue.address}</span>
-                    </div>
-                    <Button asChild variant="outline" size="sm" className="h-8 flex-shrink-0">
-                       <Link href={googleMapsUrl} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-4 w-4 mr-2" />
-                        Ver no Google Maps
-                       </Link>
-                    </Button>
-                </div>
-              )}
-
-              <Button
-                size="sm"
-                variant="ghost"
-                className={cn(
-                    "w-full bg-transparent hover:bg-white/10 dark:hover:bg-black/10 border border-border/20 text-foreground",
-                    upvotedIssues.has(issue.id) && "opacity-50 cursor-not-allowed"
-                )}
-                onClick={() => handleUpvote(issue.id, issue.upvotes)}
-                disabled={upvotedIssues.has(issue.id)}
-              >
-                <ThumbsUp className="mr-2 h-4 w-4" />
-                Apoiar ({issue.upvotes})
-              </Button>
-            </div>
-          );
-        }) : (
+        {filteredIssues.length > 0 ? filteredIssues.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime()).map((issue) => (
+            <LazyLoad key={issue.id} placeholderHeight="290px">
+              <IssueCard
+                  issue={issue}
+                  onUpvote={() => handleUpvote(issue.id, issue.upvotes)}
+                  isUpvoted={upvotedIssues.has(issue.id)}
+              />
+            </LazyLoad>
+          )) : (
           <p className="text-sm text-center text-muted-foreground py-8">Nenhuma ocorrência encontrada.</p>
         )}
       </div>
