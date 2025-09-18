@@ -2,13 +2,14 @@
  * @file src/app/page.tsx
  * @fileoverview Componente principal da página do mapa interativo.
  * Este componente renderiza o mapa, os controles de busca e filtro,
- * e o painel de ocorrências recentes.
+ * e o painel de ocorrências recentes. A importação do mapa é feita
+ * dinamicamente para garantir que ele só seja renderizado no lado do cliente.
  */
 
 'use client';
 
 import { useState, useMemo, useEffect, useRef } from 'react';
-import InteractiveMap from '@/components/interactive-map';
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink, Globe, Map as MapIcon, Square, Cuboid } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -29,10 +30,17 @@ import Link from 'next/link';
 import { MapRef } from 'react-map-gl';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Separator } from '@/components/ui/separator';
-
+import { Skeleton } from '@/components/ui/skeleton';
 
 // Chave usada para armazenar no localStorage os IDs das ocorrências que o usuário já apoiou.
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
+
+// Importação dinâmica do mapa para desativar a renderização no lado do servidor (SSR).
+const InteractiveMap = dynamic(() => import('@/components/interactive-map'), {
+  ssr: false,
+  loading: () => <Skeleton className="h-full w-full" />,
+});
+
 
 /**
  * Componente da página principal que exibe o mapa interativo e a lista de ocorrências.
@@ -74,7 +82,9 @@ export default function MapPage() {
   
   // Efeito que inicializa as categorias selecionadas com todas as categorias disponíveis quando o app carrega.
   useEffect(() => {
-    setSelectedCategories(allCategories);
+    if (allCategories.length > 0) {
+      setSelectedCategories(allCategories);
+    }
   }, [allCategories]);
 
 
