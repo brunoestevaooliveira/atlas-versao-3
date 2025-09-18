@@ -34,12 +34,12 @@ const prompt = ai.definePrompt({
   name: 'geocodeAddressPrompt',
   input: { schema: GeocodeAddressInputSchema },
   output: { schema: OptimizedQueryOutputSchema },
-  prompt: `You are an expert in Brazilian addresses and geocoding. Your task is to parse the user's query and convert it into a structured format optimized for the Nominatim (OpenStreetMap) API.
+  prompt: `You are an expert in Brazilian addresses and geocoding. Your main task is to parse the user's query and extract the CEP (postal code) if available. If not, identify other address components.
 
 User query: {{{query}}}
 
-- If the query contains a CEP (postal code), extract it.
-- Identify street names, city, and state.
+- Your primary goal is to identify and extract the CEP (postal code).
+- If no CEP is found, then identify street names, city, and state.
 - The target area is primarily Santa Maria, DF, Brasil. Use this as a default when information is missing.
 - Structure the output as a JSON object.`,
 });
@@ -72,7 +72,7 @@ const geocodeAddressFlow = ai.defineFlow(
 
 
     // 3. Call the Nominatim API
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nominatimQuery)}&viewbox=-48.05,-16.05,-47.95,-15.95&bounded=1`);
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nominatimQuery)}&countrycodes=br`);
     
     if (!response.ok) {
         throw new Error(`Nominatim API failed with status ${response.status}`);
