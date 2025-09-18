@@ -4,7 +4,7 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import InteractiveMap from '@/components/interactive-map';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink } from 'lucide-react';
+import { Layers, Search, ThumbsUp, MapPin, Filter, List, PanelRightOpen, PanelRightClose, ExternalLink, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import Link from 'next/link';
+import { MapRef, MapLayerMouseEvent } from 'react-map-gl';
 
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
@@ -33,6 +34,10 @@ export default function MapPage() {
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
+  const mapRef = useRef<MapRef>(null);
+
+  const [addressSearch, setAddressSearch] = useState('');
+  const [isGeocoding, setIsGeocoding] = useState(false);
 
 
   const allCategories = useMemo(() => {
@@ -134,6 +139,63 @@ export default function MapPage() {
         : [...prev, category]
     );
   };
+  
+  const handleGeocodeSearch = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!addressSearch.trim()) return;
+
+    setIsGeocoding(true);
+    try {
+        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(addressSearch)}, Santa Maria, Federal District, Brazil&limit=1`);
+        const data = await response.json();
+        
+        if (data && data.length > 0) {
+            const { lat, lon } = data[0];
+            const lng = parseFloat(lon);
+            const latitude = parseFloat(lat);
+            
+            mapRef.current?.flyTo({ center: [lng, latitude], zoom: 16 });
+
+            // Simulate a map click to trigger the pin and popup
+            // This requires the map component to expose a way to do this
+            // For now, we'll just fly there. The user can then click to confirm.
+            const map = mapRef.current?.getMap();
+            if (map) {
+                // This simulates the event object that handleMapClick expects.
+                const mockEvent: MapLayerMouseEvent = {
+                    lngLat: { lng, lat: latitude },
+                    point: map.project([lng, latitude]),
+                    features: [],
+                    target: map,
+                    originalEvent: new MouseEvent('click') as any, // Cast to avoid full type definition
+                };
+                // We'd call the map's internal click handler here if it was exposed
+                // Since it's not, we'll have to guide the user to click.
+                 toast({
+                    title: "Localização Encontrada!",
+                    description: "O mapa foi centralizado no endereço. Clique no local exato para criar sua ocorrência.",
+                });
+            }
+
+        } else {
+            toast({
+                variant: 'destructive',
+                title: 'Endereço não encontrado',
+                description: 'Não foi possível encontrar o endereço ou CEP informado. Tente novamente.',
+            });
+        }
+    } catch (error) {
+        console.error("Geocoding error:", error);
+        toast({
+            variant: 'destructive',
+            title: 'Erro ao Buscar Endereço',
+            description: 'Ocorreu um problema ao se comunicar com o serviço de mapas.',
+        });
+    } finally {
+        setIsGeocoding(false);
+    }
+  };
+
 
   const RecentIssuesPanelContent = () => (
       <div className="space-y-4">
@@ -189,7 +251,7 @@ export default function MapPage() {
   return (
     <div className="h-screen w-screen flex flex-col pt-0 overflow-hidden">
       <div className="relative flex-grow">
-        <InteractiveMap issues={showIssues ? filteredIssues : []} />
+        <InteractiveMap issues={showIssues ? filteredIssues : []} mapRef={mapRef}/>
 
         <div className="absolute top-24 left-4 z-10 hidden md:block w-80 space-y-4">
           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
@@ -197,7 +259,7 @@ export default function MapPage() {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar ocorrência ou endereço..."
+                  placeholder="Buscar ocorrência..."
                   className="pl-10 bg-background/80 focus:border-primary"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -248,6 +310,26 @@ export default function MapPage() {
             </CardContent>
           </Card>
         </div>
+        
+        <div className="absolute bottom-32 left-1/2 -translate-x-1/2 z-10 w-full max-w-sm md:max-w-md px-4">
+           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
+              <CardContent className="p-3">
+                <form onSubmit={handleGeocodeSearch} className="flex items-center gap-2">
+                    <Input
+                      placeholder="Buscar por CEP ou endereço..."
+                      className="bg-background/80 focus:border-primary border-0 h-9"
+                      value={addressSearch}
+                      onChange={(e) => setAddressSearch(e.target.value)}
+                    />
+                    <Button type="submit" size="icon" className="h-9 w-10 flex-shrink-0" disabled={isGeocoding}>
+                      {isGeocoding ? <Loader2 className="animate-spin" /> : <Search className="h-4 w-4" />}
+                      <span className="sr-only">Buscar endereço</span>
+                    </Button>
+                </form>
+              </CardContent>
+           </Card>
+        </div>
+
 
         <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-10 w-full max-w-sm md:max-w-md px-4">
           <Card className="rounded-lg border border-white/20 bg-white/30 dark:bg-black/30 shadow-lg backdrop-blur-xl">
@@ -318,5 +400,7 @@ export default function MapPage() {
     </div>
   );
 }
+
+    
 
     
