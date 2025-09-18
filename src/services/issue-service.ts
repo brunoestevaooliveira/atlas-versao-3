@@ -23,6 +23,7 @@ import {
   getDocs,
   arrayUnion,
   getDoc,
+  increment,
 } from 'firebase/firestore';
 import type { Issue, IssueData, CommentData, AppUser, Comment } from '@/lib/types';
 import { v4 as uuidv4 } from 'uuid';
@@ -114,6 +115,13 @@ export async function addIssueClient(issue: NewIssue) {
   };
 
   const docRef = await addDoc(ref, payload);
+
+  // Incrementa o contador de ocorrências do usuário.
+  const userRef = doc(db, "users", issue.reporterId);
+  await updateDoc(userRef, {
+    issuesReported: increment(1)
+  });
+
   return docRef.id;
 }
 

@@ -85,6 +85,7 @@ export type AppUser = {
     photoURL?: string | null;
     createdAt: Date;
     role: 'user' | 'admin';
+    issuesReported: number;
 };
 
 /**
@@ -98,6 +99,7 @@ export type AppUserData = {
     photoURL?: string | null;
     createdAt: Timestamp;
     role: 'user' | 'admin';
+    issuesReported: number;
 }
 
 /**

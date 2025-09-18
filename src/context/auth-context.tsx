@@ -76,6 +76,7 @@ const fetchAppUser = async (uid: string, isAdminFromToken: boolean): Promise<App
             role: finalRole,
             // Converte o Timestamp do Firestore para um objeto Date.
             createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+            issuesReported: data.issuesReported || 0, // Garante que o campo exista
         };
     }
     return null;
@@ -156,6 +157,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             ...data,
             role: isAdmin ? 'admin' : data.role,
             createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
+            issuesReported: data.issuesReported || 0,
         };
         setAppUser(existingAppUser);
         return;
@@ -171,6 +173,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         photoURL: user.photoURL,
         role: 'user', // Papel padrão para novos usuários.
         createdAt: serverTimestamp() as Timestamp,
+        issuesReported: 0, // Inicia a contagem de ocorrências
     };
     
     await setDoc(userRef, newUserDocData);
@@ -183,6 +186,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         photoURL: newUserDocData.photoURL,
         role: newUserDocData.role,
         createdAt: new Date(), // Valor aproximado, o valor real está no servidor.
+        issuesReported: newUserDocData.issuesReported,
     };
     setAppUser(newAppUser);
   }

@@ -9,7 +9,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut, Menu, Sun, Moon } from 'lucide-react';
+import { Compass, FilePlus, BarChart, Search, LineChart, Shield, LogOut, Menu, Sun, Moon, Users } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
@@ -33,6 +33,7 @@ const baseNavLinks = [
   { href: '/', label: 'Mapa' },
   { href: '/report', label: 'Reportar' },
   { href: '/tracking', label: 'Acompanhar' },
+  { href: '/community', label: 'Comunidade' },
 ];
 
 /**
