@@ -27,17 +27,30 @@ interface MapProps {
 
 const formatAddress = (addressData: any): string => {
     if (!addressData) return 'Endereço não encontrado';
-    const { road, suburb, city_district, city, postcode, house_number } = addressData;
-    let address = '';
-    if (road) address += road;
-    if (house_number) address += `, ${house_number}`;
-    if (suburb && suburb !== road) address += `, ${suburb}`;
-    if (city_district && city_district !== suburb) address += `, ${city_district}`;
-    if (city) address += ` - ${city}`;
-    if (postcode) address += `, CEP: ${postcode}`;
 
-    return address || 'Endereço não pode ser determinado';
+    const { road, neighbourhood, suburb, city, state, postcode } = addressData;
+    
+    // Prioriza o nome da rua/quadra (road) que é o mais específico
+    let mainAddress = road;
+    
+    // Se não tiver 'road', tenta 'neighbourhood' ou 'suburb'
+    if (!mainAddress) {
+        mainAddress = neighbourhood || suburb;
+    }
+
+    // Se encontrou alguma informação de rua/bairro, adiciona a cidade
+    if (mainAddress) {
+        return `${mainAddress} - ${city}, ${state}`;
+    }
+
+    // Se não encontrou nem rua nem bairro, retorna cidade e CEP como último recurso
+    if (city && postcode) {
+         return `${city}, CEP: ${postcode}`;
+    }
+
+    return 'Endereço não pode ser determinado';
 }
+
 
 const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle }, ref) => {
   const router = useRouter();
@@ -48,9 +61,10 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
   const [newReportInfo, setNewReportInfo] = useState<NewReportInfo | null>(null);
 
   const getMapStyle = () => {
-    if (theme === 'dark') return "mapbox://styles/mapbox/dark-v11";
-    if (mapStyle === 'satellite') return "mapbox://styles/mapbox/satellite-v9";
-    return "mapbox://styles/mapbox/streets-v12";
+    if (mapStyle === 'satellite') {
+      return theme === 'dark' ? "mapbox://styles/mapbox/satellite-streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12";
+    }
+    return theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v12";
   }
 
 
@@ -67,7 +81,7 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center, mapStyle },
     setNewReportInfo({ lat, lng, address: '', isLoading: true });
 
     try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=pt-BR`);
         const data = await response.json();
         const address = formatAddress(data.address) || 'Endereço não encontrado';
         setNewReportInfo({ lat, lng, address, isLoading: false });
