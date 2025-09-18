@@ -25,11 +25,13 @@ const geocodeAddressFlow = ai.defineFlow(
   },
   async (input) => {
     
-    // Simplification: Pass the user query directly to Nominatim,
-    // but force the search to be within Brazil for better accuracy.
     const nominatimQuery = input.query;
+    
+    // Viewbox for Santa Maria, DF, Brazil to prioritize local results.
+    // Coordinates: [lng_min, lat_min, lng_max, lat_max]
+    const viewbox = '-48.05,-16.05,-47.95,-15.95';
 
-    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nominatimQuery)}&countrycodes=br`);
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nominatimQuery)}&countrycodes=br&viewbox=${viewbox}&bounded=1`);
     
     if (!response.ok) {
         throw new Error(`Nominatim API failed with status ${response.status}`);
@@ -37,6 +39,15 @@ const geocodeAddressFlow = ai.defineFlow(
 
     const data: GeocodeResult[] = await response.json();
     
+    // If bounded search returns no results, try a broader search within Brazil.
+    if (data.length === 0) {
+      const broaderResponse = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nominatimQuery)}&countrycodes=br`);
+      if (broaderResponse.ok) {
+        const broaderData: GeocodeResult[] = await broaderResponse.json();
+        return broaderData;
+      }
+    }
+
     return data;
   }
 );
