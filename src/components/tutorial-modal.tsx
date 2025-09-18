@@ -110,7 +110,7 @@ export default function TutorialModal({ isOpen, onOpenChange }: TutorialModalPro
           <CarouselContent>
             {tutorialSteps.map((step, index) => (
               <CarouselItem key={index}>
-                <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 space-y-4 h-[450px] md:h-[480px]">
+                <div className="flex flex-col items-center justify-center text-center p-6 md:p-8 space-y-4">
                   <div className="mb-2">{step.icon}</div>
                   <h3 className="text-xl md:text-2xl font-bold font-headline text-foreground">{step.title}</h3>
                   <div className="relative w-full aspect-video rounded-lg overflow-hidden my-2 border border-border/20">
