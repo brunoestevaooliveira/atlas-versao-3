@@ -317,20 +317,6 @@ export default function MapPage() {
       </div>
     </div>
   );
+}
 
     
-
-
-
-    
-
-
-    
-
-    
-
-    
-
-    
-
-

@@ -3,9 +3,9 @@
 
 import type { Issue } from '@/lib/types';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, forwardRef } from 'react';
 import { useRouter } from 'next/navigation';
-import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseEvent } from 'react-map-gl';
+import Map, { Marker, Popup, NavigationControl, GeolocateControl, MapLayerMouseEvent, MapRef } from 'react-map-gl';
 import { Loader2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { MapPin } from 'lucide-react';
@@ -21,17 +21,24 @@ interface NewReportInfo {
 interface MapProps {
   issues: Issue[];
   center: { lat: number; lng: number };
+  mapRef?: React.RefObject<MapRef>;
 }
 
 const formatAddress = (addressData: any): string => {
     if (!addressData) return 'Endereço não encontrado';
-    const { road, suburb, city_district, city, postcode } = addressData;
-    const parts = [road, suburb, city_district, city].filter(Boolean); // Filtra partes nulas ou vazias
-    const address = parts.join(', ');
-    return postcode ? `${address} - CEP: ${postcode}` : address;
+    const { road, suburb, city_district, city, postcode, house_number } = addressData;
+    let address = '';
+    if (road) address += road;
+    if (house_number) address += `, ${house_number}`;
+    if (suburb && suburb !== road) address += `, ${suburb}`;
+    if (city_district && city_district !== suburb) address += `, ${city_district}`;
+    if (city) address += ` - ${city}`;
+    if (postcode) address += `, CEP: ${postcode}`;
+
+    return address || 'Endereço não pode ser determinado';
 }
 
-const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
+const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center }, ref) => {
   const router = useRouter();
   const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_ACCESS_TOKEN;
   const { theme } = useTheme();
@@ -90,15 +97,17 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
   return (
     <>
       <Map
+        ref={ref}
         mapboxAccessToken={mapboxToken}
         initialViewState={{
           longitude: center.lng,
           latitude: center.lat,
           zoom: 13,
-          pitch: 45 // Initial 3D tilt
+          pitch: 0
         }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle={theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v11"}
+        mapStyle={theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/light-v11"}
+        key={theme}
         onClick={handleMapClick}
         interactiveLayerIds={['clusters']}
       >
@@ -169,6 +178,10 @@ const MapComponent: React.FC<MapProps> = ({ issues, center }) => {
       </Map>
     </>
   );
-};
+});
+
+MapComponent.displayName = 'MapComponent';
 
 export default MapComponent;
+
+    
