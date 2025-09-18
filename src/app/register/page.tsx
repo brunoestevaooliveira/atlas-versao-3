@@ -1,4 +1,9 @@
-
+/**
+ * @file src/app/register/page.tsx
+ * @fileoverview Componente da página de registro de novos usuários.
+ * Este arquivo renderiza o formulário para criação de uma nova conta
+ * com nome, email e senha. Também oferece a opção de registro via Google.
+ */
 
 'use client';
 
@@ -13,6 +18,9 @@ import { useToast } from '@/hooks/use-toast';
 import { UserPlus, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
+/**
+ * Componente do ícone do Google para o botão de registro social.
+ */
 const GoogleIcon = () => (
     <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48">
         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
@@ -22,26 +30,39 @@ const GoogleIcon = () => (
     </svg>
 );
 
-
+/**
+ * Componente principal da página de Registro.
+ */
 export default function RegisterPage() {
+  // Estados para controlar os campos do formulário.
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // Obtém as funções de autenticação do contexto.
   const { register, loginWithGoogle } = useAuth();
+  // Estados para controlar o loading dos botões.
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  // Hook para exibir notificações.
   const { toast } = useToast();
 
+  /**
+   * Manipula a submissão do formulário de registro.
+   * @param {React.FormEvent} e O evento do formulário.
+   */
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Chama a função de registro do contexto.
       await register(email, password, name);
       toast({
         title: 'Cadastro bem-sucedido!',
         description: 'Você já pode acessar a plataforma.',
       });
+       // O redirecionamento para a página principal é feito automaticamente pelo AuthProvider.
     } catch (error: any) {
+      // Exibe uma notificação de erro em caso de falha.
       toast({
         variant: 'destructive',
         title: 'Falha no Cadastro',
@@ -51,21 +72,21 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
-
+  
+  /**
+   * Manipula o clique no botão de registro/login com Google.
+   */
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
+        // Chama a função de login com Google do contexto.
         await loginWithGoogle();
         toast({
             title: 'Login com Google bem-sucedido!',
             description: 'Bem-vindo(a).',
         });
     } catch (error: any) {
-        toast({
-            variant: 'destructive',
-            title: 'Falha no Login com Google',
-            description: error.message || 'Não foi possível autenticar com o Google.',
-        });
+       // O AuthContext já trata e exibe os toasts de erro para o login com Google.
     } finally {
         setGoogleLoading(false);
     }

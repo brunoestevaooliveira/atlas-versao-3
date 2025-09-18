@@ -1,3 +1,9 @@
+/**
+ * @file src/app/report/page.tsx
+ * @fileoverview Página para reportar uma nova ocorrência.
+ * Este componente atua como um container para o formulário de relatório,
+ * envolvendo-o com um layout de card para apresentação visual.
+ */
 
 'use client';
 
@@ -5,6 +11,9 @@ import ReportForm from '@/components/report-form';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText } from 'lucide-react';
 
+/**
+ * Componente da página de relatório.
+ */
 export default function ReportPage() {
   return (
     <div className="min-h-screen w-full flex items-center justify-center bg-background">
@@ -20,6 +29,7 @@ export default function ReportPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* O componente do formulário em si, contendo toda a lógica. */}
             <ReportForm />
           </CardContent>
         </Card>

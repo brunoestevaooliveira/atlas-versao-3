@@ -1,4 +1,10 @@
-
+/**
+ * @file src/app/login/page.tsx
+ * @fileoverview Componente da página de login.
+ * Este arquivo renderiza o formulário de login, permitindo que os usuários
+ * acessem a plataforma com email/senha ou através do login com Google.
+ * Ele utiliza o `useAuth` para interagir com o contexto de autenticação.
+ */
 
 'use client';
 
@@ -13,6 +19,10 @@ import { useToast } from '@/hooks/use-toast';
 import { LogIn, Loader2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 
+
+/**
+ * Componente do ícone do Google para o botão de login social.
+ */
 const GoogleIcon = () => (
     <svg className="mr-2 h-4 w-4" viewBox="0 0 48 48">
         <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24s8.955,20,20,20s20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"></path>
@@ -22,25 +32,38 @@ const GoogleIcon = () => (
     </svg>
 );
 
-
+/**
+ * Componente principal da página de Login.
+ */
 export default function LoginPage() {
+  // Estados para controlar os campos do formulário.
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // Obtém as funções de autenticação do contexto.
   const { login, loginWithGoogle } = useAuth();
+  // Estados para controlar o loading dos botões.
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  // Hook para exibir notificações (toasts).
   const { toast } = useToast();
 
+  /**
+   * Manipula a submissão do formulário de login com email e senha.
+   * @param {React.FormEvent} e O evento do formulário.
+   */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
+      // Chama a função de login do contexto.
       await login(email, password);
       toast({
         title: 'Login bem-sucedido!',
         description: 'Bem-vindo de volta.',
       });
+      // O redirecionamento é tratado pelo AuthProvider/Layout.
     } catch (error: any) {
+      // Exibe uma notificação de erro em caso de falha.
       toast({
         variant: 'destructive',
         title: 'Falha no Login',
@@ -51,20 +74,21 @@ export default function LoginPage() {
     }
   };
 
+  /**
+   * Manipula o clique no botão de login com Google.
+   */
   const handleGoogleLogin = async () => {
     setGoogleLoading(true);
     try {
+        // Chama a função de login com Google do contexto.
         await loginWithGoogle();
         toast({
             title: 'Login com Google bem-sucedido!',
             description: 'Bem-vindo(a).',
         });
     } catch (error: any) {
-        toast({
-            variant: 'destructive',
-            title: 'Falha no Login com Google',
-            description: error.message || 'Não foi possível autenticar com o Google.',
-        });
+        // O erro já é tratado e exibido pelo toast dentro do AuthContext,
+        // mas o bloco try/catch aqui garante que o loading seja finalizado.
     } finally {
         setGoogleLoading(false);
     }

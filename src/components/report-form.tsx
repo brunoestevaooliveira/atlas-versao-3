@@ -1,3 +1,9 @@
+/**
+ * @file src/components/report-form.tsx
+ * @fileoverview Componente do formulário para criar uma nova ocorrência.
+ * Ele gerencia o estado dos campos, captura as coordenadas e o endereço da URL,
+ * valida os dados e lida com a submissão para o serviço do Firestore.
+ */
 
 "use client";
 
@@ -12,14 +18,19 @@ import { Send, Loader2, MapPin } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/context/auth-context";
 
+
+/**
+ * Define a estrutura do estado do formulário.
+ */
 type FormState = {
   title: string;
   description: string;
   category: string;
-  locationText: string;
+  locationText: string; // Coordenadas em formato de string "lat, lng"
   address: string;
 };
 
+// Lista de categorias de ocorrências disponíveis.
 const issueCategories = [
   "Limpeza urbana / Acúmulo de lixo",
   "Iluminação pública",
@@ -32,6 +43,11 @@ const issueCategories = [
   "Outros",
 ];
 
+/**
+ * Converte uma string de coordenadas "lat, lng" para um objeto de localização.
+ * @param {string | null} text A string a ser convertida.
+ * @returns {{ lat: number; lng: number } | null} O objeto de localização ou null se a string for inválida.
+ */
 function parseLatLng(text: string | null): { lat: number; lng: number } | null {
   if (!text) return null;
   const parts = text.split(",").map((s) => s.trim());
@@ -42,12 +58,16 @@ function parseLatLng(text: string | null): { lat: number; lng: number } | null {
   return { lat, lng };
 }
 
+/**
+ * Componente principal do formulário de relatório.
+ */
 export default function ReportForm() {
   const params = useSearchParams();
   const { toast } = useToast();
   const { appUser } = useAuth();
   const router = useRouter();
 
+  // Memoiza a captura inicial da localização e endereço da URL para evitar recálculos.
   const initialLocation = useMemo(() => {
     const lat = params.get("lat");
     const lng = params.get("lng");
@@ -59,6 +79,7 @@ export default function ReportForm() {
     return params.get("address") || "";
   }, [params]);
 
+  // Estado que armazena todos os dados do formulário.
   const [form, setForm] = useState<FormState>({
     title: "",
     description: "",
@@ -67,8 +88,11 @@ export default function ReportForm() {
     address: initialAddress
   });
 
+  // Estado para controlar o loading durante a submissão.
   const [loading, setLoading] = useState(false);
 
+  // Efeito que atualiza o estado do formulário se os parâmetros da URL mudarem.
+  // Útil se o usuário navegar de volta para o mapa e selecionar outro ponto.
   useEffect(() => {
     const lat = params.get("lat");
     const lng = params.get("lng");
@@ -83,11 +107,16 @@ export default function ReportForm() {
   }, [params]);
 
 
+  /**
+   * Manipula a submissão do formulário.
+   * @param {React.FormEvent} e O evento de submissão.
+   */
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     
     if (loading) return;
 
+    // Valida se o usuário está logado.
     if (!appUser) {
         toast({
             variant: 'destructive',
@@ -96,7 +125,8 @@ export default function ReportForm() {
         });
         return router.push('/login');
     }
-
+    
+    // Valida se a localização foi selecionada no mapa.
     if (!form.locationText.trim()) {
       toast({
         variant: 'destructive',
@@ -106,6 +136,7 @@ export default function ReportForm() {
       return router.push('/');
     }
 
+    // Valida se o endereço não está vazio (permitindo que o usuário edite).
     if (!form.address.trim()) {
       toast({
         variant: 'destructive',
@@ -115,6 +146,7 @@ export default function ReportForm() {
       return;
     }
     
+    // Valida se o título começa com letra maiúscula.
     if (form.title.trim() && form.title.trim()[0] !== form.title.trim()[0].toUpperCase()) {
       toast({
         variant: 'destructive',
@@ -127,9 +159,11 @@ export default function ReportForm() {
     setLoading(true);
 
     try {
+      // Converte a string de localização para um objeto de coordenadas.
       const loc = parseLatLng(form.locationText);
       if (!loc) throw new Error("Localização inválida. Clique no mapa para definir um ponto.");
 
+      // Chama a função do serviço para adicionar a ocorrência no Firestore.
       await addIssueClient({
         title: form.title,
         description: form.description,
@@ -140,14 +174,17 @@ export default function ReportForm() {
         reporterId: appUser.uid,
       });
 
+      // Exibe uma notificação de sucesso.
       toast({
         title: "Ocorrência Enviada!",
         description: `Sua ocorrência (${form.title}) foi registrada com sucesso.`,
       });
 
+      // Redireciona o usuário para a página de acompanhamento.
       router.push('/tracking');
       
     } catch (err: any) {
+      // Em caso de erro, exibe uma notificação de falha.
       console.error("Falha ao enviar ocorrência:", err);
       toast({
         variant: 'destructive',
