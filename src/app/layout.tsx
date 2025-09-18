@@ -11,7 +11,6 @@
 
 import { useState, useEffect } from 'react';
 import './globals.css';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
 import { cn } from '@/lib/utils';
