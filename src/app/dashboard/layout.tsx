@@ -1,3 +1,10 @@
+/**
+ * @file src/app/dashboard/layout.tsx
+ * @fileoverview Layout para a rota do Dashboard de Análise.
+ * Este componente atua como um portão de segurança, similar ao AdminLayout.
+ * Ele garante que apenas usuários administradores possam acessar a página
+ * do dashboard, mostrando telas de carregamento ou acesso negado conforme necessário.
+ */
 
 'use client';
 
@@ -7,9 +14,16 @@ import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
 
+/**
+ * Layout de proteção para a página do Dashboard.
+ * @param {object} props - Propriedades do componente.
+ * @param {React.ReactNode} props.children - A página do dashboard a ser renderizada.
+ */
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  // Hook para obter o estado de autenticação e permissões.
   const { appUser, isLoading, isAdmin } = useAuth();
 
+  // Exibe uma tela de carregamento enquanto as informações do usuário são verificadas.
   if (isLoading) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background gap-4">
@@ -20,6 +34,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
+  // Se o usuário não for um administrador, exibe uma mensagem de acesso negado.
   if (!isAdmin) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background gap-4">
@@ -32,6 +47,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     );
   }
 
+  // Se o usuário for um administrador, renderiza a página do dashboard.
   return (
     <>
       {children}

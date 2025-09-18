@@ -1,3 +1,10 @@
+/**
+ * @file src/components/tutorial-modal.tsx
+ * @fileoverview Modal de tutorial para novos usuários.
+ * Este componente exibe um carrossel com os passos iniciais para usar a plataforma.
+ * É mostrado automaticamente para novos usuários e pode ser dispensado, marcando
+ * o tutorial como concluído no localStorage para não ser exibido novamente.
+ */
 
 'use client';
 
@@ -21,6 +28,7 @@ import {
 import { Button } from './ui/button';
 import { Map, FilePlus, BarChart, Check, Compass } from 'lucide-react';
 
+// Conteúdo dos slides do tutorial.
 const tutorialSteps = [
   {
     icon: <Compass className="w-10 h-10 md:w-12 md:h-12 text-primary" />,
@@ -59,19 +67,32 @@ const tutorialSteps = [
   },
 ];
 
+// Chave usada para salvar o estado de conclusão do tutorial no localStorage.
 const TUTORIAL_COMPLETED_KEY = 'tutorialCompleted';
 
 interface TutorialModalProps {
+  /** Controla a visibilidade do modal. */
   isOpen: boolean;
+  /** Função para alterar a visibilidade do modal. */
   onOpenChange: (open: boolean) => void;
 }
 
+/**
+ * Componente do Modal de Tutorial.
+ * @param {TutorialModalProps} props As propriedades do componente.
+ */
 export default function TutorialModal({ isOpen, onOpenChange }: TutorialModalProps) {
+  
+  /**
+   * Fecha o modal e salva o estado de conclusão no localStorage.
+   */
   const handleClose = () => {
     try {
+      // Salva a informação para que o tutorial não seja mostrado novamente.
       localStorage.setItem(TUTORIAL_COMPLETED_KEY, 'true');
     } catch (error) {
-      console.error('Failed to access localStorage:', error);
+      // Falha silenciosamente se o localStorage não estiver acessível.
+      console.error('Falha ao acessar o localStorage:', error);
     }
     onOpenChange(false);
   };

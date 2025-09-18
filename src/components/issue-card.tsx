@@ -1,3 +1,9 @@
+/**
+ * @file src/components/issue-card.tsx
+ * @fileoverview Componente de card para exibir um resumo de uma única ocorrência.
+ * Usado na página de Acompanhamento, este card mostra o título, categoria, status,
+ * descrição, e permite apoiar (upvote) e abrir um modal para ver/adicionar comentários.
+ */
 
 import type { Issue } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,12 +19,24 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
 interface IssueCardProps {
+  /** O objeto da ocorrência a ser exibido. */
   issue: Issue;
+  /** Função chamada quando o botão de apoio é clicado. */
   onUpvote: (id: string, currentUpvotes: number) => void;
+  /** `true` se o usuário logado já apoiou esta ocorrência. */
   isUpvoted: boolean;
 }
 
+/**
+ * Componente do Card de Ocorrência.
+ * @param {IssueCardProps} props As propriedades do componente.
+ */
 const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => {
+  
+  /**
+   * Retorna a variante de cor para o Badge de status.
+   * @param status O status da ocorrência.
+   */
   const getStatusVariant = (status: Issue['status']): "success" | "warning" | "info" | "default" => {
     switch (status) {
       case 'Resolvido':
@@ -32,10 +50,15 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
     }
   };
 
+  /**
+   * Retorna o texto formatado para o status.
+   * @param status O status da ocorrência.
+   */
   const getStatusText = (status: Issue['status']) => {
     return status === 'Em análise' ? 'Análise' : status;
   };
   
+  // Gera o link do Google Maps para a localização da ocorrência.
   const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${issue.location.lat},${issue.location.lng}`;
 
   return (
@@ -73,6 +96,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
         <Separator className="my-0 bg-border/50" />
         <CardFooter className="flex-col items-stretch p-0">
            <div className="flex items-center">
+              {/* Botão de Apoiar */}
               <Button 
                   variant="ghost" 
                   className={cn(
@@ -86,6 +110,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
                   Apoiar ({issue.upvotes})
               </Button>
               <Separator orientation="vertical" className="h-10 bg-border/50" />
+              {/* Botão para abrir o modal de comentários */}
               <DialogTrigger asChild>
                   <Button variant="ghost" className="w-full rounded-t-none rounded-bl-none text-muted-foreground hover:bg-accent/50 hover:text-foreground">
                       <MessageCircle className="mr-2 h-4 w-4" />
@@ -94,6 +119,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
               </DialogTrigger>
            </div>
            <Separator className="bg-border/50"/>
+           {/* Rodapé com informações do relator e data */}
            <div className="text-xs text-slate-500 flex justify-between p-3 bg-background/50 rounded-b-lg">
                 <div className="flex items-center gap-1.5">
                     <User className="h-3 w-3" />
@@ -106,6 +132,8 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onUpvote, isUpvoted }) => 
             </div>
         </CardFooter>
       </Card>
+      
+      {/* Conteúdo do Modal de Comentários */}
       <DialogContent className="max-w-2xl">
           <DialogHeader>
             <DialogTitle>{issue.title}</DialogTitle>

@@ -1,6 +1,16 @@
+/**
+ * @file src/lib/types.ts
+ * @fileoverview Este arquivo centraliza todas as definições de tipos (TypeScript)
+ * utilizadas na aplicação. Definir os tipos em um único local ajuda a manter
+ * a consistência dos dados e facilita a manutenção.
+ */
 
 import { Timestamp, GeoPoint } from 'firebase/firestore';
 
+/**
+ * Representa um comentário como usado no frontend.
+ * Note que `createdAt` é um objeto `Date` para facilitar a manipulação.
+ */
 export type Comment = {
   id: string;
   author: string;
@@ -11,6 +21,10 @@ export type Comment = {
   createdAt: Date;
 };
 
+/**
+ * Representa os dados de um comentário como são armazenados no Firestore.
+ * Note que `createdAt` é um `Timestamp` do Firestore.
+ */
 export type CommentData = {
   id: string;
   author: string;
@@ -21,6 +35,10 @@ export type CommentData = {
   createdAt: Timestamp;
 }
 
+/**
+ * Representa uma ocorrência como usada no frontend.
+ * `reportedAt` é um `Date` e `location` é um objeto com `lat` e `lng`.
+ */
 export type Issue = {
   id: string;
   title: string;
@@ -28,31 +46,38 @@ export type Issue = {
   category: string;
   status: 'Recebido' | 'Em análise' | 'Resolvido';
   location: { lat: number; lng: number };
-  address: string; // Endereço textual obrigatório
+  address: string;
   imageUrl: string; 
   reportedAt: Date;
   reporter: string;
-  reporterId: string; // ID do usuário que reportou
+  reporterId: string;
   upvotes: number;
   comments: Comment[];
 };
 
-// This is the type for data stored in Firestore
+/**
+ * Representa os dados de uma ocorrência como são armazenados no Firestore.
+ * `reportedAt` é um `Timestamp` e `location` é um `GeoPoint`.
+ */
 export type IssueData = {
   title: string;
   description: string;
   category: string;
   status: 'Recebido' | 'Em análise' | 'Resolvido';
   location: GeoPoint;
-  address: string; // Endereço textual obrigatório
+  address: string;
   imageUrl: string;
   reportedAt: Timestamp;
   reporter: string;
-  reporterId: string; // ID do usuário que reportou
+  reporterId: string;
   upvotes: number;
   comments: CommentData[];
 };
 
+/**
+ * Representa o perfil de um usuário como usado no frontend.
+ * `createdAt` é um objeto `Date`.
+ */
 export type AppUser = {
     uid: string;
     email: string | null;
@@ -62,6 +87,10 @@ export type AppUser = {
     role: 'user' | 'admin';
 };
 
+/**
+ * Representa os dados de um perfil de usuário como são armazenados no Firestore.
+ * `createdAt` é um `Timestamp`.
+ */
 export type AppUserData = {
     uid: string;
     email: string | null;
@@ -71,6 +100,10 @@ export type AppUserData = {
     role: 'user' | 'admin';
 }
 
+/**
+ * Representa o resultado de uma busca na API de geocodificação.
+ * (Atualmente não utilizada após a troca para Mapbox, mas mantida para referência).
+ */
 export interface GeocodeResult {
   place_id: number;
   display_name: string;

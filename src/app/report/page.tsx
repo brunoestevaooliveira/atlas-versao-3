@@ -2,7 +2,9 @@
  * @file src/app/report/page.tsx
  * @fileoverview Página para reportar uma nova ocorrência.
  * Este componente atua como um container para o formulário de relatório,
- * envolvendo-o com um layout de card para apresentação visual.
+ * envolvendo-o com um layout de card para apresentação visual e fornecendo
+ * o título e a descrição da página. A lógica do formulário em si está no
+ * componente `ReportForm`.
  */
 
 'use client';
@@ -29,7 +31,7 @@ export default function ReportPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* O componente do formulário em si, contendo toda a lógica. */}
+            {/* O componente do formulário em si, contendo toda a lógica de preenchimento e submissão. */}
             <ReportForm />
           </CardContent>
         </Card>

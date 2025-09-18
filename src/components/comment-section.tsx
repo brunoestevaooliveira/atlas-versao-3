@@ -1,3 +1,9 @@
+/**
+ * @file src/components/comment-section.tsx
+ * @fileoverview Componente para exibir e adicionar comentários a uma ocorrência.
+ * Responsável por renderizar a lista de comentários, exibir um formulário para
+ * novos comentários, e lidar com a lógica de submissão e exclusão de comentários.
+ */
 
 'use client';
 
@@ -33,12 +39,20 @@ interface CommentSectionProps {
   comments: Comment[];
 }
 
+/**
+ * Retorna as iniciais de um nome para usar no AvatarFallback.
+ * @param name O nome do autor.
+ */
 const getInitials = (name: string | null | undefined) => {
-    if (!name) return 'U';
+    if (!name) return 'U'; // 'U' de 'Usuário'
     return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 }
 
 
+/**
+ * Componente da seção de comentários.
+ * @param {CommentSectionProps} props As propriedades do componente.
+ */
 const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) => {
   const [newComment, setNewComment] = useState('');
   const [loading, setLoading] = useState(false);
@@ -46,10 +60,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
   const { appUser, isAdmin } = useAuth();
   const router = useRouter();
 
+  /**
+   * Manipula a submissão do formulário de novo comentário.
+   * @param e O evento do formulário.
+   */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newComment.trim()) return;
 
+     // Verifica se o usuário está logado antes de permitir o comentário.
      if (!appUser) {
         toast({
             variant: 'destructive',
@@ -61,6 +80,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
 
     setLoading(true);
     try {
+      // Chama o serviço para adicionar o comentário no Firestore.
       await addCommentToIssue(issueId, newComment, appUser);
       setNewComment('');
       toast({
@@ -79,6 +99,10 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
     }
   };
 
+  /**
+   * Manipula a exclusão de um comentário (ação de administrador).
+   * @param commentId O ID do comentário a ser excluído.
+   */
   const handleDeleteComment = async (commentId: string) => {
     try {
         await deleteCommentFromIssue(issueId, commentId);
@@ -98,6 +122,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
 
   return (
     <div className="space-y-6">
+      {/* Formulário para novo comentário */}
       <form onSubmit={handleSubmit} className="space-y-4">
         <Textarea
           placeholder="Adicione seu comentário..."
@@ -114,10 +139,12 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
       
       <Separator />
 
+      {/* Área de rolagem para a lista de comentários */}
       <ScrollArea className="h-72 pr-4">
         <div className="space-y-6">
           <h4 className="text-lg font-semibold">Comentários</h4>
           {comments && comments.length > 0 ? (
+            // Ordena os comentários do mais novo para o mais antigo antes de renderizar.
             comments.sort((a,b) => b.createdAt.getTime() - a.createdAt.getTime()).map((comment) => (
               <div key={comment.id} className="flex gap-3 group">
                 <Avatar className="h-8 w-8 flex-shrink-0">
@@ -127,6 +154,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
                 <div className="flex-grow">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="font-semibold text-sm">{comment.author}</span>
+                    {/* Exibe um badge se o autor do comentário for um administrador. */}
                     {comment.authorRole === 'admin' && (
                         <Badge variant="secondary" className="px-1.5 py-0.5 text-xs">
                             <ShieldCheck className="h-3 w-3 mr-1" />
@@ -139,6 +167,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ issueId, comments }) =>
                   </div>
                   <p className="text-sm text-foreground/90 mt-1">{comment.content}</p>
                 </div>
+                {/* Botão de exclusão, visível apenas para administradores. */}
                 {isAdmin && (
                   <AlertDialog>
                     <AlertDialogTrigger asChild>

@@ -1,3 +1,9 @@
+/**
+ * @file src/app/admin/page.tsx
+ * @fileoverview Página do painel de administração para gerenciamento de ocorrências.
+ * Permite que administradores visualizem, filtrem, ordenem, atualizem o status e excluam
+ * todas as ocorrências reportadas na plataforma.
+ */
 
 'use client';
 
@@ -38,49 +44,60 @@ import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { Input } from '@/components/ui/input';
 
+/**
+ * Componente principal da página de administração.
+ */
 export default function AdminPage() {
+  // --- ESTADOS ---
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const { logout, appUser } = useAuth();
   
+  // Estados para os controles de filtro e ordenação
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [addressFilter, setAddressFilter] = useState('');
   const [sortOrder, setSortOrder] = useState('recent');
 
+  // --- EFEITOS ---
+  // Se inscreve para ouvir atualizações em tempo real das ocorrências do Firestore.
   useEffect(() => {
-      if (appUser) { // Only listen to issues if user is authenticated
+      // Garante que a escuta só comece se o usuário estiver autenticado.
+      if (appUser) {
         const unsubscribe = listenToIssues((issues) => {
           setIssues(issues);
           setLoading(false);
         });
-        return () => unsubscribe();
+        return () => unsubscribe(); // Cancela a inscrição ao desmontar o componente.
       }
   }, [appUser]);
 
+
+  // --- MEMOS ---
+
+  // Extrai categorias únicas da lista de ocorrências para popular o filtro de categorias.
   const uniqueCategories = useMemo(() => {
     return ['all', ...new Set(issues.map(issue => issue.category))];
   }, [issues]);
 
+  // Filtra e ordena a lista de ocorrências com base nos estados dos filtros.
+  // É recalculado apenas quando as dependências mudam, otimizando a performance.
   const filteredAndSortedIssues = useMemo(() => {
     let filtered = issues;
 
-    // 1. Filter by category
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(issue => issue.category === categoryFilter);
     }
 
-    // 2. Filter by address
     if (addressFilter.trim() !== '') {
       filtered = filtered.filter(issue => 
         issue.address.toLowerCase().includes(addressFilter.toLowerCase())
       );
     }
 
-    // 3. Sort
     if (sortOrder === 'upvotes') {
       filtered.sort((a, b) => b.upvotes - a.upvotes);
-    } else {
+    } else { // 'recent'
       filtered.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime());
     }
 
@@ -88,6 +105,13 @@ export default function AdminPage() {
   }, [issues, categoryFilter, addressFilter, sortOrder]);
 
 
+  // --- FUNÇÕES ---
+
+  /**
+   * Manipula a mudança de status de uma ocorrência, chamando o serviço correspondente.
+   * @param issueId O ID da ocorrência a ser atualizada.
+   * @param newStatus O novo status a ser aplicado.
+   */
   const handleStatusChange = async (issueId: string, newStatus: Issue['status']) => {
     try {
       await updateIssueStatus(issueId, newStatus);
@@ -105,6 +129,10 @@ export default function AdminPage() {
     }
   };
 
+  /**
+   * Manipula a exclusão de uma ocorrência.
+   * @param issueId O ID da ocorrência a ser excluída.
+   */
   const handleDeleteIssue = async (issueId: string) => {
     try {
       await deleteIssue(issueId);
@@ -122,6 +150,10 @@ export default function AdminPage() {
     }
   };
 
+  /**
+   * Retorna a variante de cor para o Badge com base no status.
+   * @param status O status da ocorrência.
+   */
   const getStatusVariant = (status: Issue['status']): "success" | "warning" | "info" => {
     switch (status) {
       case 'Resolvido':
@@ -129,17 +161,21 @@ export default function AdminPage() {
       case 'Em análise':
         return 'warning';
       case 'Recebido':
-        return 'info';
       default:
         return 'info';
     }
   };
-
+  
+  /**
+   * Retorna o texto formatado para o status (ex: 'Em análise' -> 'Análise').
+   * @param status O status da ocorrência.
+   */
   const getStatusText = (status: Issue['status']) => {
     return status === 'Em análise' ? 'Análise' : status;
   };
 
 
+  // --- RENDERIZAÇÃO ---
   return (
     <div className="min-h-screen w-full bg-background">
       <div className="container mx-auto py-8 pt-24 space-y-8">
@@ -159,6 +195,7 @@ export default function AdminPage() {
           </p>
         </header>
 
+        {/* Card com os controles de filtro e ordenação */}
         <Card className="p-4 bg-card/80">
           <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
             <div className="relative flex-1 w-full sm:w-auto">
@@ -194,6 +231,7 @@ export default function AdminPage() {
           </CardContent>
         </Card>
 
+        {/* Card com a tabela de ocorrências */}
         <Card className="bg-card/80">
           <CardHeader>
             <CardTitle>Lista de Ocorrências</CardTitle>

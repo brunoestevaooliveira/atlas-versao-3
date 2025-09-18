@@ -1,3 +1,10 @@
+/**
+ * @file src/app/dashboard/page.tsx
+ * @fileoverview Página do Dashboard de Análise para administradores.
+ * Esta página apresenta uma visualização de dados agregados das ocorrências
+ * reportadas, utilizando gráficos para mostrar estatísticas como total de ocorrências,
+ * status, distribuição por categoria e volume ao longo do tempo.
+ */
 
 'use client';
 
@@ -19,18 +26,25 @@ import { Calendar as CalendarIcon } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 
+/**
+ * Componente principal da página do Dashboard.
+ */
 export default function DashboardPage() {
+  // --- ESTADOS ---
   const [issues, setIssues] = useState<Issue[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Filter states
+  // Estados para os filtros de análise.
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState<'all' | Issue['status']>('all');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: addDays(new Date(), -30),
+    from: addDays(new Date(), -30), // Período padrão: últimos 30 dias.
     to: new Date(),
   });
 
+
+  // --- EFEITOS ---
+  // Se inscreve para ouvir atualizações em tempo real das ocorrências.
   useEffect(() => {
     const unsubscribe = listenToIssues((fetchedIssues) => {
       setIssues(fetchedIssues);
@@ -38,15 +52,20 @@ export default function DashboardPage() {
     });
     return () => unsubscribe();
   }, []);
+
   
+  // --- MEMOS ---
+  // Extrai as categorias únicas para o seletor de filtro.
   const uniqueCategories = useMemo(() => {
     return ['all', ...new Set(issues.map(issue => issue.category))];
   }, [issues]);
 
+  // Filtra as ocorrências com base nos filtros de categoria, status e período.
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
       const categoryMatch = categoryFilter === 'all' || issue.category === categoryFilter;
       const statusMatch = statusFilter === 'all' || issue.status === statusFilter;
+      // Garante que o filtro de data só seja aplicado se um intervalo válido for selecionado.
       const dateMatch = !dateRange?.from || !dateRange?.to || 
                         (issue.reportedAt >= dateRange.from && issue.reportedAt <= dateRange.to);
       return categoryMatch && statusMatch && dateMatch;
@@ -54,6 +73,7 @@ export default function DashboardPage() {
   }, [issues, categoryFilter, statusFilter, dateRange]);
 
 
+  // Calcula as estatísticas principais (cards) com base nas ocorrências filtradas.
   const stats = useMemo(() => {
     return {
       total: filteredIssues.length,
@@ -63,6 +83,8 @@ export default function DashboardPage() {
     };
   }, [filteredIssues]);
 
+  
+  // --- RENDERIZAÇÃO ---
   return (
     <div className="min-h-screen w-full bg-background">
       <div className="container mx-auto py-8 pt-24 space-y-8">
@@ -73,6 +95,7 @@ export default function DashboardPage() {
           </p>
         </header>
 
+        {/* Card de Filtros */}
         <Card className="p-4 bg-card/80">
           <CardHeader className="p-2 pt-0">
               <CardTitle className="text-base flex items-center gap-2">
@@ -81,6 +104,7 @@ export default function DashboardPage() {
               </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
+            {/* Filtro por Categoria */}
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="flex-1 w-full sm:w-auto">
                 <SelectValue placeholder="Filtrar por Categoria" />
@@ -93,6 +117,7 @@ export default function DashboardPage() {
                 ))}
               </SelectContent>
             </Select>
+            {/* Filtro por Status */}
             <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as any)}>
               <SelectTrigger className="flex-1 w-full sm:w-auto">
                 <SelectValue placeholder="Filtrar por Status" />
@@ -104,6 +129,7 @@ export default function DashboardPage() {
                 <SelectItem value="Resolvido">Resolvido</SelectItem>
               </SelectContent>
             </Select>
+            {/* Filtro por Período (Date Range Picker) */}
             <Popover>
               <PopoverTrigger asChild>
                 <Button
@@ -143,7 +169,7 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-
+        {/* Cards de Estatísticas Principais */}
         {loading ? (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               <Skeleton className="h-28" />
@@ -185,7 +211,9 @@ export default function DashboardPage() {
           </div>
         )}
 
+        {/* Gráficos */}
         <div className="grid gap-8 lg:grid-cols-5">
+          {/* Gráfico de Pizza: Ocorrências por Categoria */}
           <Card className="lg:col-span-2 bg-card/80">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -198,6 +226,7 @@ export default function DashboardPage() {
               <CategoryChart issues={filteredIssues} loading={loading} />
             </CardContent>
           </Card>
+          {/* Gráfico de Barras: Status das Ocorrências */}
           <Card className="lg:col-span-3 bg-card/80">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -212,6 +241,7 @@ export default function DashboardPage() {
           </Card>
         </div>
 
+        {/* Gráfico de Linha: Linha do Tempo */}
         <Card className="bg-card/80">
             <CardHeader>
               <div className="flex items-center gap-2">

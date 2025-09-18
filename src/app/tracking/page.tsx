@@ -1,3 +1,11 @@
+/**
+ * @file src/app/tracking/page.tsx
+ * @fileoverview Página de Acompanhamento de Ocorrências.
+ * Permite que os usuários visualizem todas as ocorrências reportadas,
+ * filtrando-as por status (Todas, Recebidas, Em Análise, Resolvidas),
+ * categoria, endereço e se foram reportadas pelo próprio usuário.
+ * Também permite ordenar por data ou número de apoios.
+ */
 
 'use client';
 
@@ -16,8 +24,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 
+// Chave do localStorage para os apoios do usuário.
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
 
+/**
+ * Componente exibido quando uma aba de filtro não retorna resultados.
+ * @param {object} props - Propriedades do componente.
+ * @param {string} props.tabName - Nome da aba atual.
+ */
 const EmptyState = ({ tabName }: { tabName: string }) => (
   <div className="text-center py-20 col-span-full">
     <Inbox className="mx-auto h-12 w-12 text-muted-foreground/50" />
@@ -28,7 +42,11 @@ const EmptyState = ({ tabName }: { tabName: string }) => (
   </div>
 );
 
+/**
+ * Componente principal da página de Acompanhamento.
+ */
 export default function TrackingPage() {
+  // --- ESTADOS ---
   const [issues, setIssues] = useState<Issue[]>([]);
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
   const [activeTab, setActiveTab] = useState('all');
@@ -40,11 +58,15 @@ export default function TrackingPage() {
   const { appUser } = useAuth();
   const router = useRouter();
 
+
+  // --- EFEITOS ---
+  // Se inscreve para ouvir atualizações em tempo real das ocorrências.
   useEffect(() => {
     const unsubscribe = listenToIssues(setIssues);
     return () => unsubscribe();
   }, []);
   
+  // Carrega os apoios (upvotes) do usuário do localStorage.
   useEffect(() => {
     if (!appUser) return;
     try {
@@ -53,49 +75,53 @@ export default function TrackingPage() {
         setUpvotedIssues(new Set(JSON.parse(storedUpvotes)));
       }
     } catch (error) {
-      console.error('Failed to parse upvoted issues from localStorage', error);
+      console.error('Falha ao carregar apoios do localStorage', error);
     }
   }, [appUser]);
 
+
+  // --- MEMOS ---
+  // Extrai categorias únicas para o seletor de filtro.
   const uniqueCategories = useMemo(() => {
     return ['all', ...new Set(issues.map(issue => issue.category))];
   }, [issues]);
 
+  // Filtra e ordena a lista de ocorrências com base em todos os filtros ativos.
   const filteredAndSortedIssues = useMemo(() => {
     let filtered = issues;
 
-    // 1. Filter by my issues
+    // 1. Filtro "Minhas Ocorrências"
     if (myIssuesOnly && appUser) {
         filtered = filtered.filter(issue => issue.reporterId === appUser.uid);
     }
 
-    // 2. Filter by status (from tabs)
+    // 2. Filtro por status (abas)
     if (activeTab !== 'all') {
       const statusMap = {
         received: 'Recebido',
         inProgress: 'Em análise',
         resolved: 'Resolvido',
       };
-      // @ts-ignore
+      // @ts-ignore - Mapeamento seguro.
       filtered = filtered.filter(issue => issue.status === statusMap[activeTab]);
     }
     
-    // 3. Filter by category
+    // 3. Filtro por categoria
     if (categoryFilter !== 'all') {
       filtered = filtered.filter(issue => issue.category === categoryFilter);
     }
 
-    // 4. Filter by address
+    // 4. Filtro por endereço
     if (addressFilter.trim() !== '') {
       filtered = filtered.filter(issue => 
         issue.address.toLowerCase().includes(addressFilter.toLowerCase())
       );
     }
 
-    // 5. Sort
+    // 5. Ordenação
     if (sortOrder === 'upvotes') {
       filtered.sort((a, b) => b.upvotes - a.upvotes);
-    } else {
+    } else { // 'recent'
       filtered.sort((a, b) => b.reportedAt.getTime() - a.reportedAt.getTime());
     }
 
@@ -103,6 +129,12 @@ export default function TrackingPage() {
   }, [issues, activeTab, categoryFilter, addressFilter, sortOrder, myIssuesOnly, appUser]);
 
 
+  // --- FUNÇÕES ---
+  /**
+   * Manipula o clique no botão de apoio (upvote).
+   * @param issueId ID da ocorrência a ser apoiada.
+   * @param currentUpvotes Número atual de apoios.
+   */
   const handleUpvote = async (issueId: string, currentUpvotes: number) => {
     if (!appUser) {
       toast({
@@ -113,10 +145,9 @@ export default function TrackingPage() {
       return router.push('/login');
     }
     
-    if (upvotedIssues.has(issueId)) {
-      return; 
-    }
+    if (upvotedIssues.has(issueId)) return; // Impede duplo apoio.
     
+    // Atualização otimista da UI
     const newUpvotedSet = new Set(upvotedIssues).add(issueId);
     setUpvotedIssues(newUpvotedSet);
 
@@ -124,6 +155,7 @@ export default function TrackingPage() {
       await updateIssueUpvotes(issueId, currentUpvotes + 1);
       localStorage.setItem(`${UPVOTED_ISSUES_KEY}_${appUser.uid}`, JSON.stringify(Array.from(newUpvotedSet)));
     } catch (error) {
+       // Reverte a UI em caso de erro.
        const revertedUpvotedSet = new Set(upvotedIssues);
        revertedUpvotedSet.delete(issueId);
        setUpvotedIssues(revertedUpvotedSet);
@@ -136,17 +168,25 @@ export default function TrackingPage() {
     }
   };
 
+  /**
+   * Retorna a lista de ocorrências para uma aba específica.
+   * A lista já foi filtrada e ordenada pelo `useMemo` principal.
+   * Esta função apenas faz a separação final para cada aba.
+   * @param status O status da aba. Se indefinido, retorna todas.
+   */
   const getIssuesForTab = (status?: 'Recebido' | 'Em análise' | 'Resolvido') => {
       if (!status) return filteredAndSortedIssues;
       return filteredAndSortedIssues.filter(issue => issue.status === status);
   }
 
+  // Separa as listas para cada aba para calcular as contagens.
   const allTabIssues = getIssuesForTab();
   const receivedTabIssues = getIssuesForTab('Recebido');
   const inProgressTabIssues = getIssuesForTab('Em análise');
   const resolvedTabIssues = getIssuesForTab('Resolvido');
   
 
+  // --- RENDERIZAÇÃO ---
   return (
     <div className="min-h-screen w-full bg-background">
       <div className="container mx-auto py-8 pt-24">
@@ -157,6 +197,7 @@ export default function TrackingPage() {
           </p>
         </header>
 
+        {/* Card de Controles de Filtro */}
         <Card className="mb-8 p-4 bg-card/80">
           <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
             <div className="relative flex-1 w-full sm:w-auto">
@@ -201,6 +242,7 @@ export default function TrackingPage() {
           </CardContent>
         </Card>
 
+        {/* Sistema de Abas */}
         <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-2xl">
             <TabsTrigger value="all">
