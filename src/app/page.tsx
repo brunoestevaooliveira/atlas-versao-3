@@ -11,7 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { listenToIssues, updateIssueUpvotes } from '@/services/issue-service';
-import type { Issue } from '@/lib/types';
+import type { Issue, GeocodeResult } from '@/lib/types';
 import { useToast } from '@/hooks/use-toast';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -22,16 +22,10 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/co
 import Link from 'next/link';
 import { MapRef, MapLayerMouseEvent } from 'react-map-gl';
 import { useDebounce } from 'use-debounce';
+import { geocodeAddress } from '@/ai/flows/geocode-address-flow';
 
 
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
-
-interface GeocodeResult {
-  place_id: number;
-  display_name: string;
-  lat: string;
-  lon: string;
-}
 
 export default function MapPage() {
   const [issues, setIssues] = useState<Issue[]>([]);
@@ -193,12 +187,9 @@ export default function MapPage() {
       setIsGeocoding(true);
       setNoResults(false);
       try {
-        // Append city/state to make search more specific
-        const query = `${debouncedAddressSearch}, Santa Maria, DF, Brasil`;
-        const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&viewbox=-48.05,-16.05,-47.95,-15.95&bounded=1`);
-        const data: GeocodeResult[] = await response.json();
-        setGeocodeResults(data);
-        if (data.length === 0) {
+        const results = await geocodeAddress({ query: debouncedAddressSearch });
+        setGeocodeResults(results);
+        if (results.length === 0) {
           setNoResults(true);
         }
       } catch (error) {
@@ -206,7 +197,7 @@ export default function MapPage() {
         toast({
           variant: 'destructive',
           title: 'Erro ao Buscar Endereço',
-          description: 'Ocorreu um problema na comunicação com o serviço de mapas.',
+          description: 'Ocorreu um problema na comunicação com o serviço de IA.',
         });
       } finally {
         setIsGeocoding(false);
@@ -451,5 +442,3 @@ export default function MapPage() {
     </div>
   );
 }
-
-    

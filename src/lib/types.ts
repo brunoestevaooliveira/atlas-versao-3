@@ -1,3 +1,4 @@
+
 import { Timestamp, GeoPoint } from 'firebase/firestore';
 
 export type Comment = {
@@ -68,4 +69,11 @@ export type AppUserData = {
     photoURL?: string | null;
     createdAt: Timestamp;
     role: 'user' | 'admin';
+}
+
+export interface GeocodeResult {
+  place_id: number;
+  display_name: string;
+  lat: string;
+  lon: string;
 }
