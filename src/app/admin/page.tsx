@@ -43,6 +43,7 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/auth-context';
 import { Input } from '@/components/ui/input';
+import { useDebounce } from 'use-debounce';
 
 /**
  * Componente principal da página de administração.
@@ -57,6 +58,7 @@ export default function AdminPage() {
   // Estados para os controles de filtro e ordenação
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [addressFilter, setAddressFilter] = useState('');
+  const [debouncedAddressFilter] = useDebounce(addressFilter, 300);
   const [sortOrder, setSortOrder] = useState('recent');
 
   // --- EFEITOS ---
@@ -89,9 +91,9 @@ export default function AdminPage() {
       filtered = filtered.filter(issue => issue.category === categoryFilter);
     }
 
-    if (addressFilter.trim() !== '') {
+    if (debouncedAddressFilter.trim() !== '') {
       filtered = filtered.filter(issue => 
-        issue.address.toLowerCase().includes(addressFilter.toLowerCase())
+        issue.address.toLowerCase().includes(debouncedAddressFilter.toLowerCase())
       );
     }
 
@@ -102,7 +104,7 @@ export default function AdminPage() {
     }
 
     return filtered;
-  }, [issues, categoryFilter, addressFilter, sortOrder]);
+  }, [issues, categoryFilter, debouncedAddressFilter, sortOrder]);
 
 
   // --- FUNÇÕES ---

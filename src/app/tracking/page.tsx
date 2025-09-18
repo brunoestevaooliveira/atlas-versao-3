@@ -24,6 +24,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import LazyLoad from '@/components/lazy-load';
+import { useDebounce } from 'use-debounce';
 
 // Chave do localStorage para os apoios do usuário.
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
@@ -53,6 +54,7 @@ export default function TrackingPage() {
   const [activeTab, setActiveTab] = useState('all');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [addressFilter, setAddressFilter] = useState('');
+  const [debouncedAddressFilter] = useDebounce(addressFilter, 300);
   const [sortOrder, setSortOrder] = useState('recent');
   const [myIssuesOnly, setMyIssuesOnly] = useState(false);
   const { toast } = useToast();
@@ -113,9 +115,9 @@ export default function TrackingPage() {
     }
 
     // 4. Filtro por endereço
-    if (addressFilter.trim() !== '') {
+    if (debouncedAddressFilter.trim() !== '') {
       filtered = filtered.filter(issue => 
-        issue.address.toLowerCase().includes(addressFilter.toLowerCase())
+        issue.address.toLowerCase().includes(debouncedAddressFilter.toLowerCase())
       );
     }
 
@@ -127,7 +129,7 @@ export default function TrackingPage() {
     }
 
     return filtered;
-  }, [issues, activeTab, categoryFilter, addressFilter, sortOrder, myIssuesOnly, appUser]);
+  }, [issues, activeTab, categoryFilter, debouncedAddressFilter, sortOrder, myIssuesOnly, appUser]);
 
 
   // --- FUNÇÕES ---

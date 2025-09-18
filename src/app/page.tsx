@@ -33,6 +33,7 @@ import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import LazyLoad from '@/components/lazy-load';
 import IssueCard from '@/components/issue-card';
+import { useDebounce } from 'use-debounce';
 
 // Chave usada para armazenar no localStorage os IDs das ocorrências que o usuário já apoiou.
 const UPVOTED_ISSUES_KEY = 'upvotedIssues';
@@ -56,6 +57,8 @@ export default function MapPage() {
   const [upvotedIssues, setUpvotedIssues] = useState(new Set<string>());
   // Armazena o texto digitado pelo usuário na barra de busca.
   const [searchQuery, setSearchQuery] = useState('');
+  // Versão com "debounce" da busca para evitar re-renderizações excessivas.
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   // Controla a visibilidade dos marcadores de ocorrências no mapa.
   const [showIssues, setShowIssues] = useState(true);
   // Controla a visibilidade do painel lateral de ocorrências em telas de desktop.
@@ -91,22 +94,22 @@ export default function MapPage() {
 
 
   // Filtra e retorna a lista de ocorrências com base na busca e nos filtros de categoria.
-  // É recalculado apenas quando as dependências (issues, searchQuery, selectedCategories) mudam.
+  // É recalculado apenas quando as dependências (issues, debouncedSearchQuery, selectedCategories) mudam.
   const filteredIssues = useMemo(() => {
     return issues.filter(issue => {
       // Verifica se o texto de busca corresponde a algum campo da ocorrência.
-      const searchMatch = searchQuery.trim() === '' ||
-        issue.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        issue.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        issue.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        issue.address.toLowerCase().includes(searchQuery.toLowerCase());
+      const searchMatch = debouncedSearchQuery.trim() === '' ||
+        issue.title.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        issue.description.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        issue.category.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        issue.address.toLowerCase().includes(debouncedSearchQuery.toLowerCase());
       
       // Verifica se a categoria da ocorrência está na lista de categorias selecionadas.
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(issue.category);
 
       return searchMatch && categoryMatch;
     });
-  }, [issues, searchQuery, selectedCategories]);
+  }, [issues, debouncedSearchQuery, selectedCategories]);
 
 
   // --- EFEITOS (useEffect) ---
