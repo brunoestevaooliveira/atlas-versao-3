@@ -203,7 +203,7 @@ export default function TrackingPage() {
         {/* Card de Controles de Filtro */}
         <Card className="mb-8 p-4 bg-card/80">
           <CardContent className="flex flex-col sm:flex-row gap-4 p-2 items-center">
-            <div className="relative flex-1 w-full sm:w-auto">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                   placeholder="Buscar por endereço..." 
@@ -213,7 +213,7 @@ export default function TrackingPage() {
               />
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="flex-1 w-full sm:w-auto">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filtrar por Categoria" />
               </SelectTrigger>
               <SelectContent>
@@ -225,7 +225,7 @@ export default function TrackingPage() {
               </SelectContent>
             </Select>
             <Select value={sortOrder} onValueChange={setSortOrder}>
-              <SelectTrigger className="flex-1 w-full sm:w-auto">
+              <SelectTrigger className="w-full">
                 <SelectValue placeholder="Ordenar por" />
               </SelectTrigger>
               <SelectContent>
@@ -233,7 +233,7 @@ export default function TrackingPage() {
                 <SelectItem value="upvotes">Mais Apoiados (Prioridade)</SelectItem>
               </SelectContent>
             </Select>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2 self-start sm:self-center pt-2 sm:pt-0">
               <Switch 
                   id="my-issues-only" 
                   checked={myIssuesOnly}
@@ -247,7 +247,7 @@ export default function TrackingPage() {
 
         {/* Sistema de Abas */}
         <Tabs defaultValue="all" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-2xl">
+          <TabsList className="grid w-full grid-cols-1 sm:grid-cols-4 mx-auto max-w-4xl h-auto">
             <TabsTrigger value="all">
               <ListFilter className="mr-2 h-4 w-4" /> Todas ({allTabIssues.length})
             </TabsTrigger>
