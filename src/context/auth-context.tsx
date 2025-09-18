@@ -59,21 +59,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 /**
  * Busca os dados do perfil do usuário no Firestore.
  * @param {string} uid O ID do usuário.
- * @param {boolean} isAdminFromToken O status de admin vindo do token de ID do Firebase.
  * @returns {Promise<AppUser | null>} O objeto AppUser ou null se não for encontrado.
  */
-const fetchAppUser = async (uid: string, isAdminFromToken: boolean): Promise<AppUser | null> => {
+const fetchAppUser = async (uid: string): Promise<AppUser | null> => {
     const userRef = doc(db, 'users', uid);
     const docSnap = await getDoc(userRef);
     if (docSnap.exists()) {
         const data = docSnap.data() as AppUserData;
         
-        // Garante que a permissão do token (que é a fonte da verdade) prevaleça.
-        const finalRole = isAdminFromToken ? 'admin' : data.role;
-
         return {
             ...data,
-            role: finalRole,
             // Converte o Timestamp do Firestore para um objeto Date.
             createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
             issuesReported: data.issuesReported || 0, // Garante que o campo exista
@@ -112,18 +107,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setShowTutorial(true);
         }
 
-        // Força a atualização do token para obter as 'claims' (ex: admin) mais recentes.
-        const token = await user.getIdTokenResult(true);
-        const isAdminStatus = token.claims.admin === true;
-        setIsAdmin(isAdminStatus);
-
-        // Busca o perfil do usuário no Firestore.
-        const appProfile = await fetchAppUser(user.uid, isAdminStatus);
+        // Força a atualização do token para obter as 'claims' mais recentes (ainda útil para outras funções do Firebase).
+        await user.getIdTokenResult(true);
+        
+        // Busca o perfil do usuário no Firestore para obter o 'role'.
+        const appProfile = await fetchAppUser(user.uid);
+        
         if (appProfile) {
             setAppUser(appProfile);
+            // Define o status de admin com base no campo 'role' do documento do Firestore.
+            setIsAdmin(appProfile.role === 'admin');
         } else {
-            // Se o perfil não existe, cria um novo (caso de primeiro login com Google ou registro).
+            // Se o perfil não existe, cria um novo.
             await handleNewUser(user);
+            // Novos usuários não são admins por padrão.
+            setIsAdmin(false);
         }
 
       } else {
@@ -152,14 +150,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Se o documento já existe, apenas atualiza o estado local.
     if (docSnap.exists()) { 
-        const data = docSnap.data() as AppUserData;
-        const existingAppUser: AppUser = {
-            ...data,
-            role: isAdmin ? 'admin' : data.role,
-            createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate() : new Date(),
-            issuesReported: data.issuesReported || 0,
-        };
-        setAppUser(existingAppUser);
+        const appProfile = await fetchAppUser(user.uid);
+        if (appProfile) {
+          setAppUser(appProfile);
+          setIsAdmin(appProfile.role === 'admin');
+        }
         return;
     }
     
