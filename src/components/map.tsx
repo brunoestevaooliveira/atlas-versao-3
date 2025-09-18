@@ -106,7 +106,7 @@ const MapComponent = forwardRef<MapRef, MapProps>(({ issues, center }, ref) => {
           pitch: 0
         }}
         style={{ width: '100%', height: '100%' }}
-        mapStyle={theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/light-v11"}
+        mapStyle={theme === 'dark' ? "mapbox://styles/mapbox/dark-v11" : "mapbox://styles/mapbox/streets-v12"}
         key={theme}
         onClick={handleMapClick}
         interactiveLayerIds={['clusters']}
