@@ -16,7 +16,7 @@ type FormState = {
   title: string;
   description: string;
   category: string;
-  locationText: string; // "lat, lng"
+  locationText: string;
   address: string;
 };
 
@@ -54,25 +54,30 @@ export default function ReportForm() {
     if (lat && lng) return `${lat}, ${lng}`;
     return "";
   }, [params]);
+  
+  const initialAddress = useMemo(() => {
+    return params.get("address") || "";
+  }, [params]);
 
   const [form, setForm] = useState<FormState>({
     title: "",
     description: "",
     category: "Limpeza urbana / Acúmulo de lixo",
     locationText: initialLocation,
-    address: "" // Endereço começa em branco para ser preenchido pelo usuário
+    address: initialAddress
   });
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    // Atualiza apenas a localização se os parâmetros da URL mudarem
     const lat = params.get("lat");
     const lng = params.get("lng");
+    const address = params.get("address");
 
     setForm(prevForm => ({
         ...prevForm,
         locationText: lat && lng ? `${lat}, ${lng}` : "",
+        address: address || "",
     }));
 
   }, [params]);
@@ -198,7 +203,7 @@ export default function ReportForm() {
                 </Select>
             </div>
             <div className="grid gap-1.5">
-                <label htmlFor="address">Endereço da Ocorrência</label>
+                <label htmlFor="address">Endereço da Ocorrência (edite se necessário)</label>
                 <Input
                     id="address"
                     value={form.address}
