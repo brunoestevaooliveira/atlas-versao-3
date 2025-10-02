@@ -1,0 +1,350 @@
+[debug] [2025-10-02T15:32:43.774Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:43.777Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:43.777Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:43.795Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:43.795Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:43.795Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:43.798Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.798Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.798Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.801Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.801Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.825Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.825Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.825Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.826Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.826Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.829Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.829Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.829Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.830Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.830Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.832Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.832Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.832Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.832Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.832Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.834Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.834Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.834Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.835Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.835Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.836Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.837Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.837Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.837Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.837Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.839Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.839Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.839Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.839Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.840Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.842Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.842Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.842Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.843Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.843Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.845Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.845Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.845Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.845Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.846Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.938Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:43.939Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:43.939Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:43.940Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:43.940Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:43.940Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:43.941Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.941Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.941Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.941Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.941Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.943Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.943Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.943Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.943Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.943Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.945Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.945Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.945Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.946Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.946Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.947Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.947Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.948Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.948Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.948Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.950Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.950Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.950Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.950Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.950Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.952Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.952Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.952Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.952Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.952Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.953Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.953Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.953Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.954Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.954Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.956Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.956Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.956Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.957Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.957Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:43.959Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.959Z] Checked if tokens are valid: false, expires at: 1757448655998
+[debug] [2025-10-02T15:32:43.959Z] > refreshing access token with scopes: []
+[debug] [2025-10-02T15:32:43.959Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-10-02T15:32:43.959Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.014Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.014Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.039Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseremoteconfig.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.040Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseremoteconfig.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.063Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.064Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.081Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.081Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.086Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.086Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.097Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/identitytoolkit.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.097Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/identitytoolkit.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.099Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.099Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.116Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/identitytoolkit.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.116Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/identitytoolkit.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.122Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.122Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.137Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ [none]
+[debug] [2025-10-02T15:32:44.137Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.143Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.143Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.158Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/fcm.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.158Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/fcm.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.160Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.160Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.171Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com [none]
+[debug] [2025-10-02T15:32:44.171Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.182Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.182Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.195Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/storage.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.195Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/storage.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.196Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.197Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.207Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.207Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.235Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.236Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.253Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/storage.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.253Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/storage.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.256Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.256Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.267Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseremoteconfig.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.267Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseremoteconfig.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.268Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.269Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.279Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.280Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.285Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.285Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.297Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.298Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.299Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.299Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.310Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ [none]
+[debug] [2025-10-02T15:32:44.310Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.353Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.353Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.365Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.365Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.369Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.369Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.383Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.383Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.385Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.386Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.397Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com [none]
+[debug] [2025-10-02T15:32:44.397Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.429Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 200
+[debug] [2025-10-02T15:32:44.429Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-10-02T15:32:44.447Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/fcm.googleapis.com [none]
+[debug] [2025-10-02T15:32:44.448Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/fcm.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:32:44.645Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com 403
+[debug] [2025-10-02T15:32:44.645Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com [omitted]
+[debug] [2025-10-02T15:32:45.044Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseremoteconfig.googleapis.com 200
+[debug] [2025-10-02T15:32:45.044Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseremoteconfig.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.086Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-02T15:32:45.087Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.120Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com 403
+[debug] [2025-10-02T15:32:45.120Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com [omitted]
+[debug] [2025-10-02T15:32:45.238Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/fcm.googleapis.com 200
+[debug] [2025-10-02T15:32:45.238Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/fcm.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.264Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/identitytoolkit.googleapis.com 200
+[debug] [2025-10-02T15:32:45.268Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/identitytoolkit.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.303Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-02T15:32:45.303Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.331Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/identitytoolkit.googleapis.com 200
+[debug] [2025-10-02T15:32:45.334Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/identitytoolkit.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.362Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/fcm.googleapis.com 200
+[debug] [2025-10-02T15:32:45.363Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/fcm.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.383Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseremoteconfig.googleapis.com 200
+[debug] [2025-10-02T15:32:45.383Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseremoteconfig.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.396Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-02T15:32:45.396Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.397Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-02T15:32:45.398Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.407Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-02T15:32:45.408Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.420Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/storage.googleapis.com 200
+[debug] [2025-10-02T15:32:45.423Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/storage.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.468Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/storage.googleapis.com 200
+[debug] [2025-10-02T15:32:45.468Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/storage.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.494Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-02T15:32:45.494Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-02T15:32:45.507Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ 200
+[debug] [2025-10-02T15:32:45.508Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ [omitted]
+[debug] [2025-10-02T15:32:45.526Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ 200
+[debug] [2025-10-02T15:32:45.527Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ [omitted]
+[debug] [2025-10-02T15:32:45.527Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:45.527Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:45.528Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:45.534Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:45.534Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:45.534Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:45.536Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-02T15:32:45.536Z] > authorizing via signed-in user (ylhito0307@gmail.com)
+[debug] [2025-10-02T15:32:45.571Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:45.571Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:45.575Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:45.582Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:45.582Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:45.582Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:45.583Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-02T15:32:45.583Z] > authorizing via signed-in user (ylhito0307@gmail.com)
+[debug] [2025-10-02T15:32:45.586Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:45.586Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:45.586Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:45.591Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:32:45.591Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:32:45.591Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:32:45.592Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-02T15:32:45.592Z] > authorizing via signed-in user (ylhito0307@gmail.com)
+[debug] [2025-10-02T15:33:07.004Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:07.007Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:07.007Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:07.011Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:07.012Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:07.012Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:07.015Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.015Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.016Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.016Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.016Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.017Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.018Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.018Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.018Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.019Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.021Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ [none]
+[debug] [2025-10-02T15:33:07.021Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.080Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-02T15:33:07.080Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.083Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-02T15:33:07.083Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.085Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-02T15:33:07.085Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.086Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com [none]
+[debug] [2025-10-02T15:33:07.086Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.170Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:07.170Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:07.170Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:07.171Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:07.172Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:07.172Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:07.172Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.172Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.173Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.173Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.173Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.173Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.173Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.173Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.174Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.174Z] Checked if tokens are valid: true, expires at: 1759422763431
+[debug] [2025-10-02T15:33:07.174Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ [none]
+[debug] [2025-10-02T15:33:07.174Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.175Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com [none]
+[debug] [2025-10-02T15:33:07.175Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.177Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com [none]
+[debug] [2025-10-02T15:33:07.177Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.178Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com [none]
+[debug] [2025-10-02T15:33:07.179Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.180Z] >>> [apiv2][query] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com [none]
+[debug] [2025-10-02T15:33:07.180Z] >>> [apiv2][(partial)header] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com x-goog-quota-user=projects/santa-maria-ativa
+[debug] [2025-10-02T15:33:07.407Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-02T15:33:07.407Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-02T15:33:08.055Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com 403
+[debug] [2025-10-02T15:33:08.055Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com [omitted]
+[debug] [2025-10-02T15:33:08.134Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com 403
+[debug] [2025-10-02T15:33:08.134Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseio.com [omitted]
+[debug] [2025-10-02T15:33:08.135Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-02T15:33:08.135Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-02T15:33:08.147Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-02T15:33:08.147Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-02T15:33:08.149Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com 200
+[debug] [2025-10-02T15:33:08.150Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasedataconnect.googleapis.com [omitted]
+[debug] [2025-10-02T15:33:08.156Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com 200
+[debug] [2025-10-02T15:33:08.156Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebaseapphosting.googleapis.com [omitted]
+[debug] [2025-10-02T15:33:08.162Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com 200
+[debug] [2025-10-02T15:33:08.163Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/firebasecrashlytics.googleapis.com [omitted]
+[debug] [2025-10-02T15:33:08.349Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ 200
+[debug] [2025-10-02T15:33:08.350Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ [omitted]
+[debug] [2025-10-02T15:33:08.519Z] <<< [apiv2][status] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ 200
+[debug] [2025-10-02T15:33:08.526Z] <<< [apiv2][body] GET https://serviceusage.googleapis.com/v1/projects/santa-maria-ativa/services/ [omitted]
+[debug] [2025-10-02T15:33:08.529Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:08.529Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:08.529Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:08.575Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:08.575Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:08.575Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:08.582Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-02T15:33:08.587Z] > authorizing via signed-in user (ylhito0307@gmail.com)
+[debug] [2025-10-02T15:33:08.668Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:08.674Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:08.674Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:08.686Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:08.686Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:08.687Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:08.689Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-02T15:33:08.689Z] > authorizing via signed-in user (ylhito0307@gmail.com)
+[debug] [2025-10-02T15:33:08.706Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:08.706Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:08.706Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:08.732Z] Object "/hosting" in "firebase.json" has unknown property: {"additionalProperty":"appHosting"}
+[debug] [2025-10-02T15:33:08.734Z] Field "/hosting" in "firebase.json" is possibly invalid: must be array
+[debug] [2025-10-02T15:33:08.734Z] Field "/hosting" in "firebase.json" is possibly invalid: must match a schema in anyOf
+[error] Failed to fetch Firebase Project from Studio Workspace because WORKSPACE_SLUG environment variable is empty
+[debug] [2025-10-02T15:33:08.743Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2025-10-02T15:33:08.744Z] > authorizing via signed-in user (ylhito0307@gmail.com)
