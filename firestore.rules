@@ -77,5 +77,12 @@ service cloud.firestore {
                      // Proíbe que o usuário altere seu papel (role) ou sua contagem de reports.
                      && !request.resource.data.keys().hasAny(['role', 'issuesReported']);
     }
+    
+    // Regras para a coleção 'rateLimits' (controle de rate limiting)
+    match /rateLimits/{limitId} {
+      // Nenhuma operação permitida para clientes - apenas Cloud Functions podem acessar.
+      // Isso garante que usuários não possam manipular os limites de rate.
+      allow read, write: if false;
+    }
   }
 }

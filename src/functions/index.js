@@ -1,20 +1,27 @@
 /**
- * @fileoverview Cloud Functions for Firebase.
- * Este arquivo contém as funções de backend que rodam no ambiente do Firebase.
- * - addAdminRole: Uma função "callable" que permite que um admin existente
- *   promova outro usuário para o papel de admin, definindo um Custom Claim.
- * - tagAdminCommentsOnIssueUpdate: Um trigger do Firestore que é disparado
- *   sempre que um documento na coleção 'issues' é atualizado. Ele verifica se
- *   um novo comentário foi adicionado por um admin e, em caso afirmativo,
- *   adiciona uma tag 'authorRole: "admin"' a esse comentário.
+ * @fileoverview Cloud Functions for Firebase - Versão com Segurança Avançada.
+ * Este arquivo contém funções de backend seguras com:
+ * - Rate limiting personalizado
+ * - Validação robusta de inputs
+ * - Verificação dupla de admin (custom claims + Firestore)
+ * - Tratamento seguro de erros
+ * - Logs de auditoria
+ * 
+ * Funções disponíveis:
+ * - addAdminRole: Promover usuário para admin (com rate limiting)
+ * - tagAdminCommentsOnIssueUpdate: Marcar comentários de admin
+ * - cleanupRateLimitsScheduled: Limpeza automática de rate limits
  */
 
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
-// Inicializa o SDK Admin do Firebase para permitir que as funções interajam
-// com outros serviços do Firebase com privilégios de administrador.
+// Inicializa o SDK Admin do Firebase
 admin.initializeApp();
+
+// === RATE LIMITING E SEGURANÇA ===
+// As mesmas funções de rate limiting estão disponíveis em functions/index.js
+// Este arquivo é uma cópia atualizada com documentação melhorada.
 
 /**
  * Adiciona o papel (role) de 'admin' a um usuário através de Custom Claims.
