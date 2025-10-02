@@ -29,6 +29,13 @@ yarn-error.log*
 # local env files
 .env*.local
 .env
+.env.development
+.env.production
+.env.backup
+.env.docker.local
+
+# IMPORTANTE: Nunca commite arquivos .env com credenciais reais!
+# Use apenas .env.example como template
 
 # vercel
 .vercel

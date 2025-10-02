@@ -13,14 +13,25 @@ import { useState, useEffect } from 'react';
 import './globals.css';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { Toaster } from '@/components/ui/toaster';
-import Header from '@/components/header';
 import { cn } from '@/lib/utils';
-import SplashScreen from '@/components/splash-screen';
 import { usePathname, useRouter } from 'next/navigation';
 import { AuthProvider, useAuth } from '@/context/auth-context';
 import { ThemeProvider } from '@/components/theme-provider';
-import TutorialModal from '@/components/tutorial-modal';
-import { useTheme } from 'next-themes';
+import dynamic from 'next/dynamic';
+
+// Lazy loading de componentes pesados para melhor performance
+const Header = dynamic(() => import('@/components/header'), { 
+  ssr: false,
+  loading: () => <div className="h-16 border-b" /> // Placeholder
+});
+
+const SplashScreen = dynamic(() => import('@/components/splash-screen'), { 
+  ssr: false 
+});
+
+const TutorialModal = dynamic(() => import('@/components/tutorial-modal'), { 
+  ssr: false 
+});
 
 
 /**

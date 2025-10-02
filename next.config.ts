@@ -2,6 +2,30 @@ import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  // Necessário para build standalone no Docker
+  output: 'standalone',
+  
+  // Otimizações de performance
+  reactStrictMode: true,
+  
+  // Otimização de compilação
+  experimental: {
+    optimizePackageImports: ['@radix-ui/react-icons', 'lucide-react', 'date-fns'],
+  },
+  
+  // Turbopack configuration (estável no Next 15)
+  turbopack: {
+    resolveAlias: {
+      '@/*': './src/*',
+    },
+  },
+  
+  // Compressão
+  compress: true,
+  
+  // Otimização de produção
+  productionBrowserSourceMaps: false,
+  
   typescript: {
     ignoreBuildErrors: true,
   },
