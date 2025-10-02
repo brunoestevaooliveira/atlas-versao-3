@@ -46,3 +46,5 @@ next-env.d.ts
 
 service-account-key.json*.json
 santa-maria-ativa-firebase-adminsdk-fbsvc-*.json
+
+certificates
